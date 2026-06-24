@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 import helpers  # noqa: F401
-from lastlight.tokenizer import normalize_text, tokenize
+from lastlight.tokenizer import expand_query_tokens, normalize_text, tokenize
 
 
 class TokenizerTests(unittest.TestCase):
@@ -14,7 +14,11 @@ class TokenizerTests(unittest.TestCase):
         tokens = tokenize("How do I purify water para la familia")
         self.assertEqual(tokens, ["purify", "water", "familia"])
 
+    def test_expands_common_emergency_aliases(self) -> None:
+        tokens = expand_query_tokens(tokenize("bateria telefono"))
+        self.assertIn("battery", tokens)
+        self.assertIn("phone", tokens)
+
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -6,13 +6,13 @@ import math
 from collections import Counter
 
 from .domain import KnowledgeDocument
-from .tokenizer import normalize_text, tokenize
+from .tokenizer import expand_query_tokens, normalize_text, tokenize
 
 PRIORITY_BOOSTS = {"critical": 1.3, "high": 1.2, "normal": 1.0, "low": 0.9}
 
 
 def lexical_score(query_text: str, document: KnowledgeDocument, corpus_size: int = 1) -> tuple[float, tuple[str, ...]]:
-    query_tokens = tokenize(query_text)
+    query_tokens = expand_query_tokens(tokenize(query_text))
     if not query_tokens:
         return 0.0, ()
 
@@ -53,4 +53,3 @@ def confidence_for_score(score: float) -> str:
     if score >= 0.55:
         return "MEDIUM"
     return "LOW"
-

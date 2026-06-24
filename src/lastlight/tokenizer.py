@@ -19,6 +19,31 @@ SPANISH_STOPWORDS = {
 STOPWORDS = ENGLISH_STOPWORDS | SPANISH_STOPWORDS
 TOKEN_RE = re.compile(r"[a-z0-9]+")
 
+QUERY_ALIASES = {
+    "agua": ("water",),
+    "bateria": ("battery",),
+    "brujula": ("compass",),
+    "calor": ("heat",),
+    "comunicacion": ("communications",),
+    "emergencia": ("emergency",),
+    "frio": ("cold",),
+    "generador": ("generator",),
+    "hemorragia": ("bleeding",),
+    "incendio": ("fire",),
+    "linterna": ("lighting",),
+    "perdido": ("lost",),
+    "quemadura": ("burns",),
+    "quemaduras": ("burns",),
+    "radio": ("radio",),
+    "refugio": ("shelter",),
+    "rescate": ("rescue", "signaling"),
+    "sangrado": ("bleeding",),
+    "sed": ("dehydration",),
+    "senal": ("signaling",),
+    "senales": ("signaling",),
+    "telefono": ("phone",),
+}
+
 
 def normalize_text(text: str) -> str:
     text = unicodedata.normalize("NFKD", text)
@@ -32,3 +57,21 @@ def tokenize(text: str, keep_stopwords: bool = False) -> list[str]:
         return tokens
     return [token for token in tokens if token not in STOPWORDS and len(token) > 1]
 
+
+def expand_query_tokens(tokens: list[str]) -> list[str]:
+    expanded: list[str] = []
+    seen: set[str] = set()
+    for token in tokens:
+        for candidate in (token, *_simple_variants(token), *QUERY_ALIASES.get(token, ())):
+            if candidate and candidate not in seen:
+                seen.add(candidate)
+                expanded.append(candidate)
+    return expanded
+
+
+def _simple_variants(token: str) -> tuple[str, ...]:
+    if len(token) > 4 and token.endswith("es"):
+        return (token[:-2],)
+    if len(token) > 3 and token.endswith("s"):
+        return (token[:-1],)
+    return ()

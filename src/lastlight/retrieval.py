@@ -6,7 +6,7 @@ from .domain import KnowledgeDocument, SearchQuery, SearchResult
 from .interfaces import RetrievalStrategy
 from .chunking import chunk_text
 from .ranking import confidence_for_score, lexical_score
-from .tokenizer import tokenize
+from .tokenizer import expand_query_tokens, tokenize
 
 
 class LexicalRetrievalStrategy(RetrievalStrategy):
@@ -36,7 +36,7 @@ def select_passage(body: str, query_text: str, max_chars: int = 700) -> str:
     if not chunks:
         return body[:max_chars].strip()
 
-    query_tokens = set(tokenize(query_text))
+    query_tokens = set(expand_query_tokens(tokenize(query_text)))
     best = max(
         chunks,
         key=lambda chunk: len(query_tokens.intersection(tokenize(chunk))),
