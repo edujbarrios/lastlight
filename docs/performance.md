@@ -6,7 +6,7 @@ LastLight is designed to be small enough to run as an emergency terminal utility
 python tools/benchmark.py --iterations 7 --watts 15
 ```
 
-These timings were measured on a local Windows 11 machine with Python 3.12.7 on 2026-06-24. They include Python process startup, Markdown discovery, retrieval, formatting, and process exit.
+These timings were measured on a local Windows 11 machine with Python 3.12.7 on 2026-06-24. Baseline hardware: Intel Core i7 11th generation CPU and 16 GB DDR4 RAM. They include Python process startup, Markdown discovery, retrieval, formatting, and process exit.
 
 Electricity use is an estimate, not a direct hardware measurement. It assumes 15 W of active system power while the command runs:
 
@@ -29,4 +29,3 @@ For exact electricity measurements, use a power meter, battery discharge telemet
 The default single-query path completes in under a quarter second on this machine and uses less than 1 mWh under the 15 W estimate. That supports LastLight's design goal: useful retrieval with very small compute, memory, and energy demands.
 
 The numbers should be treated as a reproducible baseline, not a universal claim. Hardware, storage speed, Python version, operating system, antivirus scanning, thermal state, and corpus size can change results.
-

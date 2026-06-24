@@ -184,7 +184,7 @@ The project uses only the Python standard library. There are no third-party depe
 
 ## Performance
 
-Measured locally with Python 3.12.7 on Windows 11, including Python startup:
+Measured locally with Python 3.12.7 on Windows 11, including Python startup. Baseline hardware: Intel Core i7 11th generation CPU and 16 GB DDR4 RAM.
 
 | Operation | Median time | Estimated energy at 15 W |
 | --- | ---: | ---: |
