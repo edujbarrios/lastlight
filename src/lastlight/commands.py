@@ -9,6 +9,7 @@ from .compat import format_self_check, run_self_check
 from .evaluation import run_evaluation
 from .indexer import write_index
 from .interfaces import KnowledgeRepository
+from .local_model import summarize_local_model, write_local_model
 from .safety import STARTUP_WARNING
 
 
@@ -86,3 +87,29 @@ class SelfCheckCommand:
         results = run_self_check(self.repository)
         print(format_self_check(results))
         return 0 if all(result.ok for result in results) else 1
+
+
+class BuildModelCommand:
+    def __init__(
+        self,
+        repository: KnowledgeRepository,
+        output_path: Path | str,
+        order: int = 2,
+    ) -> None:
+        self.repository = repository
+        self.output_path = output_path
+        self.order = order
+
+    def execute(self) -> int:
+        output = write_local_model(self.repository, self.output_path, order=self.order)
+        print(f"Wrote local n-gram model: {output}")
+        return 0
+
+
+class ModelInfoCommand:
+    def __init__(self, model_path: Path | str) -> None:
+        self.model_path = model_path
+
+    def execute(self) -> int:
+        print(summarize_local_model(self.model_path))
+        return 0

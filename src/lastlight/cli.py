@@ -7,9 +7,11 @@ import argparse
 from pathlib import Path
 
 from .commands import (
+    BuildModelCommand,
     BuildIndexCommand,
     EvaluationCommand,
     InteractiveCommand,
+    ModelInfoCommand,
     QueryCommand,
     SelfCheckCommand,
 )
@@ -41,6 +43,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="write an optional offline JSON index and exit",
     )
     parser.add_argument(
+        "--build-model",
+        metavar="PATH",
+        help="write an experimental local n-gram model JSON and exit",
+    )
+    parser.add_argument(
+        "--model-order",
+        type=int,
+        default=2,
+        help="n-gram order for --build-model",
+    )
+    parser.add_argument(
+        "--model-info",
+        metavar="PATH",
+        help="inspect a local n-gram model JSON and exit",
+    )
+    parser.add_argument(
         "--stream",
         action="store_true",
         help="print query output line by line with flushing",
@@ -65,6 +83,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.self_check:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return SelfCheckCommand(repository).execute()
+    if args.model_info:
+        return ModelInfoCommand(Path(args.model_info)).execute()
+    if args.build_model:
+        repository = MarkdownKnowledgeRepository(args.knowledge)
+        return BuildModelCommand(
+            repository, Path(args.build_model), order=args.model_order
+        ).execute()
     if args.build_index:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return BuildIndexCommand(repository, Path(args.build_index)).execute()
