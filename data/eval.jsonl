@@ -1,0 +1,11 @@
+{"query":"how do I stop severe bleeding","expected_tag":"bleeding"}
+{"query":"how can I purify water","expected_tag":"purification"}
+{"query":"how do I save phone battery","expected_tag":"battery"}
+{"query":"is it safe to run a generator indoors","expected_tag":"generator"}
+{"query":"what should I do for burns","expected_tag":"burns"}
+{"query":"what are signs of dehydration","expected_tag":"dehydration"}
+{"query":"how do I use a compass","expected_tag":"compass"}
+{"query":"how can I signal rescuers","expected_tag":"signaling"}
+{"query":"how do I stay warm in cold shelter","expected_tag":"cold"}
+{"query":"what should I do in extreme heat","expected_tag":"heat"}
+
