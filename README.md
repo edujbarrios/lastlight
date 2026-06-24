@@ -88,6 +88,14 @@ It uses deterministic lexical retrieval:
 - top-k ranking
 - confidence scoring
 
+It also includes an optional lightweight BM25 strategy:
+
+- no persistent index
+- no external database
+- computed in memory per query
+- title and tag boosts through repeated tokens
+- selectable with `--strategy bm25`
+
 Design patterns are intentionally lightweight:
 
 - Repository Pattern: `KnowledgeRepository`, `MarkdownKnowledgeRepository`
@@ -114,6 +122,13 @@ Evaluation:
 
 ```bash
 python3 src/main.py --eval
+```
+
+Optional BM25 retrieval:
+
+```bash
+python3 src/main.py --strategy bm25 "how do I save phone battery"
+python3 src/main.py --strategy bm25 --eval
 ```
 
 Make targets:
@@ -162,9 +177,9 @@ v0.1:
 
 v0.2:
 
-- BM25 strategy
-- Better multilingual support
-- Improved chunking
+- BM25 strategy: implemented as optional `--strategy bm25`
+- Better multilingual support: basic deterministic query expansion
+- Improved chunking: lightweight passage chunking for cleaner excerpts
 
 v0.3:
 

@@ -8,7 +8,7 @@ LastLight uses clean architecture principles without heavy ceremony.
 
 ## Strategy Pattern
 
-`RetrievalStrategy` defines search behavior. `LexicalRetrievalStrategy` implements deterministic lexical ranking. `BM25RetrievalStrategy` is reserved for v0.2.
+`RetrievalStrategy` defines search behavior. `LexicalRetrievalStrategy` implements deterministic lexical ranking. `BM25RetrievalStrategy` implements an optional in-memory BM25 ranker for v0.2 experiments.
 
 ## Factory Pattern
 
@@ -28,5 +28,4 @@ The application depends on interfaces. Markdown storage and lexical ranking are 
 
 ## Future Evolution
 
-Future versions can add BM25, compressed packs, offline indexing, and citation-aware local generation without changing the knowledge contribution workflow.
-
+Future versions can add compressed packs, optional offline indexing, and citation-aware local generation without changing the knowledge contribution workflow.

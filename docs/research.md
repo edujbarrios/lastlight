@@ -14,3 +14,4 @@ Future research directions include:
 - evaluating constrained hardware performance
 - exploring citation-only local generation
 
+The v0.2 line keeps BM25 intentionally small: scores are computed in memory at query time, avoiding a persistent index until there is evidence that startup cost or corpus size requires one.

@@ -11,9 +11,9 @@
 
 ## v0.2
 
-- BM25 strategy
-- Better multilingual support
-- Improved chunking
+- BM25 strategy: implemented as optional in-memory retrieval
+- Better multilingual support: started with deterministic query expansion
+- Improved chunking: implemented for cleaner passage selection
 
 ## v0.3
 
@@ -46,4 +46,3 @@
 - Community-maintained emergency knowledge repository
 - Multilingual knowledge packs
 - Reproducible offline intelligence system
-
