@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from .app import LastLightApp
 from .evaluation import run_evaluation
+from .indexer import write_index
+from .interfaces import KnowledgeRepository
 from .safety import STARTUP_WARNING
 
 
@@ -29,14 +33,20 @@ class InteractiveCommand:
 
 
 class QueryCommand:
-    def __init__(self, app: LastLightApp, query: str) -> None:
+    def __init__(self, app: LastLightApp, query: str, stream: bool = False) -> None:
         self.app = app
         self.query = query
+        self.stream = stream
 
     def execute(self) -> int:
         print(STARTUP_WARNING)
         print()
-        print(self.app.answer(self.query))
+        answer = self.app.answer(self.query)
+        if self.stream:
+            for line in answer.splitlines():
+                print(line, flush=True)
+        else:
+            print(answer)
         return 0
 
 
@@ -48,3 +58,13 @@ class EvaluationCommand:
         print(run_evaluation(self.app))
         return 0
 
+
+class BuildIndexCommand:
+    def __init__(self, repository: KnowledgeRepository, output_path: Path | str) -> None:
+        self.repository = repository
+        self.output_path = output_path
+
+    def execute(self) -> int:
+        output = write_index(self.repository, self.output_path)
+        print(f"Wrote offline index: {output}")
+        return 0

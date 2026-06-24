@@ -6,4 +6,4 @@ htmlcov/
 build/
 dist/
 *.egg-info/
-
+*.index.json
