@@ -156,6 +156,25 @@ python3 -m unittest discover -s tests
 
 The project uses only the Python standard library. There are no third-party dependencies and no package installation step.
 
+## Performance
+
+Measured locally with Python 3.12.7 on Windows 11, including Python startup:
+
+| Operation | Median time | Estimated energy at 15 W |
+| --- | ---: | ---: |
+| Lexical query | 194.8 ms | 0.8118 mWh |
+| BM25 query | 197.1 ms | 0.8214 mWh |
+| Lexical evaluation | 354.8 ms | 1.4782 mWh |
+| BM25 evaluation | 334.0 ms | 1.3918 mWh |
+
+Electricity use is estimated, not directly measured. Reproduce the table with:
+
+```bash
+python3 tools/benchmark.py --iterations 7 --watts 15
+```
+
+See [docs/performance.md](docs/performance.md) for the full table and methodology.
+
 ## Add Knowledge
 
 1. Create a Markdown file.
