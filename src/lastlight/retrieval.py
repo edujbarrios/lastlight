@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from .domain import KnowledgeDocument, SearchQuery, SearchResult
 from .interfaces import RetrievalStrategy
+from .chunking import chunk_text
 from .ranking import confidence_for_score, lexical_score
 from .tokenizer import tokenize
 
@@ -31,18 +32,16 @@ class LexicalRetrievalStrategy(RetrievalStrategy):
 
 
 def select_passage(body: str, query_text: str, max_chars: int = 700) -> str:
-    paragraphs = [part.strip() for part in body.split("\n\n") if part.strip()]
-    if not paragraphs:
+    chunks = chunk_text(body, max_chars=max_chars)
+    if not chunks:
         return body[:max_chars].strip()
 
     query_tokens = set(tokenize(query_text))
     best = max(
-        paragraphs,
-        key=lambda paragraph: len(query_tokens.intersection(tokenize(paragraph))),
+        chunks,
+        key=lambda chunk: len(query_tokens.intersection(tokenize(chunk))),
     )
-    if len(best) <= max_chars:
-        return best
-    return best[: max_chars - 3].rstrip() + "..."
+    return best
 
 
 class BM25RetrievalStrategy:
@@ -52,4 +51,3 @@ class BM25RetrievalStrategy:
         self, query: SearchQuery, documents: list[KnowledgeDocument]
     ) -> list[SearchResult]:
         raise NotImplementedError("BM25 is planned for LastLight v0.2.")
-
