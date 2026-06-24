@@ -131,6 +131,13 @@ python3 src/main.py --strategy bm25 "how do I save phone battery"
 python3 src/main.py --strategy bm25 --eval
 ```
 
+Use a different knowledge directory or compressed Markdown pack:
+
+```bash
+python3 src/main.py --knowledge path/to/knowledge "how do I purify water"
+python3 src/main.py --knowledge path/to/pack.zip "how do I purify water"
+```
+
 Make targets:
 
 ```bash
@@ -183,7 +190,7 @@ v0.2:
 
 v0.3:
 
-- Compressed knowledge packs
+- Compressed knowledge packs: basic `.zip` Markdown loading implemented
 - Offline index builder
 - Streaming retrieval
 

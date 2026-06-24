@@ -17,7 +17,7 @@
 
 ## v0.3
 
-- Compressed knowledge packs
+- Compressed knowledge packs: basic `.zip` Markdown loading implemented
 - Offline index builder
 - Streaming retrieval
 

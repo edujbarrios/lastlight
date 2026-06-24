@@ -6,6 +6,8 @@ LastLight uses clean architecture principles without heavy ceremony.
 
 `KnowledgeRepository` defines how the application obtains documents. `MarkdownKnowledgeRepository` implements that interface by recursively discovering Markdown files under `knowledge/`.
 
+The same repository can also read a `.zip` knowledge pack. Markdown files inside the archive are loaded directly with the Python standard library, without extracting files or building an external database.
+
 ## Strategy Pattern
 
 `RetrievalStrategy` defines search behavior. `LexicalRetrievalStrategy` implements deterministic lexical ranking. `BM25RetrievalStrategy` implements an optional in-memory BM25 ranker for v0.2 experiments.
