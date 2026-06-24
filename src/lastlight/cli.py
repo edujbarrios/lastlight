@@ -26,7 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--eval", action="store_true", help="run evaluation suite")
     parser.add_argument(
         "--strategy",
-        choices=("lexical", "bm25"),
+        choices=("lexical", "bm25", "c-lexical"),
         default="lexical",
         help="retrieval strategy to use",
     )

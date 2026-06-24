@@ -7,3 +7,6 @@ build/
 dist/
 *.egg-info/
 *.index.json
+native/*.dll
+native/*.so
+native/*.dylib

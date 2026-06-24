@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from .c_core import OptionalCCore
 from .domain import KnowledgeDocument, SearchQuery, SearchResult
 from .interfaces import RetrievalStrategy
 from .chunking import chunk_text
@@ -64,6 +65,44 @@ class BM25RetrievalStrategy(RetrievalStrategy):
                     document=document,
                     score=score,
                     confidence=confidence_for_bm25_score(score),
+                    passage=select_passage(document.body, query.text),
+                    matched_terms=matched_terms,
+                )
+            )
+        results.sort(key=lambda result: (-result.score, result.document.path))
+        return results[: max(query.top_k, 1)]
+
+
+class CBackedLexicalRetrievalStrategy(RetrievalStrategy):
+    def __init__(self, c_core: OptionalCCore | None = None) -> None:
+        self.c_core = c_core or OptionalCCore()
+
+    def search(
+        self, query: SearchQuery, documents: list[KnowledgeDocument]
+    ) -> list[SearchResult]:
+        query_tokens = expand_query_tokens(tokenize(query.text))
+        if not query_tokens:
+            return []
+
+        results: list[SearchResult] = []
+        for document in documents:
+            document_tokens = tokenize(
+                f"{document.title} {' '.join(document.tags)} {document.body}"
+            )
+            matched_count = self.c_core.count_matches(query_tokens, document_tokens)
+            if matched_count <= 0:
+                continue
+            score, python_matched_terms = lexical_score(query.text, document, len(documents))
+            if score <= 0:
+                continue
+            matched_terms = tuple(
+                sorted(set(python_matched_terms).union(set(query_tokens).intersection(set(document_tokens))))
+            )
+            results.append(
+                SearchResult(
+                    document=document,
+                    score=score,
+                    confidence=confidence_for_score(score),
                     passage=select_passage(document.body, query.text),
                     matched_terms=matched_terms,
                 )

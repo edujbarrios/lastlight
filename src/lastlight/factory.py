@@ -6,7 +6,11 @@ from pathlib import Path
 
 from .app import LastLightApp
 from .repository import MarkdownKnowledgeRepository
-from .retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy
+from .retrieval import (
+    BM25RetrievalStrategy,
+    CBackedLexicalRetrievalStrategy,
+    LexicalRetrievalStrategy,
+)
 
 
 class ApplicationFactory:
@@ -17,6 +21,8 @@ class ApplicationFactory:
         repository = MarkdownKnowledgeRepository(knowledge_dir)
         if strategy == "bm25":
             retrieval = BM25RetrievalStrategy()
+        elif strategy == "c-lexical":
+            retrieval = CBackedLexicalRetrievalStrategy()
         else:
             retrieval = LexicalRetrievalStrategy()
         return LastLightApp(repository=repository, retrieval=retrieval)
