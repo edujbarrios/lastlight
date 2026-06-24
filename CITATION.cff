@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use LastLight in research, please cite it."
+title: "LastLight: Offline intelligence under extreme constraints"
+authors:
+  - family-names: "Barrios"
+    given-names: "Eduardo J."
+repository-code: "https://github.com/edujbarrios/lastlight"
+license: "MPL-2.0"
+version: "0.1.0"
+date-released: "2026-06-24"
+
