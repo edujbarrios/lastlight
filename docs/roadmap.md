@@ -28,9 +28,9 @@
 
 ## v0.5
 
-- Raspberry Pi support
-- Termux support
-- Old laptop support
+- Raspberry Pi support: documented with `--self-check`
+- Termux support: documented with `--self-check`
+- Old laptop support: documented with low-power usage notes
 
 ## v0.6
 

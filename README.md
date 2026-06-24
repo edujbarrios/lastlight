@@ -158,6 +158,12 @@ python3 src/main.py --synthesize "how do I purify water"
 
 This mode trains a tiny n-gram model only on the retrieved passage, prints a generated note, and still includes the citation and original passage. The retrieved passage remains the authority.
 
+Constrained-device compatibility check:
+
+```bash
+python3 src/main.py --self-check
+```
+
 Make targets:
 
 ```bash
@@ -210,6 +216,8 @@ No code changes should be necessary.
 
 LastLight avoids polling, progress bars, animations, background work, network calls, and expensive startup tasks. It reads Markdown, ranks documents, prints sourced passages, and exits.
 
+For Raspberry Pi, Termux, and old laptop notes, see [docs/platforms.md](docs/platforms.md).
+
 ## Roadmap
 
 v0.1:
@@ -240,9 +248,9 @@ v0.4:
 
 v0.5:
 
-- Raspberry Pi support
-- Termux support
-- Old laptop support
+- Raspberry Pi support: documented with `--self-check`
+- Termux support: documented with `--self-check`
+- Old laptop support: documented with low-power usage notes
 
 v0.6:
 
