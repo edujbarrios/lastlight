@@ -18,8 +18,8 @@
 ## v0.3
 
 - Compressed knowledge packs: basic `.zip` Markdown loading implemented
-- Offline index builder
-- Streaming retrieval
+- Offline index builder: optional JSON audit index implemented
+- Streaming retrieval: line-flushed terminal output implemented
 
 ## v0.4
 

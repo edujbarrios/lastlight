@@ -8,6 +8,10 @@ LastLight uses clean architecture principles without heavy ceremony.
 
 The same repository can also read a `.zip` knowledge pack. Markdown files inside the archive are loaded directly with the Python standard library, without extracting files or building an external database.
 
+## Offline Index Builder
+
+The optional index builder writes a human-readable JSON summary of the current knowledge base. It records document metadata, token counts, and term counts. The main query path does not require this index, so normal startup remains simple and low-cost.
+
 ## Strategy Pattern
 
 `RetrievalStrategy` defines search behavior. `LexicalRetrievalStrategy` implements deterministic lexical ranking. `BM25RetrievalStrategy` implements an optional in-memory BM25 ranker for v0.2 experiments.
@@ -19,6 +23,8 @@ The same repository can also read a `.zip` knowledge pack. Markdown files inside
 ## Command Pattern
 
 Interactive mode, single-query mode, and evaluation mode are command objects. The CLI only selects a command and executes it.
+
+Index building and streaming query output are also command-level behaviors. They do not introduce background workers or persistent services.
 
 ## Value Objects
 

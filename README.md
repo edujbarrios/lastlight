@@ -138,6 +138,18 @@ python3 src/main.py --knowledge path/to/knowledge "how do I purify water"
 python3 src/main.py --knowledge path/to/pack.zip "how do I purify water"
 ```
 
+Build an optional offline audit index:
+
+```bash
+python3 src/main.py --build-index data/lastlight.index.json
+```
+
+Stream output line by line:
+
+```bash
+python3 src/main.py --stream "how do I purify water"
+```
+
 Make targets:
 
 ```bash
@@ -210,8 +222,8 @@ v0.2:
 v0.3:
 
 - Compressed knowledge packs: basic `.zip` Markdown loading implemented
-- Offline index builder
-- Streaming retrieval
+- Offline index builder: optional JSON audit index implemented
+- Streaming retrieval: line-flushed terminal output implemented
 
 v0.4:
 
