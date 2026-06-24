@@ -38,8 +38,8 @@
 
 ## v0.7
 
-- Tiny local language models
-- Research into ultra-low-power AI systems
+- Tiny local language models: auditable JSON n-gram model packs implemented
+- Research into ultra-low-power AI systems: local model size and transition summaries available through `--model-info`
 
 ## v1.0
 

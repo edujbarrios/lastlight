@@ -173,6 +173,15 @@ Constrained-device compatibility check:
 python3 src/main.py --self-check
 ```
 
+Build and inspect an experimental local n-gram model pack:
+
+```bash
+python3 src/main.py --build-model data/lastlight.model.json
+python3 src/main.py --model-info data/lastlight.model.json
+```
+
+Model packs are JSON, auditable, optional, and not used by the default answer path. See [docs/local_models.md](docs/local_models.md).
+
 Make targets:
 
 ```bash
@@ -267,8 +276,8 @@ v0.6:
 
 v0.7:
 
-- Tiny local language models
-- Research into ultra-low-power AI systems
+- Tiny local language models: auditable JSON n-gram model packs implemented
+- Research into ultra-low-power AI systems: local model size and transition summaries available through `--model-info`
 
 v1.0:
 

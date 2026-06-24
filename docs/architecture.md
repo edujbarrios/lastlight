@@ -45,3 +45,7 @@ The optional `--synthesize` mode trains a tiny n-gram model only on the selected
 ## Optional Native Core
 
 The optional C core is deliberately narrow. It counts token matches through a small `ctypes` bridge, while parsing, ranking, confidence scoring, and safety formatting remain in Python. If the native library is absent, the strategy falls back to Python match counting.
+
+## Tiny Local Model Packs
+
+The optional local model builder writes deterministic n-gram transitions to JSON. These model packs are research artifacts and are not required by the default answer path. They preserve language structure from the local Markdown corpus in an inspectable form.
