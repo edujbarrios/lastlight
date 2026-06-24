@@ -150,6 +150,14 @@ Stream output line by line:
 python3 src/main.py --stream "how do I purify water"
 ```
 
+Experimental citation-aware n-gram synthesis:
+
+```bash
+python3 src/main.py --synthesize "how do I purify water"
+```
+
+This mode trains a tiny n-gram model only on the retrieved passage, prints a generated note, and still includes the citation and original passage. The retrieved passage remains the authority.
+
 Make targets:
 
 ```bash
@@ -227,8 +235,8 @@ v0.3:
 
 v0.4:
 
-- Tiny n-gram language model
-- Citation-aware generation based exclusively on retrieved passages
+- Tiny n-gram language model: experimental `--synthesize` mode implemented
+- Citation-aware generation based exclusively on retrieved passages: implemented with warning, citation, and original passage display
 
 v0.5:
 

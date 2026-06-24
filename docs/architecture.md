@@ -37,3 +37,7 @@ The application depends on interfaces. Markdown storage and lexical ranking are 
 ## Future Evolution
 
 Future versions can add compressed packs, optional offline indexing, and citation-aware local generation without changing the knowledge contribution workflow.
+
+## Experimental Synthesis
+
+The optional `--synthesize` mode trains a tiny n-gram model only on the selected retrieved passage. It prints a generated note, the citation, and the original passage. This keeps the retrieval result visible and avoids using unsourced external knowledge.

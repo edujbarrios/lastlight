@@ -15,3 +15,5 @@ Future research directions include:
 - exploring citation-only local generation
 
 The v0.2 line keeps BM25 intentionally small: scores are computed in memory at query time, avoiding a persistent index until there is evidence that startup cost or corpus size requires one.
+
+The v0.4 synthesis experiment is intentionally constrained. The n-gram model is trained only on the retrieved passage selected for the current query, and the original passage remains visible as the source of truth. This is a research step toward citation-aware generation, not a replacement for retrieval.

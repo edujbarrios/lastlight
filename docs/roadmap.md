@@ -23,8 +23,8 @@
 
 ## v0.4
 
-- Tiny n-gram language model
-- Citation-aware generation based exclusively on retrieved passages
+- Tiny n-gram language model: experimental `--synthesize` mode implemented
+- Citation-aware generation based exclusively on retrieved passages: implemented with warning, citation, and original passage display
 
 ## v0.5
 
