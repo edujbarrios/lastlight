@@ -21,12 +21,17 @@ def build_parser() -> argparse.ArgumentParser:
         default="lexical",
         help="retrieval strategy to use",
     )
+    parser.add_argument(
+        "--knowledge",
+        default=None,
+        help="knowledge directory or .zip knowledge pack",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    app = ApplicationFactory.create(strategy=args.strategy)
+    app = ApplicationFactory.create(knowledge_dir=args.knowledge, strategy=args.strategy)
 
     if args.eval:
         return EvaluationCommand(app).execute()

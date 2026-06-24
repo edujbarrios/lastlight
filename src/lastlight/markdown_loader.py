@@ -12,9 +12,14 @@ from .util import normalize_relative_path, project_root
 def load_markdown_document(path: Path, root: Path | None = None) -> KnowledgeDocument:
     root = root or project_root()
     text = path.read_text(encoding="utf-8")
+    label = normalize_relative_path(path, root)
+    return load_markdown_text(text, label)
+
+
+def load_markdown_text(text: str, path_label: str) -> KnowledgeDocument:
     metadata, body = split_front_matter(text)
 
-    title = str(metadata.get("title") or infer_title(path, body))
+    title = str(metadata.get("title") or infer_title(Path(path_label), body))
     language = str(metadata.get("language") or "unknown")
     priority = str(metadata.get("priority") or "normal")
     tags = metadata.get("tags") or ()
@@ -27,7 +32,7 @@ def load_markdown_document(path: Path, root: Path | None = None) -> KnowledgeDoc
 
     return KnowledgeDocument(
         title=title,
-        path=normalize_relative_path(path, root),
+        path=path_label,
         body=body,
         language=language,
         tags=tag_values,
@@ -42,4 +47,3 @@ def infer_title(path: Path, body: str) -> str:
         if stripped.startswith("#"):
             return stripped.lstrip("#").strip()
     return path.stem.replace("_", " ").replace("-", " ").title()
-
