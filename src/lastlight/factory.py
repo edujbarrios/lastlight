@@ -6,13 +6,17 @@ from pathlib import Path
 
 from .app import LastLightApp
 from .repository import MarkdownKnowledgeRepository
-from .retrieval import LexicalRetrievalStrategy
+from .retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy
 
 
 class ApplicationFactory:
     @staticmethod
-    def create(knowledge_dir: Path | str | None = None) -> LastLightApp:
+    def create(
+        knowledge_dir: Path | str | None = None, strategy: str = "lexical"
+    ) -> LastLightApp:
         repository = MarkdownKnowledgeRepository(knowledge_dir)
-        retrieval = LexicalRetrievalStrategy()
+        if strategy == "bm25":
+            retrieval = BM25RetrievalStrategy()
+        else:
+            retrieval = LexicalRetrievalStrategy()
         return LastLightApp(repository=repository, retrieval=retrieval)
-

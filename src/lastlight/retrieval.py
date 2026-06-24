@@ -5,7 +5,12 @@ from __future__ import annotations
 from .domain import KnowledgeDocument, SearchQuery, SearchResult
 from .interfaces import RetrievalStrategy
 from .chunking import chunk_text
-from .ranking import confidence_for_score, lexical_score
+from .ranking import (
+    bm25_scores,
+    confidence_for_bm25_score,
+    confidence_for_score,
+    lexical_score,
+)
 from .tokenizer import expand_query_tokens, tokenize
 
 
@@ -44,10 +49,24 @@ def select_passage(body: str, query_text: str, max_chars: int = 700) -> str:
     return best
 
 
-class BM25RetrievalStrategy:
-    """Future strategy placeholder."""
-
+class BM25RetrievalStrategy(RetrievalStrategy):
     def search(
         self, query: SearchQuery, documents: list[KnowledgeDocument]
     ) -> list[SearchResult]:
-        raise NotImplementedError("BM25 is planned for LastLight v0.2.")
+        results: list[SearchResult] = []
+        for document, (score, matched_terms) in zip(
+            documents, bm25_scores(query.text, documents)
+        ):
+            if score <= 0:
+                continue
+            results.append(
+                SearchResult(
+                    document=document,
+                    score=score,
+                    confidence=confidence_for_bm25_score(score),
+                    passage=select_passage(document.body, query.text),
+                    matched_terms=matched_terms,
+                )
+            )
+        results.sort(key=lambda result: (-result.score, result.document.path))
+        return results[: max(query.top_k, 1)]

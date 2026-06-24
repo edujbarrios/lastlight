@@ -4,7 +4,7 @@ import unittest
 
 import helpers  # noqa: F401
 from lastlight.domain import KnowledgeDocument, SearchQuery
-from lastlight.retrieval import LexicalRetrievalStrategy
+from lastlight.retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy
 
 
 class RetrievalTests(unittest.TestCase):
@@ -44,7 +44,28 @@ class RetrievalTests(unittest.TestCase):
 
         self.assertEqual(results, [])
 
+    def test_bm25_ranks_relevant_document_first(self) -> None:
+        docs = [
+            KnowledgeDocument(
+                title="Battery Saving",
+                path="knowledge/energy/battery_saving.md",
+                body="Reduce phone screen brightness and use low power mode.",
+                tags=("battery", "phone"),
+                priority="high",
+            ),
+            KnowledgeDocument(
+                title="Burns",
+                path="knowledge/medical/burns.md",
+                body="Cool burns with clean water.",
+                tags=("burns",),
+            ),
+        ]
+
+        results = BM25RetrievalStrategy().search(SearchQuery("save phone battery", 2), docs)
+
+        self.assertEqual(results[0].document.title, "Battery Saving")
+        self.assertIn(results[0].confidence, {"HIGH", "MEDIUM"})
+
 
 if __name__ == "__main__":
     unittest.main()
-

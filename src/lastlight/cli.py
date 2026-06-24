@@ -15,16 +15,21 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("query", nargs="*", help="single query to answer")
     parser.add_argument("--eval", action="store_true", help="run evaluation suite")
+    parser.add_argument(
+        "--strategy",
+        choices=("lexical", "bm25"),
+        default="lexical",
+        help="retrieval strategy to use",
+    )
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    app = ApplicationFactory.create()
+    app = ApplicationFactory.create(strategy=args.strategy)
 
     if args.eval:
         return EvaluationCommand(app).execute()
     if args.query:
         return QueryCommand(app, " ".join(args.query)).execute()
     return InteractiveCommand(app).execute()
-
