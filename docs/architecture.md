@@ -41,3 +41,7 @@ Future versions can add compressed packs, optional offline indexing, and citatio
 ## Experimental Synthesis
 
 The optional `--synthesize` mode trains a tiny n-gram model only on the selected retrieved passage. It prints a generated note, the citation, and the original passage. This keeps the retrieval result visible and avoids using unsourced external knowledge.
+
+## Optional Native Core
+
+The optional C core is deliberately narrow. It counts token matches through a small `ctypes` bridge, while parsing, ranking, confidence scoring, and safety formatting remain in Python. If the native library is absent, the strategy falls back to Python match counting.

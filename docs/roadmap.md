@@ -34,7 +34,7 @@
 
 ## v0.6
 
-- Optional C retrieval core
+- Optional C retrieval core: implemented as `--strategy c-lexical` with Python fallback
 
 ## v0.7
 

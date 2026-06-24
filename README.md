@@ -131,6 +131,15 @@ python3 src/main.py --strategy bm25 "how do I save phone battery"
 python3 src/main.py --strategy bm25 --eval
 ```
 
+Optional C-backed lexical retrieval:
+
+```bash
+python3 tools/build_c_core.py
+python3 src/main.py --strategy c-lexical "how do I purify water"
+```
+
+The C core is optional. If no compiled native library is present, `c-lexical` falls back safely for the native match-count step. See [docs/native_core.md](docs/native_core.md).
+
 Use a different knowledge directory or compressed Markdown pack:
 
 ```bash
@@ -254,7 +263,7 @@ v0.5:
 
 v0.6:
 
-- Optional C retrieval core
+- Optional C retrieval core: implemented as `--strategy c-lexical` with Python fallback
 
 v0.7:
 
