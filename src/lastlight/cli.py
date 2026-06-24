@@ -39,6 +39,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="print query output line by line with flushing",
     )
+    parser.add_argument(
+        "--synthesize",
+        action="store_true",
+        help="experimental citation-aware n-gram synthesis from retrieved passage",
+    )
     return parser
 
 
@@ -52,5 +57,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.eval:
         return EvaluationCommand(app).execute()
     if args.query:
-        return QueryCommand(app, " ".join(args.query), stream=args.stream).execute()
+        return QueryCommand(
+            app,
+            " ".join(args.query),
+            stream=args.stream,
+            synthesize=args.synthesize,
+        ).execute()
     return InteractiveCommand(app).execute()

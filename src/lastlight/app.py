@@ -5,6 +5,7 @@ from __future__ import annotations
 from .domain import SearchQuery, SearchResult
 from .interfaces import KnowledgeRepository, RetrievalStrategy
 from .safety import safe_answer
+from .synthesis import synthesize_answer
 
 
 class LastLightApp:
@@ -19,3 +20,5 @@ class LastLightApp:
     def answer(self, text: str) -> str:
         return safe_answer(self.search(text, top_k=3))
 
+    def synthesize(self, text: str) -> str:
+        return synthesize_answer(text, self.search(text, top_k=3))

@@ -33,15 +33,22 @@ class InteractiveCommand:
 
 
 class QueryCommand:
-    def __init__(self, app: LastLightApp, query: str, stream: bool = False) -> None:
+    def __init__(
+        self,
+        app: LastLightApp,
+        query: str,
+        stream: bool = False,
+        synthesize: bool = False,
+    ) -> None:
         self.app = app
         self.query = query
         self.stream = stream
+        self.synthesize = synthesize
 
     def execute(self) -> int:
         print(STARTUP_WARNING)
         print()
-        answer = self.app.answer(self.query)
+        answer = self.app.synthesize(self.query) if self.synthesize else self.app.answer(self.query)
         if self.stream:
             for line in answer.splitlines():
                 print(line, flush=True)
