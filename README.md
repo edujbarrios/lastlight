@@ -4,7 +4,7 @@
 
 > Everybody is focusing on making advances in AI, LLMs... etc, but what happens when there is a blackout and you are running out of battery in a para-apocalyptic environment?
 
-LastLight is a tiny, offline, extensible knowledge capsule for preserving critical human knowledge under severe resource constraints.
+LastLight is a tiny, offline, extensible knowledge capsule for preserving critical human knowledge under severe resource constraints. In practical terms, it is an extremely lightweight local RAG system: it retrieves relevant passages from a human-readable Markdown knowledge base and refuses to answer when confidence is too low.
 
 It is an experimental indie AI research project by **Eduardo J. Barrios** exploring how much useful intelligence can survive when computation, energy, connectivity, and hardware are limited.
 
@@ -38,6 +38,22 @@ LastLight follows a retrieval-first philosophy:
 
 If LastLight cannot find a sufficiently confident source in its local knowledge base, it refuses to answer.
 
+## Micro-RAG
+
+LastLight can be understood as a micro-RAG system built for blackout conditions.
+
+Traditional RAG systems often depend on embeddings, vector databases, cloud APIs, web services, large language models, and continuous infrastructure. LastLight keeps the same core idea, retrieve grounded knowledge before answering, but strips the system down to the smallest useful form:
+
+- Markdown files instead of a database
+- lexical retrieval instead of embeddings
+- deterministic ranking instead of model scoring
+- sourced passages instead of generated prose
+- confidence thresholds instead of fluent guessing
+- terminal execution instead of a web interface
+- no network, no telemetry, no package installation
+
+This is not meant to compete with full-scale AI assistants. It is meant to function when full-scale AI is unavailable. The research question is whether a tiny, auditable retrieval system can still provide useful, source-grounded intelligence on ordinary hardware with very little energy.
+
 ## How It Works
 
 Knowledge is stored as ordinary Markdown under `knowledge/`. Files are discovered recursively at runtime. Metadata is optional and lives in a small front matter block:
@@ -59,7 +75,7 @@ No knowledge is hardcoded into Python source files. A contributor can add a Mark
 
 ## Architecture
 
-LastLight v0.1 uses no neural models, embeddings, databases, cloud APIs, browser, GUI, telemetry, daemon, or background threads.
+LastLight v0.1 is a retrieval-only RAG implementation. It uses no neural models, embeddings, databases, cloud APIs, browser, GUI, telemetry, daemon, or background threads.
 
 It uses deterministic lexical retrieval:
 
@@ -185,4 +201,3 @@ v1.0:
 ## License
 
 Mozilla Public License 2.0.
-
