@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .app import LastLightApp
+from .compat import format_self_check, run_self_check
 from .evaluation import run_evaluation
 from .indexer import write_index
 from .interfaces import KnowledgeRepository
@@ -75,3 +76,13 @@ class BuildIndexCommand:
         output = write_index(self.repository, self.output_path)
         print(f"Wrote offline index: {output}")
         return 0
+
+
+class SelfCheckCommand:
+    def __init__(self, repository: KnowledgeRepository) -> None:
+        self.repository = repository
+
+    def execute(self) -> int:
+        results = run_self_check(self.repository)
+        print(format_self_check(results))
+        return 0 if all(result.ok for result in results) else 1

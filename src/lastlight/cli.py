@@ -6,7 +6,13 @@ import argparse
 
 from pathlib import Path
 
-from .commands import BuildIndexCommand, EvaluationCommand, InteractiveCommand, QueryCommand
+from .commands import (
+    BuildIndexCommand,
+    EvaluationCommand,
+    InteractiveCommand,
+    QueryCommand,
+    SelfCheckCommand,
+)
 from .factory import ApplicationFactory
 from .repository import MarkdownKnowledgeRepository
 
@@ -44,6 +50,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="experimental citation-aware n-gram synthesis from retrieved passage",
     )
+    parser.add_argument(
+        "--self-check",
+        action="store_true",
+        help="check offline compatibility for constrained devices",
+    )
     return parser
 
 
@@ -51,6 +62,9 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     app = ApplicationFactory.create(knowledge_dir=args.knowledge, strategy=args.strategy)
 
+    if args.self_check:
+        repository = MarkdownKnowledgeRepository(args.knowledge)
+        return SelfCheckCommand(repository).execute()
     if args.build_index:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return BuildIndexCommand(repository, Path(args.build_index)).execute()
