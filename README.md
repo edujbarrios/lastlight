@@ -52,6 +52,7 @@ Open `http://127.0.0.1:8765`.
 | Use another pack | `python3 src/main.py --knowledge path/to/pack.zip "save battery"` |
 | Filter language | `python3 src/main.py --language es "necesito ayuda"` |
 | Evaluate retrieval | `python3 src/main.py --eval` |
+| Custom eval JSON | `python3 src/main.py --eval --eval-output eval/results.json` |
 | Choose retrieval | `python3 src/main.py --strategy bm25 "purify water"` |
 | Build C core | `python3 tools/build_c_core.py` |
 | Inspect pack | `python3 src/main.py --pack-info` |

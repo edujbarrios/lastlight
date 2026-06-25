@@ -32,6 +32,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("query", nargs="*", help="single query to answer")
     parser.add_argument("--eval", action="store_true", help="run evaluation suite")
     parser.add_argument(
+        "--eval-output",
+        default=None,
+        metavar="PATH",
+        help="write evaluation JSON to this path",
+    )
+    parser.add_argument(
         "--strategy",
         choices=("lexical", "bm25", "c-lexical"),
         default="lexical",
@@ -159,7 +165,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.serve:
         return ServeCommand(app, host=args.host, port=args.port).execute()
     if args.eval:
-        return EvaluationCommand(app).execute()
+        output_path = Path(args.eval_output) if args.eval_output else None
+        command = (
+            EvaluationCommand(app, output_path)
+            if output_path
+            else EvaluationCommand(app)
+        )
+        return command.execute()
     if args.query:
         return QueryCommand(
             app,

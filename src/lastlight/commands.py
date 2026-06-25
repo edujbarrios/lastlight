@@ -6,7 +6,12 @@ from pathlib import Path
 
 from .app import LastLightApp
 from .compat import format_self_check, run_self_check
-from .evaluation import run_evaluation
+from .evaluation import (
+    DEFAULT_EVAL_OUTPUT,
+    build_evaluation_report,
+    format_evaluation_report,
+    write_evaluation_report,
+)
 from .indexer import write_index
 from .interfaces import KnowledgeRepository
 from .local_model import summarize_local_model, write_local_model
@@ -63,11 +68,17 @@ class QueryCommand:
 
 
 class EvaluationCommand:
-    def __init__(self, app: LastLightApp) -> None:
+    def __init__(
+        self, app: LastLightApp, output_path: Path | str = DEFAULT_EVAL_OUTPUT
+    ) -> None:
         self.app = app
+        self.output_path = output_path
 
     def execute(self) -> int:
-        print(run_evaluation(self.app))
+        report = build_evaluation_report(self.app)
+        print(format_evaluation_report(report))
+        output = write_evaluation_report(report, self.output_path)
+        print(f"Wrote evaluation report: {output}")
         return 0
 
 

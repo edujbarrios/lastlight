@@ -1,0 +1,233 @@
+{
+  "cases": [
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "bleeding",
+      "query": "how do I stop severe bleeding",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "bleeding",
+          "severe"
+        ],
+        "passage": "For severe bleeding, apply firm direct pressure with clean cloth, gauze, or the cleanest available material. Keep pressure steady. Do not repeatedly lift the dressing to check the wound because that can restart bleeding.",
+        "path": "knowledge/en/medical/bleeding.md",
+        "score": 2.65261415982379,
+        "tags": [
+          "medical",
+          "bleeding",
+          "pressure"
+        ],
+        "title": "Severe Bleeding"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "purification",
+      "query": "how can I purify water",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "water"
+        ],
+        "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
+        "path": "knowledge/en/water/purification.md",
+        "score": 1.4617548176964643,
+        "tags": [
+          "water",
+          "purification",
+          "boiling",
+          "survival"
+        ],
+        "title": "Water Purification"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "battery",
+      "query": "how do I save phone battery",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "battery",
+          "phone"
+        ],
+        "passage": "To extend phone battery life, reduce screen brightness, enable low-power mode, turn off Bluetooth, Wi-Fi, mobile data, location, and background app refresh when not needed. Use airplane mode when communication is not currently required.",
+        "path": "knowledge/en/energy/battery_saving.md",
+        "score": 2.153444815665601,
+        "tags": [
+          "energy",
+          "battery",
+          "phone",
+          "low-power"
+        ],
+        "title": "Battery Saving"
+      }
+    },
+    {
+      "confidence": "MEDIUM",
+      "correct": true,
+      "expected_tag": "generator",
+      "query": "is it safe to run a generator indoors",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "generator"
+        ],
+        "passage": "Do not connect a generator directly to household wiring unless a proper transfer switch has been installed by qualified personnel. Backfeeding can injure or kill utility workers and neighbors.",
+        "path": "knowledge/en/energy/generators.md",
+        "score": 1.2939438600631488,
+        "tags": [
+          "energy",
+          "generator",
+          "carbon-monoxide"
+        ],
+        "title": "Generator Safety"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "burns",
+      "query": "what should I do for burns",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "burn",
+          "burns"
+        ],
+        "passage": "Cool a burn with clean, cool running water for about 20 minutes if possible. Remove jewelry or tight clothing near the burn before swelling starts, but do not remove material stuck to the skin.",
+        "path": "knowledge/en/medical/burns.md",
+        "score": 1.8385494867662822,
+        "tags": [
+          "medical",
+          "burns",
+          "first-aid"
+        ],
+        "title": "Burns"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "dehydration",
+      "query": "what are signs of dehydration",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "dehydration",
+          "signs"
+        ],
+        "passage": "Warning signs include confusion, fainting, very little urine, rapid heartbeat, sunken eyes, inability to keep fluids down, or worsening weakness. These signs require urgent medical help when available.",
+        "path": "knowledge/en/medical/dehydration.md",
+        "score": 2.143764642069973,
+        "tags": [
+          "medical",
+          "dehydration",
+          "rehydration"
+        ],
+        "title": "Dehydration"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "compass",
+      "query": "how do I use a compass",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "compass",
+          "use"
+        ],
+        "passage": "When navigating with a map, account for local magnetic declination if known. In poor visibility, move slowly and use short legs between identifiable landmarks.",
+        "path": "knowledge/en/navigation/compass.md",
+        "score": 1.5282438665491396,
+        "tags": [
+          "navigation",
+          "compass",
+          "map"
+        ],
+        "title": "Compass Navigation"
+      }
+    },
+    {
+      "confidence": "MEDIUM",
+      "correct": true,
+      "expected_tag": "signaling",
+      "query": "how can I signal rescuers",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "rescuers"
+        ],
+        "passage": "Signals for rescuers should be simple, repeated, and easy to notice. Three repeated sounds, flashes, or marks are widely recognized as a distress pattern in many contexts.",
+        "path": "knowledge/en/communications/signaling.md",
+        "score": 0.7390145746454947,
+        "tags": [
+          "communications",
+          "signaling",
+          "rescue",
+          "rescuers"
+        ],
+        "title": "Emergency Signaling"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "cold",
+      "query": "how do I stay warm in cold shelter",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "cold",
+          "shelter"
+        ],
+        "passage": "In cold conditions, reduce heat loss by blocking wind, staying dry, insulating from the ground, and wearing loose layers. Wet clothing removes heat quickly.",
+        "path": "knowledge/en/shelter/cold_weather.md",
+        "score": 2.397181679546035,
+        "tags": [
+          "shelter",
+          "cold",
+          "insulation"
+        ],
+        "title": "Cold Weather Shelter"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "heat",
+      "query": "what should I do in extreme heat",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "extreme",
+          "heat"
+        ],
+        "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
+        "path": "knowledge/en/shelter/heat.md",
+        "score": 2.4835547038366452,
+        "tags": [
+          "shelter",
+          "heat",
+          "cooling"
+        ],
+        "title": "Extreme Heat"
+      }
+    }
+  ],
+  "confidence": {
+    "HIGH": 8,
+    "LOW": 0,
+    "MEDIUM": 2,
+    "NONE": 0
+  },
+  "correct": 10,
+  "top_1_accuracy": 1.0,
+  "total_cases": 10
+}
