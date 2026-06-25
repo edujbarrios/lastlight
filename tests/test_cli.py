@@ -1,0 +1,41 @@
+from __future__ import annotations
+
+import io
+import tempfile
+import unittest
+from contextlib import redirect_stdout
+from pathlib import Path
+from unittest.mock import patch
+
+import helpers  # noqa: F401
+from lastlight import cli
+
+
+class CliTests(unittest.TestCase):
+    def test_pack_info_does_not_create_application(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "doc.md").write_text("Body.", encoding="utf-8")
+
+            with patch.object(cli.ApplicationFactory, "create") as create:
+                with redirect_stdout(io.StringIO()):
+                    exit_code = cli.main(["--knowledge", str(root), "--pack-info"])
+
+        self.assertEqual(exit_code, 0)
+        create.assert_not_called()
+
+    def test_query_creates_application(self) -> None:
+        with patch.object(cli.ApplicationFactory, "create") as create:
+            app = create.return_value
+            app.answer.return_value = "answer"
+
+            with redirect_stdout(io.StringIO()):
+                exit_code = cli.main(["hello"])
+
+        self.assertEqual(exit_code, 0)
+        create.assert_called_once_with(knowledge_dir=None, strategy="lexical")
+        app.answer.assert_called_once_with("hello")
+
+
+if __name__ == "__main__":
+    unittest.main()

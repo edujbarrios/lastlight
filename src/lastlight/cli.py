@@ -96,7 +96,6 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    app = ApplicationFactory.create(knowledge_dir=args.knowledge, strategy=args.strategy)
 
     if args.self_check:
         repository = MarkdownKnowledgeRepository(args.knowledge)
@@ -120,6 +119,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.build_index:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return BuildIndexCommand(repository, Path(args.build_index)).execute()
+
+    app = ApplicationFactory.create(knowledge_dir=args.knowledge, strategy=args.strategy)
     if args.eval:
         return EvaluationCommand(app).execute()
     if args.query:
