@@ -16,7 +16,9 @@ from .retrieval import (
 class ApplicationFactory:
     @staticmethod
     def create(
-        knowledge_dir: Path | str | None = None, strategy: str = "lexical"
+        knowledge_dir: Path | str | None = None,
+        strategy: str = "lexical",
+        language: str | None = None,
     ) -> LastLightApp:
         repository = MarkdownKnowledgeRepository(knowledge_dir)
         if strategy == "bm25":
@@ -25,4 +27,4 @@ class ApplicationFactory:
             retrieval = CBackedLexicalRetrievalStrategy()
         else:
             retrieval = LexicalRetrievalStrategy()
-        return LastLightApp(repository=repository, retrieval=retrieval)
+        return LastLightApp(repository=repository, retrieval=retrieval, language=language)

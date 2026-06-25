@@ -41,6 +41,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="knowledge directory or .zip knowledge pack",
     )
     parser.add_argument(
+        "--language",
+        metavar="CODE",
+        help="restrict query, interactive, or evaluation mode to a language code",
+    )
+    parser.add_argument(
         "--build-index",
         metavar="PATH",
         help="write an optional offline JSON index and exit",
@@ -120,7 +125,11 @@ def main(argv: list[str] | None = None) -> int:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return BuildIndexCommand(repository, Path(args.build_index)).execute()
 
-    app = ApplicationFactory.create(knowledge_dir=args.knowledge, strategy=args.strategy)
+    app = ApplicationFactory.create(
+        knowledge_dir=args.knowledge,
+        strategy=args.strategy,
+        language=args.language,
+    )
     if args.eval:
         return EvaluationCommand(app).execute()
     if args.query:

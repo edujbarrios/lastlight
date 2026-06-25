@@ -37,6 +37,7 @@ On Windows, use `python` instead of `python3` if needed.
 | Interactive mode | `python3 src/main.py` |
 | Single query | `python3 src/main.py "stop bleeding"` |
 | Use another pack | `python3 src/main.py --knowledge path/to/pack.zip "save battery"` |
+| Filter language | `python3 src/main.py --language es "necesito ayuda"` |
 | Evaluate retrieval | `python3 src/main.py --eval` |
 | Choose retrieval | `python3 src/main.py --strategy bm25 "purify water"` |
 | Build C core | `python3 tools/build_c_core.py` |

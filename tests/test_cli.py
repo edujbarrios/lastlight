@@ -33,8 +33,24 @@ class CliTests(unittest.TestCase):
                 exit_code = cli.main(["hello"])
 
         self.assertEqual(exit_code, 0)
-        create.assert_called_once_with(knowledge_dir=None, strategy="lexical")
+        create.assert_called_once_with(
+            knowledge_dir=None, strategy="lexical", language=None
+        )
         app.answer.assert_called_once_with("hello")
+
+    def test_query_passes_language_filter(self) -> None:
+        with patch.object(cli.ApplicationFactory, "create") as create:
+            app = create.return_value
+            app.answer.return_value = "answer"
+
+            with redirect_stdout(io.StringIO()):
+                exit_code = cli.main(["--language", "es", "hola"])
+
+        self.assertEqual(exit_code, 0)
+        create.assert_called_once_with(
+            knowledge_dir=None, strategy="lexical", language="es"
+        )
+        app.answer.assert_called_once_with("hola")
 
 
 if __name__ == "__main__":
