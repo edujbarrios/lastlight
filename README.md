@@ -154,6 +154,13 @@ python3 src/main.py --pack-info
 python3 src/main.py --knowledge path/to/pack.zip --pack-info
 ```
 
+Validate a knowledge pack before sharing it:
+
+```bash
+python3 src/main.py --validate-pack
+python3 src/main.py --knowledge path/to/pack.zip --validate-pack
+```
+
 Build an optional offline audit index:
 
 ```bash

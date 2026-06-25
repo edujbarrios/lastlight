@@ -15,6 +15,7 @@ from .commands import (
     PackInfoCommand,
     QueryCommand,
     SelfCheckCommand,
+    ValidatePackCommand,
 )
 from .factory import ApplicationFactory
 from .repository import MarkdownKnowledgeRepository
@@ -47,6 +48,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--pack-info",
         action="store_true",
         help="print knowledge pack metadata and exit",
+    )
+    parser.add_argument(
+        "--validate-pack",
+        action="store_true",
+        help="validate a knowledge pack for community publishing and exit",
     )
     parser.add_argument(
         "--build-model",
@@ -92,6 +98,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.pack_info:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return PackInfoCommand(repository).execute()
+    if args.validate_pack:
+        repository = MarkdownKnowledgeRepository(args.knowledge)
+        return ValidatePackCommand(repository).execute()
     if args.model_info:
         return ModelInfoCommand(Path(args.model_info)).execute()
     if args.build_model:

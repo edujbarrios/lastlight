@@ -26,6 +26,13 @@ python3 src/main.py --pack-info
 python3 src/main.py --knowledge path/to/pack.zip --pack-info
 ```
 
+Validate a pack before publishing it:
+
+```bash
+python3 src/main.py --validate-pack
+python3 src/main.py --knowledge path/to/pack.zip --validate-pack
+```
+
 Build an audit index that includes pack metadata:
 
 ```bash
@@ -37,5 +44,5 @@ python3 src/main.py --build-index data/lastlight.index.json
 1. Use Markdown files with clear source-grounded instructions.
 2. Add front matter with `title`, `language`, `tags`, and `priority` where useful.
 3. Include `lastlight-pack.json` at the pack root.
-4. Run `--pack-info`, `--self-check`, and `--eval` before publishing.
+4. Run `--pack-info`, `--validate-pack`, `--self-check`, and `--eval` before publishing.
 5. Prefer small topic-focused packs over large unreviewable bundles.
