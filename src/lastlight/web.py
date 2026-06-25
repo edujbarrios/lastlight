@@ -5,7 +5,7 @@ from __future__ import annotations
 from html import escape
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Callable
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlsplit
 
 from .app import LastLightApp
 
@@ -88,10 +88,17 @@ def parse_query(body: bytes) -> str:
     return values.get("q", [""])[0].strip()
 
 
+def parse_query_string(path: str) -> str:
+    values = parse_qs(urlsplit(path).query, keep_blank_values=True)
+    return values.get("q", [""])[0].strip()
+
+
 def make_handler(app: LastLightApp) -> type[BaseHTTPRequestHandler]:
     class LastLightHandler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
-            self._send_page(render_page())
+            query = parse_query_string(self.path)
+            answer = app.answer(query) if query else ""
+            self._send_page(render_page(query=query, answer=answer))
 
         def do_POST(self) -> None:
             length = int(self.headers.get("Content-Length", "0"))

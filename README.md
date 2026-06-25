@@ -21,6 +21,18 @@ python3 src/main.py --knowledge path/to/pack.zip "find north without a compass"
 
 On Windows, use `python` instead of `python3` if needed.
 
+## Frontend
+
+Start the optional dark local web UI:
+
+```bash
+python3 src/main.py --serve
+```
+
+Open `http://127.0.0.1:8765`.
+
+![LastLight web UI](docs/screenshots/lastlight-web.png)
+
 ## Features
 
 - Offline terminal search over `knowledge/en/`, `knowledge/es/`, or custom packs
