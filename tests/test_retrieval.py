@@ -4,7 +4,7 @@ import unittest
 
 import helpers  # noqa: F401
 from lastlight.domain import KnowledgeDocument, SearchQuery
-from lastlight.retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy
+from lastlight.retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy, select_passage
 
 
 class RetrievalTests(unittest.TestCase):
@@ -65,6 +65,21 @@ class RetrievalTests(unittest.TestCase):
 
         self.assertEqual(results[0].document.title, "Battery Saving")
         self.assertIn(results[0].confidence, {"HIGH", "MEDIUM"})
+
+    def test_select_passage_prefers_best_sentence_window(self) -> None:
+        body = (
+            "General preparation matters. Keep supplies organized.\n\n"
+            "If you need direction, use the shadow stick method. "
+            "Mark the first shadow tip, wait, then mark the second tip. "
+            "The line gives an approximate west to east direction.\n\n"
+            "Unrelated radio instructions follow."
+        )
+
+        passage = select_passage(body, "shadow stick direction", max_chars=170)
+
+        self.assertIn("shadow stick method", passage)
+        self.assertIn("west to east direction", passage)
+        self.assertLessEqual(len(passage), 170)
 
 
 if __name__ == "__main__":

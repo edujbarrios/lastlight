@@ -5,7 +5,7 @@ from __future__ import annotations
 from .c_core import OptionalCCore
 from .domain import KnowledgeDocument, SearchQuery, SearchResult
 from .interfaces import RetrievalStrategy
-from .chunking import chunk_text
+from .chunking import sentence_windows
 from .ranking import (
     bm25_scores,
     confidence_for_bm25_score,
@@ -38,16 +38,33 @@ class LexicalRetrievalStrategy(RetrievalStrategy):
 
 
 def select_passage(body: str, query_text: str, max_chars: int = 700) -> str:
-    chunks = chunk_text(body, max_chars=max_chars)
+    chunks = sentence_windows(body, max_chars=max_chars)
     if not chunks:
         return body[:max_chars].strip()
 
-    query_tokens = set(expand_query_tokens(tokenize(query_text)))
-    best = max(
-        chunks,
-        key=lambda chunk: len(query_tokens.intersection(tokenize(chunk))),
-    )
+    query_tokens = tuple(expand_query_tokens(tokenize(query_text)))
+    if not query_tokens:
+        return chunks[0]
+
+    best = max(chunks, key=lambda chunk: _passage_score(chunk, query_text, query_tokens))
     return best
+
+
+def _passage_score(
+    chunk: str, query_text: str, query_tokens: tuple[str, ...]
+) -> tuple[float, int]:
+    chunk_tokens = tokenize(chunk)
+    if not chunk_tokens:
+        return (0.0, 0)
+
+    chunk_token_set = set(chunk_tokens)
+    query_token_set = set(query_tokens)
+    unique_matches = len(query_token_set.intersection(chunk_token_set))
+    repeated_matches = sum(1 for token in chunk_tokens if token in query_token_set)
+    density = unique_matches / max(len(chunk_token_set), 1)
+    phrase_bonus = 1.0 if query_text.casefold() in chunk.casefold() else 0.0
+    score = unique_matches * 4.0 + repeated_matches + density + phrase_bonus
+    return (score, -len(chunk))
 
 
 class BM25RetrievalStrategy(RetrievalStrategy):

@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 import helpers  # noqa: F401
-from lastlight.chunking import chunk_text
+from lastlight.chunking import chunk_text, sentence_windows
 
 
 class ChunkingTests(unittest.TestCase):
@@ -19,7 +19,23 @@ class ChunkingTests(unittest.TestCase):
         self.assertGreater(len(chunks), 1)
         self.assertTrue(all(len(chunk) <= 90 for chunk in chunks))
 
+    def test_sentence_windows_include_neighboring_context(self) -> None:
+        text = "First step. Important middle instruction. Final warning."
+
+        windows = sentence_windows(text, max_chars=80)
+
+        self.assertIn(
+            "First step. Important middle instruction. Final warning.",
+            windows,
+        )
+
+    def test_sentence_windows_respect_limit(self) -> None:
+        text = "Alpha beta gamma. " * 20
+
+        windows = sentence_windows(text, max_chars=60)
+
+        self.assertTrue(all(len(window) <= 60 for window in windows))
+
 
 if __name__ == "__main__":
     unittest.main()
-
