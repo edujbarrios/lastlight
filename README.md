@@ -28,6 +28,7 @@ On Windows, use `python` instead of `python3` if needed.
 - Lexical, BM25, and optional C-backed lexical retrieval
 - Directory and deterministic `.zip` knowledge packs
 - Pack validation, export, metadata, and SHA-256 audit indexes
+- Optional minimal dark local web UI
 - Optional experimental n-gram synthesis and local model packs
 
 ## Commands
@@ -47,6 +48,7 @@ On Windows, use `python` instead of `python3` if needed.
 | Export pack | `python3 src/main.py --export-pack dist/lastlight-core.zip` |
 | Build audit index | `python3 src/main.py --build-index data/lastlight.index.json` |
 | Device self-check | `python3 src/main.py --self-check` |
+| Local web UI | `python3 src/main.py --serve` |
 | Run tests | `python3 -m unittest discover -s tests` |
 
 ## Knowledge

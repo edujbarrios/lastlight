@@ -16,6 +16,7 @@ from .commands import (
     ModelInfoCommand,
     PackInfoCommand,
     QueryCommand,
+    ServeCommand,
     SelfCheckCommand,
     ValidatePackCommand,
 )
@@ -102,6 +103,22 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="check offline compatibility for constrained devices",
     )
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="serve a minimal local dark web interface",
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="host for --serve",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8765,
+        help="port for --serve",
+    )
     return parser
 
 
@@ -139,6 +156,8 @@ def main(argv: list[str] | None = None) -> int:
         strategy=args.strategy,
         language=args.language,
     )
+    if args.serve:
+        return ServeCommand(app, host=args.host, port=args.port).execute()
     if args.eval:
         return EvaluationCommand(app).execute()
     if args.query:

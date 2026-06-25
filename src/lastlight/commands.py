@@ -13,6 +13,7 @@ from .local_model import summarize_local_model, write_local_model
 from .pack_export import export_pack, sha256_file
 from .pack_validation import format_validation_report, validate_pack
 from .safety import STARTUP_WARNING
+from .web import serve
 
 
 class InteractiveCommand:
@@ -67,6 +68,18 @@ class EvaluationCommand:
 
     def execute(self) -> int:
         print(run_evaluation(self.app))
+        return 0
+
+
+class ServeCommand:
+    def __init__(self, app: LastLightApp, host: str, port: int) -> None:
+        self.app = app
+        self.host = host
+        self.port = port
+
+    def execute(self) -> int:
+        print(STARTUP_WARNING)
+        serve(self.app, host=self.host, port=self.port)
         return 0
 
 
