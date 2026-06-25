@@ -61,11 +61,30 @@ def validate_pack(repository: KnowledgeRepository) -> PackValidationReport:
             f"{unknown_language_count} document(s) do not declare a language"
         )
 
+    misplaced_language_count = sum(
+        1
+        for document in documents
+        if document.language != "unknown"
+        and not _path_contains_language_section(document.path, document.language)
+    )
+    if misplaced_language_count:
+        warnings.append(
+            f"{misplaced_language_count} document(s) are outside their language section"
+        )
+
     untagged_count = sum(1 for document in documents if not document.tags)
     if untagged_count:
         warnings.append(f"{untagged_count} document(s) do not declare tags")
 
     return PackValidationReport(tuple(errors), tuple(warnings))
+
+
+def _path_contains_language_section(path: str, language: str) -> bool:
+    normalized = path.replace("\\", "/")
+    section = f"/{language.casefold()}/"
+    return normalized.casefold().startswith(f"{language.casefold()}/") or (
+        section in normalized.casefold()
+    )
 
 
 def format_validation_report(report: PackValidationReport) -> str:
