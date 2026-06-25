@@ -8,9 +8,11 @@ LastLight uses clean architecture principles without heavy ceremony.
 
 The same repository can also read a `.zip` knowledge pack. Markdown files inside the archive are loaded directly with the Python standard library, without extracting files or building an external database.
 
+Knowledge directories and `.zip` packs can include `lastlight-pack.json` at the pack root. The manifest records pack name, version, languages, license, source, and description. LastLight treats it as audit metadata, not as executable configuration, and continues to run when it is absent.
+
 ## Offline Index Builder
 
-The optional index builder writes a human-readable JSON summary of the current knowledge base. It records document metadata, token counts, and term counts. The main query path does not require this index, so normal startup remains simple and low-cost.
+The optional index builder writes a human-readable JSON summary of the current knowledge base. It records pack metadata, document metadata, token counts, and term counts. The main query path does not require this index, so normal startup remains simple and low-cost.
 
 ## Strategy Pattern
 

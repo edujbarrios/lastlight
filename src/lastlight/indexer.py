@@ -33,12 +33,25 @@ def build_index(repository: KnowledgeRepository) -> dict[str, object]:
             }
         )
 
-    return {
+    index: dict[str, object] = {
         "index_version": INDEX_VERSION,
         "document_count": len(documents),
         "term_count": len(corpus_terms),
         "documents": entries,
     }
+    describe_pack = getattr(repository, "describe_pack", None)
+    if callable(describe_pack):
+        pack = describe_pack()
+        index["pack"] = {
+            "name": pack.name,
+            "version": pack.version,
+            "languages": list(pack.languages),
+            "description": pack.description,
+            "license": pack.license,
+            "source": pack.source,
+            "path": pack.path,
+        }
+    return index
 
 
 def write_index(repository: KnowledgeRepository, output_path: Path | str) -> Path:
@@ -50,4 +63,3 @@ def write_index(repository: KnowledgeRepository, output_path: Path | str) -> Pat
         encoding="utf-8",
     )
     return output
-

@@ -147,6 +147,13 @@ python3 src/main.py --knowledge path/to/knowledge "how do I purify water"
 python3 src/main.py --knowledge path/to/pack.zip "how do I purify water"
 ```
 
+Inspect knowledge pack metadata:
+
+```bash
+python3 src/main.py --pack-info
+python3 src/main.py --knowledge path/to/pack.zip --pack-info
+```
+
 Build an optional offline audit index:
 
 ```bash
@@ -230,6 +237,10 @@ See [docs/performance.md](docs/performance.md) for the full table and methodolog
 
 No code changes should be necessary.
 
+For reproducible community and multilingual packs, include a small
+`lastlight-pack.json` manifest at the knowledge root. See
+[docs/knowledge_packs.md](docs/knowledge_packs.md).
+
 ## Low-Power Design
 
 LastLight avoids polling, progress bars, animations, background work, network calls, and expensive startup tasks. It reads Markdown, ranks documents, prints sourced passages, and exits.
@@ -241,8 +252,8 @@ For Raspberry Pi, Termux, and old laptop notes, see [docs/platforms.md](docs/pla
 The implemented roadmap is tracked in [docs/roadmap.md](docs/roadmap.md). The next major target is v1.0:
 
 - Community-maintained emergency knowledge repository
-- Multilingual knowledge packs
-- Reproducible offline intelligence system
+- Multilingual knowledge packs with auditable manifests
+- Reproducible offline intelligence system with pack metadata in audit indexes
 
 ## License
 

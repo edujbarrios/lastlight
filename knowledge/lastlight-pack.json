@@ -1,0 +1,11 @@
+{
+  "name": "LastLight Core Emergency Knowledge Pack",
+  "version": "0.1.0",
+  "languages": [
+    "en",
+    "es"
+  ],
+  "description": "Core offline emergency knowledge included with LastLight.",
+  "license": "MPL-2.0",
+  "source": "https://github.com/edujbarrios/lastlight"
+}

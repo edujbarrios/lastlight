@@ -12,6 +12,7 @@ from .commands import (
     EvaluationCommand,
     InteractiveCommand,
     ModelInfoCommand,
+    PackInfoCommand,
     QueryCommand,
     SelfCheckCommand,
 )
@@ -41,6 +42,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--build-index",
         metavar="PATH",
         help="write an optional offline JSON index and exit",
+    )
+    parser.add_argument(
+        "--pack-info",
+        action="store_true",
+        help="print knowledge pack metadata and exit",
     )
     parser.add_argument(
         "--build-model",
@@ -83,6 +89,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.self_check:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return SelfCheckCommand(repository).execute()
+    if args.pack_info:
+        repository = MarkdownKnowledgeRepository(args.knowledge)
+        return PackInfoCommand(repository).execute()
     if args.model_info:
         return ModelInfoCommand(Path(args.model_info)).execute()
     if args.build_model:

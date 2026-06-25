@@ -6,6 +6,18 @@ from dataclasses import dataclass, field
 
 
 @dataclass(frozen=True)
+class KnowledgePack:
+    name: str
+    version: str = "unknown"
+    languages: tuple[str, ...] = field(default_factory=tuple)
+    description: str = ""
+    license: str = "unknown"
+    source: str = "local"
+    path: str = ""
+    metadata: dict[str, object] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class KnowledgeDocument:
     title: str
     path: str
@@ -35,4 +47,3 @@ class SearchResult:
 class EvaluationCase:
     query: str
     expected_tag: str
-

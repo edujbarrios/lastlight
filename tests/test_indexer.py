@@ -26,6 +26,25 @@ class IndexerTests(unittest.TestCase):
         self.assertEqual(document["title"], "Water Test")
         self.assertIn("water", document["terms"])
 
+    def test_index_includes_pack_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "lastlight-pack.json").write_text(
+                '{"name":"Core Pack","version":"1.0","languages":["en"]}',
+                encoding="utf-8",
+            )
+            (root / "water.md").write_text(
+                "---\ntitle: Water\nlanguage: en\n---\n\nBoil water.",
+                encoding="utf-8",
+            )
+
+            index = build_index(MarkdownKnowledgeRepository(root))
+
+        self.assertEqual(index["pack"]["name"], "Core Pack")
+        self.assertEqual(index["pack"]["version"], "1.0")
+        self.assertEqual(index["pack"]["languages"], ["en"])
+        self.assertEqual(index["document_count"], 1)
+
     def test_writes_index_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp) / "knowledge"
@@ -42,4 +61,3 @@ class IndexerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

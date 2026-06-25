@@ -79,6 +79,31 @@ class BuildIndexCommand:
         return 0
 
 
+class PackInfoCommand:
+    def __init__(self, repository: KnowledgeRepository) -> None:
+        self.repository = repository
+
+    def execute(self) -> int:
+        describe_pack = getattr(self.repository, "describe_pack", None)
+        documents = self.repository.list_documents()
+        if not callable(describe_pack):
+            print(f"Documents: {len(documents)}")
+            return 0
+
+        pack = describe_pack()
+        languages = ", ".join(pack.languages) if pack.languages else "unknown"
+        print(f"Name: {pack.name}")
+        print(f"Version: {pack.version}")
+        print(f"Languages: {languages}")
+        print(f"Documents: {len(documents)}")
+        print(f"License: {pack.license}")
+        print(f"Source: {pack.source}")
+        if pack.description:
+            print(f"Description: {pack.description}")
+        print(f"Path: {pack.path}")
+        return 0
+
+
 class SelfCheckCommand:
     def __init__(self, repository: KnowledgeRepository) -> None:
         self.repository = repository
