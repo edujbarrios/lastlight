@@ -33,6 +33,12 @@ python3 src/main.py --validate-pack
 python3 src/main.py --knowledge path/to/pack.zip --validate-pack
 ```
 
+Export a directory pack as a deterministic `.zip`:
+
+```bash
+python3 src/main.py --export-pack dist/lastlight-core.zip
+```
+
 Build an audit index that includes pack metadata:
 
 ```bash
@@ -45,4 +51,5 @@ python3 src/main.py --build-index data/lastlight.index.json
 2. Add front matter with `title`, `language`, `tags`, and `priority` where useful.
 3. Include `lastlight-pack.json` at the pack root.
 4. Run `--pack-info`, `--validate-pack`, `--self-check`, and `--eval` before publishing.
-5. Prefer small topic-focused packs over large unreviewable bundles.
+5. Export with `--export-pack` when distributing a `.zip` pack.
+6. Prefer small topic-focused packs over large unreviewable bundles.

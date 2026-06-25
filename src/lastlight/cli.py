@@ -7,9 +7,10 @@ import argparse
 from pathlib import Path
 
 from .commands import (
-    BuildModelCommand,
     BuildIndexCommand,
+    BuildModelCommand,
     EvaluationCommand,
+    ExportPackCommand,
     InteractiveCommand,
     ModelInfoCommand,
     PackInfoCommand,
@@ -53,6 +54,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--validate-pack",
         action="store_true",
         help="validate a knowledge pack for community publishing and exit",
+    )
+    parser.add_argument(
+        "--export-pack",
+        metavar="PATH",
+        help="write a deterministic .zip knowledge pack and exit",
     )
     parser.add_argument(
         "--build-model",
@@ -101,6 +107,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.validate_pack:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return ValidatePackCommand(repository).execute()
+    if args.export_pack:
+        repository = MarkdownKnowledgeRepository(args.knowledge)
+        return ExportPackCommand(repository.knowledge_dir, Path(args.export_pack)).execute()
     if args.model_info:
         return ModelInfoCommand(Path(args.model_info)).execute()
     if args.build_model:

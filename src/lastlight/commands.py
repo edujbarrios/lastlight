@@ -10,6 +10,7 @@ from .evaluation import run_evaluation
 from .indexer import write_index
 from .interfaces import KnowledgeRepository
 from .local_model import summarize_local_model, write_local_model
+from .pack_export import export_pack
 from .pack_validation import format_validation_report, validate_pack
 from .safety import STARTUP_WARNING
 
@@ -113,6 +114,21 @@ class ValidatePackCommand:
         report = validate_pack(self.repository)
         print(format_validation_report(report))
         return 0 if report.ok else 1
+
+
+class ExportPackCommand:
+    def __init__(self, source_dir: Path | str, output_path: Path | str) -> None:
+        self.source_dir = source_dir
+        self.output_path = output_path
+
+    def execute(self) -> int:
+        try:
+            output = export_pack(self.source_dir, self.output_path)
+        except ValueError as error:
+            print(f"Export failed: {error}")
+            return 1
+        print(f"Wrote knowledge pack: {output}")
+        return 0
 
 
 class SelfCheckCommand:

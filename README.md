@@ -161,6 +161,12 @@ python3 src/main.py --validate-pack
 python3 src/main.py --knowledge path/to/pack.zip --validate-pack
 ```
 
+Export the current knowledge directory as a deterministic `.zip` pack:
+
+```bash
+python3 src/main.py --export-pack dist/lastlight-core.zip
+```
+
 Build an optional offline audit index:
 
 ```bash
@@ -260,7 +266,7 @@ The implemented roadmap is tracked in [docs/roadmap.md](docs/roadmap.md). The ne
 
 - Community-maintained emergency knowledge repository
 - Multilingual knowledge packs with auditable manifests
-- Reproducible offline intelligence system with pack metadata in audit indexes
+- Reproducible offline intelligence system with deterministic pack export and pack metadata in audit indexes
 
 ## License
 

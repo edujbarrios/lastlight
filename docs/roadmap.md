@@ -45,4 +45,4 @@
 
 - Community-maintained emergency knowledge repository: started with pack manifest conventions, validation, and contribution checklist
 - Multilingual knowledge packs: optional `lastlight-pack.json` metadata implemented for directories and `.zip` packs
-- Reproducible offline intelligence system: audit indexes now include pack metadata
+- Reproducible offline intelligence system: deterministic pack export and audit indexes with pack metadata implemented
