@@ -106,6 +106,36 @@ class PackInfoCommand:
         return 0
 
 
+class ListKnowledgeCommand:
+    def __init__(self, repository: KnowledgeRepository, language: str | None = None) -> None:
+        self.repository = repository
+        self.language = language.casefold() if language else None
+
+    def execute(self) -> int:
+        documents = self.repository.list_documents()
+        if self.language:
+            documents = [
+                document
+                for document in documents
+                if document.language.casefold() == self.language
+            ]
+
+        if not documents:
+            print("No knowledge documents found.")
+            return 0
+
+        for document in sorted(
+            documents,
+            key=lambda item: (item.language, item.title.casefold(), item.path),
+        ):
+            tags = ", ".join(document.tags) if document.tags else "none"
+            print(
+                f"{document.language} | {document.priority} | "
+                f"{document.title} | {tags} | {document.path}"
+            )
+        return 0
+
+
 class ValidatePackCommand:
     def __init__(self, repository: KnowledgeRepository) -> None:
         self.repository = repository

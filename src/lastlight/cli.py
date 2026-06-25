@@ -12,6 +12,7 @@ from .commands import (
     EvaluationCommand,
     ExportPackCommand,
     InteractiveCommand,
+    ListKnowledgeCommand,
     ModelInfoCommand,
     PackInfoCommand,
     QueryCommand,
@@ -54,6 +55,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--pack-info",
         action="store_true",
         help="print knowledge pack metadata and exit",
+    )
+    parser.add_argument(
+        "--list-knowledge",
+        action="store_true",
+        help="list available knowledge documents and exit",
     )
     parser.add_argument(
         "--validate-pack",
@@ -108,6 +114,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.pack_info:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return PackInfoCommand(repository).execute()
+    if args.list_knowledge:
+        repository = MarkdownKnowledgeRepository(args.knowledge)
+        return ListKnowledgeCommand(repository, language=args.language).execute()
     if args.validate_pack:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return ValidatePackCommand(repository).execute()

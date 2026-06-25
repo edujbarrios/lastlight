@@ -24,6 +24,20 @@ class CliTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         create.assert_not_called()
 
+    def test_list_knowledge_does_not_create_application(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "doc.md").write_text("Body.", encoding="utf-8")
+
+            with patch.object(cli.ApplicationFactory, "create") as create:
+                with redirect_stdout(io.StringIO()):
+                    exit_code = cli.main(
+                        ["--knowledge", str(root), "--list-knowledge"]
+                    )
+
+        self.assertEqual(exit_code, 0)
+        create.assert_not_called()
+
     def test_query_creates_application(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
             app = create.return_value

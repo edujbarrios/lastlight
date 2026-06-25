@@ -42,6 +42,7 @@ On Windows, use `python` instead of `python3` if needed.
 | Choose retrieval | `python3 src/main.py --strategy bm25 "purify water"` |
 | Build C core | `python3 tools/build_c_core.py` |
 | Inspect pack | `python3 src/main.py --pack-info` |
+| List knowledge | `python3 src/main.py --list-knowledge` |
 | Validate pack | `python3 src/main.py --validate-pack` |
 | Export pack | `python3 src/main.py --export-pack dist/lastlight-core.zip` |
 | Build audit index | `python3 src/main.py --build-index data/lastlight.index.json` |
