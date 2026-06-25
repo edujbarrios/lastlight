@@ -6,7 +6,7 @@ from pathlib import Path
 from zipfile import ZipFile
 
 import helpers  # noqa: F401
-from lastlight.pack_export import export_pack
+from lastlight.pack_export import export_pack, sha256_file
 
 
 class PackExportTests(unittest.TestCase):
@@ -46,8 +46,11 @@ class PackExportTests(unittest.TestCase):
 
             first_bytes = first.read_bytes()
             second_bytes = second.read_bytes()
+            first_hash = sha256_file(first)
+            second_hash = sha256_file(second)
 
         self.assertEqual(first_bytes, second_bytes)
+        self.assertEqual(first_hash, second_hash)
 
     def test_export_requires_directory(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

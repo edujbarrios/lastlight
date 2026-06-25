@@ -167,11 +167,15 @@ Export the current knowledge directory as a deterministic `.zip` pack:
 python3 src/main.py --export-pack dist/lastlight-core.zip
 ```
 
+The export command prints a SHA-256 checksum for offline verification.
+
 Build an optional offline audit index:
 
 ```bash
 python3 src/main.py --build-index data/lastlight.index.json
 ```
+
+Audit indexes include per-document SHA-256 hashes.
 
 Stream output line by line:
 

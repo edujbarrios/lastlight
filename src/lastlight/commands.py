@@ -10,7 +10,7 @@ from .evaluation import run_evaluation
 from .indexer import write_index
 from .interfaces import KnowledgeRepository
 from .local_model import summarize_local_model, write_local_model
-from .pack_export import export_pack
+from .pack_export import export_pack, sha256_file
 from .pack_validation import format_validation_report, validate_pack
 from .safety import STARTUP_WARNING
 
@@ -128,6 +128,7 @@ class ExportPackCommand:
             print(f"Export failed: {error}")
             return 1
         print(f"Wrote knowledge pack: {output}")
+        print(f"SHA-256: {sha256_file(output)}")
         return 0
 
 

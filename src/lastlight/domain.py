@@ -22,6 +22,7 @@ class KnowledgeDocument:
     title: str
     path: str
     body: str
+    source_sha256: str = ""
     language: str = "unknown"
     tags: tuple[str, ...] = field(default_factory=tuple)
     priority: str = "normal"

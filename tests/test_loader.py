@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import tempfile
 import unittest
 from pathlib import Path
@@ -32,6 +33,22 @@ class LoaderTests(unittest.TestCase):
         self.assertEqual(doc.tags, ("water", "test"))
         self.assertEqual(doc.priority, "high")
         self.assertEqual(doc.body, "Useful body.")
+        self.assertEqual(
+            doc.source_sha256,
+            hashlib.sha256(
+                (
+                    "---\n"
+                    "title: Test Doc\n"
+                    "language: en\n"
+                    "tags:\n"
+                    "  - water\n"
+                    "  - test\n"
+                    "priority: high\n"
+                    "---\n\n"
+                    "Useful body."
+                ).encode("utf-8")
+            ).hexdigest(),
+        )
 
     def test_missing_metadata_is_graceful(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -46,4 +63,3 @@ class LoaderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

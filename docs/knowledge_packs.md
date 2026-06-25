@@ -39,11 +39,16 @@ Export a directory pack as a deterministic `.zip`:
 python3 src/main.py --export-pack dist/lastlight-core.zip
 ```
 
+The export command prints a SHA-256 checksum so the copied pack can be verified
+on another machine.
+
 Build an audit index that includes pack metadata:
 
 ```bash
 python3 src/main.py --build-index data/lastlight.index.json
 ```
+
+The audit index includes pack metadata and per-document SHA-256 hashes.
 
 ## Community Pack Checklist
 

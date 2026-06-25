@@ -2,12 +2,21 @@
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 from .repository import PACK_MANIFEST
 
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+
+
+def sha256_file(path: Path | str) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def export_pack(source_dir: Path | str, output_path: Path | str) -> Path:

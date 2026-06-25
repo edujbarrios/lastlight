@@ -12,7 +12,7 @@ Knowledge directories and `.zip` packs can include `lastlight-pack.json` at the 
 
 ## Offline Index Builder
 
-The optional index builder writes a human-readable JSON summary of the current knowledge base. It records pack metadata, document metadata, token counts, and term counts. The main query path does not require this index, so normal startup remains simple and low-cost.
+The optional index builder writes a human-readable JSON summary of the current knowledge base. It records pack metadata, document metadata, per-document SHA-256 hashes, token counts, and term counts. The main query path does not require this index, so normal startup remains simple and low-cost.
 
 ## Strategy Pattern
 

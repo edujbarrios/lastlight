@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import tempfile
 import unittest
@@ -25,6 +26,12 @@ class IndexerTests(unittest.TestCase):
         document = index["documents"][0]  # type: ignore[index]
         self.assertEqual(document["title"], "Water Test")
         self.assertIn("water", document["terms"])
+        self.assertEqual(
+            document["source_sha256"],
+            hashlib.sha256(
+                b"---\ntitle: Water Test\ntags:\n  - water\n---\n\nBoil water."
+            ).hexdigest(),
+        )
 
     def test_index_includes_pack_metadata(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

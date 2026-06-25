@@ -28,6 +28,7 @@ def build_index(repository: KnowledgeRepository) -> dict[str, object]:
                 "language": document.language,
                 "tags": list(document.tags),
                 "priority": document.priority,
+                "source_sha256": document.source_sha256,
                 "token_count": len(tokens),
                 "terms": dict(sorted(term_counts.items())),
             }

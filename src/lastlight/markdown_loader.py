@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 
 from .domain import KnowledgeDocument
@@ -18,6 +19,7 @@ def load_markdown_document(path: Path, root: Path | None = None) -> KnowledgeDoc
 
 def load_markdown_text(text: str, path_label: str) -> KnowledgeDocument:
     metadata, body = split_front_matter(text)
+    source_sha256 = hashlib.sha256(text.encode("utf-8")).hexdigest()
 
     title = str(metadata.get("title") or infer_title(Path(path_label), body))
     language = str(metadata.get("language") or "unknown")
@@ -34,6 +36,7 @@ def load_markdown_text(text: str, path_label: str) -> KnowledgeDocument:
         title=title,
         path=path_label,
         body=body,
+        source_sha256=source_sha256,
         language=language,
         tags=tag_values,
         priority=priority,
