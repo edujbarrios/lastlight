@@ -9,7 +9,7 @@ It uses only the Python standard library. No cloud APIs, embeddings, vector data
 ## What It Does
 
 - Runs fully offline from the terminal
-- Searches Markdown files under `knowledge/`
+- Searches Markdown files under `knowledge/en/`, `knowledge/es/`, and other pack folders
 - Supports directory and `.zip` knowledge packs
 - Returns citations, confidence, language, tags, and source passages
 - Supports lexical, BM25, and optional C-backed lexical retrieval
@@ -92,7 +92,7 @@ python3 src/main.py --model-info data/lastlight.model.json
 
 ## Knowledge Format
 
-Add Markdown files anywhere under `knowledge/`:
+Add Markdown files under the matching language section, such as `knowledge/en/` or `knowledge/es/`:
 
 ```markdown
 ---

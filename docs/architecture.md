@@ -4,7 +4,7 @@ LastLight uses clean architecture principles without heavy ceremony.
 
 ## Repository Pattern
 
-`KnowledgeRepository` defines how the application obtains documents. `MarkdownKnowledgeRepository` implements that interface by recursively discovering Markdown files under `knowledge/`.
+`KnowledgeRepository` defines how the application obtains documents. `MarkdownKnowledgeRepository` implements that interface by recursively discovering Markdown files under `knowledge/`, including language sections such as `knowledge/en/` and `knowledge/es/`.
 
 The same repository can also read a `.zip` knowledge pack. Markdown files inside the archive are loaded directly with the Python standard library, without extracting files or building an external database.
 

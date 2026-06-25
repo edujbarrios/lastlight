@@ -2,6 +2,7 @@
 
 LastLight knowledge packs are ordinary directories or `.zip` files containing Markdown.
 They can optionally include `lastlight-pack.json` at the pack root.
+The bundled pack keeps English documents under `en/` and Spanish documents under `es/`.
 
 ```json
 {
@@ -54,7 +55,8 @@ The audit index includes pack metadata and per-document SHA-256 hashes.
 
 1. Use Markdown files with clear source-grounded instructions.
 2. Add front matter with `title`, `language`, `tags`, and `priority` where useful.
-3. Include `lastlight-pack.json` at the pack root.
-4. Run `--pack-info`, `--validate-pack`, `--self-check`, and `--eval` before publishing.
-5. Export with `--export-pack` when distributing a `.zip` pack.
-6. Prefer small topic-focused packs over large unreviewable bundles.
+3. Place documents under language sections such as `en/` and `es/`.
+4. Include `lastlight-pack.json` at the pack root.
+5. Run `--pack-info`, `--validate-pack`, `--self-check`, and `--eval` before publishing.
+6. Export with `--export-pack` when distributing a `.zip` pack.
+7. Prefer small topic-focused packs over large unreviewable bundles.
