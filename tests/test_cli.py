@@ -77,6 +77,30 @@ class CliTests(unittest.TestCase):
         )
         execute.assert_called_once_with()
 
+    def test_import_pdf_does_not_create_application(self) -> None:
+        with patch.object(cli.ApplicationFactory, "create") as create:
+            with patch.object(cli.ImportPdfCommand, "execute", return_value=0) as execute:
+                exit_code = cli.main(
+                    [
+                        "--import-pdf",
+                        "guide.pdf",
+                        "--import-output",
+                        "knowledge/en/imported/guide.md",
+                        "--language",
+                        "en",
+                        "--import-tags",
+                        "imported,pdf,water",
+                        "--import-priority",
+                        "high",
+                        "--import-summary-items",
+                        "3",
+                    ]
+                )
+
+        self.assertEqual(exit_code, 0)
+        create.assert_not_called()
+        execute.assert_called_once_with()
+
 
 if __name__ == "__main__":
     unittest.main()

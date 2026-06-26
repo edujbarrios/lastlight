@@ -11,6 +11,7 @@ from .commands import (
     BuildModelCommand,
     EvaluationCommand,
     ExportPackCommand,
+    ImportPdfCommand,
     InteractiveCommand,
     ListKnowledgeCommand,
     ModelInfoCommand,
@@ -77,6 +78,33 @@ def build_parser() -> argparse.ArgumentParser:
         "--export-pack",
         metavar="PATH",
         help="write a deterministic .zip knowledge pack and exit",
+    )
+    parser.add_argument(
+        "--import-pdf",
+        metavar="PATH",
+        help="convert a text-based PDF into LastLight Markdown and exit",
+    )
+    parser.add_argument(
+        "--import-output",
+        metavar="PATH",
+        help="output Markdown path for --import-pdf",
+    )
+    parser.add_argument("--import-title", help="title override for --import-pdf")
+    parser.add_argument(
+        "--import-tags",
+        default="imported,pdf",
+        help="comma-separated tags for --import-pdf",
+    )
+    parser.add_argument(
+        "--import-priority",
+        default="normal",
+        help="front matter priority for --import-pdf",
+    )
+    parser.add_argument(
+        "--import-summary-items",
+        type=int,
+        default=8,
+        help="maximum important points for --import-pdf",
     )
     parser.add_argument(
         "--build-model",
@@ -146,6 +174,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.export_pack:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return ExportPackCommand(repository.knowledge_dir, Path(args.export_pack)).execute()
+    if args.import_pdf:
+        tags = tuple(tag.strip() for tag in args.import_tags.split(",") if tag.strip())
+        return ImportPdfCommand(
+            args.import_pdf,
+            output_path=args.import_output,
+            title=args.import_title,
+            language=args.language or "unknown",
+            tags=tags,
+            priority=args.import_priority,
+            summary_items=args.import_summary_items,
+        ).execute()
     if args.model_info:
         return ModelInfoCommand(Path(args.model_info)).execute()
     if args.build_model:

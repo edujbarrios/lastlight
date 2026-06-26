@@ -17,6 +17,7 @@ from .interfaces import KnowledgeRepository
 from .local_model import summarize_local_model, write_local_model
 from .pack_export import export_pack, sha256_file
 from .pack_validation import format_validation_report, validate_pack
+from .pdf_ingest import document_to_markdown, load_pdf
 from .safety import STARTUP_WARNING
 from .session import LastLightSession
 from .web import serve
@@ -189,6 +190,46 @@ class ExportPackCommand:
             return 1
         print(f"Wrote knowledge pack: {output}")
         print(f"SHA-256: {sha256_file(output)}")
+        return 0
+
+
+class ImportPdfCommand:
+    def __init__(
+        self,
+        pdf_path: Path | str,
+        output_path: Path | str | None = None,
+        title: str | None = None,
+        language: str = "unknown",
+        tags: tuple[str, ...] = ("imported", "pdf"),
+        priority: str = "normal",
+        summary_items: int = 8,
+    ) -> None:
+        self.pdf_path = Path(pdf_path)
+        self.output_path = Path(output_path) if output_path else self.pdf_path.with_suffix(".md")
+        self.title = title
+        self.language = language
+        self.tags = tags
+        self.priority = priority
+        self.summary_items = summary_items
+
+    def execute(self) -> int:
+        try:
+            document = load_pdf(self.pdf_path)
+            markdown = document_to_markdown(
+                document,
+                title=self.title,
+                language=self.language,
+                tags=self.tags,
+                priority=self.priority,
+                max_summary_items=self.summary_items,
+            )
+        except Exception as error:
+            print(f"PDF import failed: {error}")
+            return 1
+
+        self.output_path.parent.mkdir(parents=True, exist_ok=True)
+        self.output_path.write_text(markdown, encoding="utf-8")
+        print(f"Wrote Markdown: {self.output_path}")
         return 0
 
 

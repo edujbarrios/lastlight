@@ -62,7 +62,7 @@ The web session keeps short-lived context for follow-up questions.
 | List knowledge | `python src/main.py --list-knowledge` |
 | Validate pack | `python src/main.py --validate-pack` |
 | Export pack | `python src/main.py --export-pack dist/lastlight-core.zip` |
-| Import PDF | `python tools/pdf_to_markdown.py guide.pdf --output knowledge/en/imported/guide.md` |
+| Import PDF | `python src/main.py --import-pdf guide.pdf --import-output knowledge/en/imported/guide.md --language en` |
 | Build audit index | `python src/main.py --build-index data/lastlight.index.json` |
 | Device self-check | `python src/main.py --self-check` |
 | Local web UI | `python src/main.py --serve` |
