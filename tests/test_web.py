@@ -5,7 +5,13 @@ import unittest
 import helpers  # noqa: F401
 from lastlight.domain import KnowledgeDocument, SearchResult
 from lastlight.session import LastLightSession
-from lastlight.web import parse_query, parse_query_string, render_page, solution_answer
+from lastlight.web import (
+    parse_query,
+    parse_query_string,
+    render_history,
+    render_page,
+    solution_answer,
+)
 
 
 class FakeApp:
@@ -30,6 +36,19 @@ class WebTests(unittest.TestCase):
         self.assertIn("&lt;answer&gt;", html)
         self.assertNotIn("<query>", html)
         self.assertNotIn("<answer>", html)
+
+    def test_render_history_shows_multiple_turns(self) -> None:
+        html = render_history(
+            [
+                ("generator safety", "Keep it outside."),
+                ("indoors?", "Do not run it indoors."),
+            ]
+        )
+
+        self.assertIn("&gt; generator safety", html)
+        self.assertIn("Keep it outside.", html)
+        self.assertIn("&gt; indoors?", html)
+        self.assertIn("Do not run it indoors.", html)
 
     def test_solution_answer_returns_only_passage(self) -> None:
         document = KnowledgeDocument(

@@ -12,16 +12,15 @@ from .session import LastLightSession
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
+MAX_TURNS = 4
 
 
-def render_page(query: str = "", answer: str = "") -> bytes:
+def render_page(
+    query: str = "", answer: str = "", history: list[tuple[str, str]] | None = None
+) -> bytes:
     escaped_query = escape(query)
-    escaped_answer = escape(answer)
-    output = (
-        f"<pre>{escaped_answer}</pre>"
-        if answer
-        else "<p class=\"muted\">Ask a question from the local knowledge pack.</p>"
-    )
+    turns = history if history is not None else ([(query, answer)] if answer else [])
+    output = render_history(turns)
     html = f"""<!doctype html>
 <html lang="en">
 <head>
@@ -72,6 +71,15 @@ pre {{
   border: 1px solid #202020;
   padding: 1rem;
 }}
+.turn {{
+  border: 1px solid #202020;
+  margin-bottom: .75rem;
+  padding: .8rem;
+}}
+.q {{
+  color: #8f8f8f;
+  margin-bottom: .45rem;
+}}
 .muted {{ color: #777; }}
 </style>
 </head>
@@ -90,6 +98,20 @@ pre {{
     return html.encode("utf-8")
 
 
+def render_history(history: list[tuple[str, str]]) -> str:
+    if not history:
+        return "<p class=\"muted\">Ask a question from the local knowledge pack.</p>"
+    parts: list[str] = []
+    for query, answer in history[-MAX_TURNS:]:
+        parts.append(
+            "<section class=\"turn\">"
+            f"<div class=\"q\">&gt; {escape(query)}</div>"
+            f"<pre>{escape(answer)}</pre>"
+            "</section>"
+        )
+    return "\n".join(parts)
+
+
 def parse_query(body: bytes) -> str:
     values = parse_qs(body.decode("utf-8"), keep_blank_values=True)
     return values.get("q", [""])[0].strip()
@@ -106,18 +128,25 @@ def solution_answer(session: LastLightSession, query: str) -> str:
 
 def make_handler(app: LastLightApp) -> type[BaseHTTPRequestHandler]:
     session = LastLightSession(app)
+    history: list[tuple[str, str]] = []
 
     class LastLightHandler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
             query = parse_query_string(self.path)
-            answer = solution_answer(session, query) if query else ""
-            self._send_page(render_page(query=query, answer=answer))
+            answer = self._record_answer(query) if query else ""
+            self._send_page(render_page(query=query, answer=answer, history=history))
 
         def do_POST(self) -> None:
             length = int(self.headers.get("Content-Length", "0"))
             query = parse_query(self.rfile.read(length))
-            answer = solution_answer(session, query) if query else ""
-            self._send_page(render_page(query=query, answer=answer))
+            answer = self._record_answer(query) if query else ""
+            self._send_page(render_page(query=query, answer=answer, history=history))
+
+        def _record_answer(self, query: str) -> str:
+            answer = solution_answer(session, query)
+            history.append((query, answer))
+            del history[:-MAX_TURNS]
+            return answer
 
         def _send_page(self, body: bytes) -> None:
             self.send_response(200)
