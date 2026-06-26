@@ -13,7 +13,7 @@
         ],
         "passage": "For severe bleeding, apply firm direct pressure with clean cloth, gauze, or the cleanest available material. Keep pressure steady. Do not repeatedly lift the dressing to check the wound because that can restart bleeding.",
         "path": "knowledge/en/medical/bleeding.md",
-        "score": 2.65261415982379,
+        "score": 2.688460297118706,
         "tags": [
           "medical",
           "bleeding",
@@ -34,7 +34,7 @@
         ],
         "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
         "path": "knowledge/en/water/purification.md",
-        "score": 1.4617548176964643,
+        "score": 1.481508261178849,
         "tags": [
           "water",
           "purification",
@@ -57,7 +57,7 @@
         ],
         "passage": "To extend phone battery life, reduce screen brightness, enable low-power mode, turn off Bluetooth, Wi-Fi, mobile data, location, and background app refresh when not needed. Use airplane mode when communication is not currently required.",
         "path": "knowledge/en/energy/battery_saving.md",
-        "score": 2.153444815665601,
+        "score": 2.182545421282704,
         "tags": [
           "energy",
           "battery",
@@ -75,17 +75,21 @@
       "result": {
         "language": "en",
         "matched_terms": [
-          "generator"
-        ],
-        "passage": "Do not connect a generator directly to household wiring unless a proper transfer switch has been installed by qualified personnel. Backfeeding can injure or kill utility workers and neighbors.",
-        "path": "knowledge/en/energy/generators.md",
-        "score": 1.2939438600631488,
-        "tags": [
-          "energy",
           "generator",
-          "carbon-monoxide"
+          "indoor",
+          "run",
+          "safe"
         ],
-        "title": "Generator Safety"
+        "passage": "Keep generators and fuel-burning equipment outside and far from windows, doors, vents, garages, crawl spaces, and neighboring homes. Opening a window is not enough to make indoor generator or charcoal use safe.",
+        "path": "knowledge/en/shelter/carbon_monoxide.md",
+        "score": 1.3604147928761754,
+        "tags": [
+          "shelter",
+          "carbon-monoxide",
+          "generator",
+          "ventilation"
+        ],
+        "title": "Carbon Monoxide Warning"
       }
     },
     {
@@ -101,7 +105,7 @@
         ],
         "passage": "Cool a burn with clean, cool running water for about 20 minutes if possible. Remove jewelry or tight clothing near the burn before swelling starts, but do not remove material stuck to the skin.",
         "path": "knowledge/en/medical/burns.md",
-        "score": 1.8385494867662822,
+        "score": 1.8633947501009616,
         "tags": [
           "medical",
           "burns",
@@ -123,7 +127,7 @@
         ],
         "passage": "Warning signs include confusion, fainting, very little urine, rapid heartbeat, sunken eyes, inability to keep fluids down, or worsening weakness. These signs require urgent medical help when available.",
         "path": "knowledge/en/medical/dehydration.md",
-        "score": 2.143764642069973,
+        "score": 2.172734434530378,
         "tags": [
           "medical",
           "dehydration",
@@ -145,7 +149,7 @@
         ],
         "passage": "When navigating with a map, account for local magnetic declination if known. In poor visibility, move slowly and use short legs between identifiable landmarks.",
         "path": "knowledge/en/navigation/compass.md",
-        "score": 1.5282438665491396,
+        "score": 1.5488958106916955,
         "tags": [
           "navigation",
           "compass",
@@ -166,7 +170,7 @@
         ],
         "passage": "Signals for rescuers should be simple, repeated, and easy to notice. Three repeated sounds, flashes, or marks are widely recognized as a distress pattern in many contexts.",
         "path": "knowledge/en/communications/signaling.md",
-        "score": 0.7390145746454947,
+        "score": 0.7490012580866501,
         "tags": [
           "communications",
           "signaling",
@@ -189,7 +193,7 @@
         ],
         "passage": "In cold conditions, reduce heat loss by blocking wind, staying dry, insulating from the ground, and wearing loose layers. Wet clothing removes heat quickly.",
         "path": "knowledge/en/shelter/cold_weather.md",
-        "score": 2.397181679546035,
+        "score": 2.4295760265669273,
         "tags": [
           "shelter",
           "cold",
@@ -211,7 +215,7 @@
         ],
         "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
         "path": "knowledge/en/shelter/heat.md",
-        "score": 2.4835547038366452,
+        "score": 2.5171162538884917,
         "tags": [
           "shelter",
           "heat",
@@ -219,15 +223,190 @@
         ],
         "title": "Extreme Heat"
       }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "food",
+      "query": "is food in the fridge safe after a power outage",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "food",
+          "outage",
+          "power",
+          "safe"
+        ],
+        "passage": "During a power outage, keep refrigerator and freezer doors closed as much as possible. A closed refrigerator can usually keep food cold for several hours, and a full freezer stays cold longer than a half-empty freezer. Opening the door repeatedly lets cold air escape quickly.",
+        "path": "knowledge/en/food/food_safety.md",
+        "score": 2.579935100874379,
+        "tags": [
+          "food",
+          "safety",
+          "refrigeration",
+          "outage"
+        ],
+        "title": "Food Safety During Power Outage"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "sanitation",
+      "query": "how do I keep hygiene when toilets do not flush",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "flush",
+          "hygiene",
+          "keep",
+          "not",
+          "toilet",
+          "toilets"
+        ],
+        "passage": "If toilets do not flush, keep human waste away from living, cooking, and water storage areas. Use a lined bucket or container only if necessary, cover waste after each use, and store it where people, animals, and floodwater cannot spread it. Wash or sanitize hands afterward.",
+        "path": "knowledge/en/sanitation/hygiene.md",
+        "score": 2.043554828460882,
+        "tags": [
+          "sanitation",
+          "hygiene",
+          "waste",
+          "illness"
+        ],
+        "title": "Sanitation and Hygiene During Outage"
+      }
+    },
+    {
+      "confidence": "MEDIUM",
+      "correct": true,
+      "expected_tag": "cooking",
+      "query": "can I cook with charcoal indoors",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "charcoal",
+          "cook",
+          "indoors"
+        ],
+        "passage": "Cook outdoors or in a very well-ventilated area when using charcoal, camp stoves, grills, or fuel burners. Never use charcoal grills, gas grills, camping stoves, or generators inside a home, tent, vehicle, garage, or enclosed room. Carbon monoxide can kill without warning.",
+        "path": "knowledge/en/energy/cooking_safety.md",
+        "score": 0.8464068170802972,
+        "tags": [
+          "energy",
+          "cooking",
+          "fire",
+          "ventilation"
+        ],
+        "title": "Emergency Cooking Safety"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "wounds",
+      "query": "how should I clean a minor wound",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "clean",
+          "minor",
+          "wound"
+        ],
+        "passage": "For minor cuts and scrapes, first stop bleeding with gentle direct pressure. Wash your hands if possible, then rinse dirt from the wound with clean running water or the safest available water. Remove loose debris with clean tweezers if available.",
+        "path": "knowledge/en/medical/wound_care.md",
+        "score": 1.5688850041510372,
+        "tags": [
+          "medical",
+          "wounds",
+          "infection",
+          "first-aid"
+        ],
+        "title": "Basic Wound Care"
+      }
+    },
+    {
+      "confidence": "MEDIUM",
+      "correct": true,
+      "expected_tag": "medication",
+      "query": "how do I manage insulin and medicine in a blackout",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "blackout",
+          "insulin",
+          "medicine"
+        ],
+        "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
+        "path": "knowledge/en/medical/medication_management.md",
+        "score": 1.0121779005736287,
+        "tags": [
+          "medical",
+          "medication",
+          "chronic-conditions",
+          "refrigeration"
+        ],
+        "title": "Medication Management During Outage"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "carbon-monoxide",
+      "query": "what are carbon monoxide warning signs",
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "carbon",
+          "monoxide",
+          "signs",
+          "warning"
+        ],
+        "passage": "Battery-powered carbon monoxide alarms are valuable during outages. If an alarm sounds, leave the building first, then seek help. Do not re-enter until the source is found and the space is safe.",
+        "path": "knowledge/en/shelter/carbon_monoxide.md",
+        "score": 3.545955594819205,
+        "tags": [
+          "shelter",
+          "carbon-monoxide",
+          "generator",
+          "ventilation"
+        ],
+        "title": "Carbon Monoxide Warning"
+      }
+    },
+    {
+      "confidence": "HIGH",
+      "correct": true,
+      "expected_tag": "agua",
+      "query": "como purificar agua en un apagon",
+      "result": {
+        "language": "es",
+        "matched_terms": [
+          "agua",
+          "apagon",
+          "purificar",
+          "water"
+        ],
+        "passage": "Para purificar agua que puede estar contaminada, hiervala antes de beberla cuando tenga combustible seguro. Lleve el agua a hervor fuerte por al menos un minuto. En zonas de gran altura, hierva por al menos tres minutos. Deje enfriar el agua en un recipiente limpio y cubierto.",
+        "path": "knowledge/es/water/agua_segura.md",
+        "score": 2.3982473105534075,
+        "tags": [
+          "water",
+          "agua",
+          "purification",
+          "purificacion",
+          "hervir"
+        ],
+        "title": "Agua segura durante un apagon"
+      }
     }
   ],
   "confidence": {
-    "HIGH": 8,
+    "HIGH": 13,
     "LOW": 0,
-    "MEDIUM": 2,
+    "MEDIUM": 4,
     "NONE": 0
   },
-  "correct": 10,
+  "correct": 17,
   "top_1_accuracy": 1.0,
-  "total_cases": 10
+  "total_cases": 17
 }

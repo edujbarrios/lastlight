@@ -8,4 +8,10 @@
 {"query":"how can I signal rescuers","expected_tag":"signaling"}
 {"query":"how do I stay warm in cold shelter","expected_tag":"cold"}
 {"query":"what should I do in extreme heat","expected_tag":"heat"}
-
+{"query":"is food in the fridge safe after a power outage","expected_tag":"food"}
+{"query":"how do I keep hygiene when toilets do not flush","expected_tag":"sanitation"}
+{"query":"can I cook with charcoal indoors","expected_tag":"cooking"}
+{"query":"how should I clean a minor wound","expected_tag":"wounds"}
+{"query":"how do I manage insulin and medicine in a blackout","expected_tag":"medication"}
+{"query":"what are carbon monoxide warning signs","expected_tag":"carbon-monoxide"}
+{"query":"como purificar agua en un apagon","expected_tag":"agua"}
