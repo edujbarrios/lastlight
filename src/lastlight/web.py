@@ -42,7 +42,7 @@ main {{
   padding: 1rem;
 }}
 h1 {{ color: #c8c8c8; font-size: 1.25rem; margin: 0 0 1rem; }}
-form {{ display: flex; gap: .5rem; margin-bottom: 1rem; }}
+form {{ display: flex; gap: .6rem; margin-bottom: 1rem; }}
 input {{
   flex: 1;
   min-width: 0;
@@ -51,10 +51,12 @@ input {{
   border: 1px solid #2a2a2a;
   padding: .7rem;
 }}
+input::placeholder {{ color: #565656; }}
 button {{
   background: #080808;
   color: #cfcfcf;
   border: 1px solid #2a2a2a;
+  min-width: 5.5rem;
   padding: .7rem .9rem;
   font-weight: 700;
 }}
@@ -68,17 +70,23 @@ pre {{
   overflow-wrap: anywhere;
   background: #000;
   color: #b8b8b8;
-  border: 1px solid #202020;
-  padding: 1rem;
+  border: 0;
+  margin: 0;
+  padding: 0;
 }}
 .turn {{
   border: 1px solid #202020;
   margin-bottom: .75rem;
-  padding: .8rem;
+  padding: .9rem;
 }}
 .q {{
   color: #8f8f8f;
   margin-bottom: .45rem;
+}}
+.a-label {{
+  color: #5f5f5f;
+  font-size: .85rem;
+  margin-bottom: .35rem;
 }}
 .muted {{ color: #777; }}
 </style>
@@ -87,8 +95,8 @@ pre {{
 <main>
 <h1>LastLight</h1>
 <form method="post">
-<input name="q" value="{escaped_query}" autocomplete="off" autofocus>
-<button>Ask</button>
+<input name="q" value="{escaped_query}" placeholder="Type a message..." autocomplete="off" autofocus>
+<button>Send</button>
 </form>
 {output}
 </main>
@@ -105,7 +113,8 @@ def render_history(history: list[tuple[str, str]]) -> str:
     for query, answer in history[-MAX_TURNS:]:
         parts.append(
             "<section class=\"turn\">"
-            f"<div class=\"q\">&gt; {escape(query)}</div>"
+            f"<div class=\"q\">You: {escape(query)}</div>"
+            "<div class=\"a-label\">LastLight</div>"
             f"<pre>{escape(answer)}</pre>"
             "</section>"
         )

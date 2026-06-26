@@ -36,6 +36,7 @@ class WebTests(unittest.TestCase):
         self.assertIn("&lt;answer&gt;", html)
         self.assertNotIn("<query>", html)
         self.assertNotIn("<answer>", html)
+        self.assertIn('placeholder="Type a message..."', html)
 
     def test_render_history_shows_multiple_turns(self) -> None:
         html = render_history(
@@ -45,9 +46,10 @@ class WebTests(unittest.TestCase):
             ]
         )
 
-        self.assertIn("&gt; generator safety", html)
+        self.assertIn("You: generator safety", html)
         self.assertIn("Keep it outside.", html)
-        self.assertIn("&gt; indoors?", html)
+        self.assertIn("You: indoors?", html)
+        self.assertIn("LastLight", html)
         self.assertIn("Do not run it indoors.", html)
 
     def test_solution_answer_returns_only_passage(self) -> None:
