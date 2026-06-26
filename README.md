@@ -14,19 +14,19 @@ cd lastlight
 ## Run
 
 ```bash
-python3 src/main.py
-python3 src/main.py "how do I purify water"
-python3 src/main.py --knowledge path/to/pack.zip "find north without a compass"
-```
+python src/main.py
+python src/main.py "how do I purify water"
 
-On Windows, use `python` instead of `python3` if needed.
+# Use --knowledge when adding an external knowledge pack beyond this repo's built-in knowledge.
+python src/main.py --knowledge path/to/pack.zip "find north without a compass"
+```
 
 ## Frontend
 
 Start the optional local web UI. It uses a pure black, low-brightness theme and shows only the answer passage:
 
 ```bash
-python3 src/main.py --serve
+python src/main.py --serve
 ```
 
 Open `http://127.0.0.1:8765`.
@@ -47,22 +47,22 @@ Open `http://127.0.0.1:8765`.
 
 | Task | Command |
 | --- | --- |
-| Interactive mode | `python3 src/main.py` |
-| Single query | `python3 src/main.py "stop bleeding"` |
-| Use another pack | `python3 src/main.py --knowledge path/to/pack.zip "save battery"` |
-| Filter language | `python3 src/main.py --language es "necesito ayuda"` |
-| Evaluate retrieval | `python3 src/main.py --eval` |
-| Custom eval JSON | `python3 src/main.py --eval --eval-output eval/results.json` |
-| Choose retrieval | `python3 src/main.py --strategy bm25 "purify water"` |
-| Build C core | `python3 tools/build_c_core.py` |
-| Inspect pack | `python3 src/main.py --pack-info` |
-| List knowledge | `python3 src/main.py --list-knowledge` |
-| Validate pack | `python3 src/main.py --validate-pack` |
-| Export pack | `python3 src/main.py --export-pack dist/lastlight-core.zip` |
-| Build audit index | `python3 src/main.py --build-index data/lastlight.index.json` |
-| Device self-check | `python3 src/main.py --self-check` |
-| Local web UI | `python3 src/main.py --serve` |
-| Run tests | `python3 -m unittest discover -s tests` |
+| Interactive mode | `python src/main.py` |
+| Single query | `python src/main.py "stop bleeding"` |
+| Use another pack | `python src/main.py --knowledge path/to/pack.zip "save battery"` |
+| Filter language | `python src/main.py --language es "necesito ayuda"` |
+| Evaluate retrieval | `python src/main.py --eval` |
+| Custom eval JSON | `python src/main.py --eval --eval-output eval/results.json` |
+| Choose retrieval | `python src/main.py --strategy bm25 "purify water"` |
+| Build C core | `python tools/build_c_core.py` |
+| Inspect pack | `python src/main.py --pack-info` |
+| List knowledge | `python src/main.py --list-knowledge` |
+| Validate pack | `python src/main.py --validate-pack` |
+| Export pack | `python src/main.py --export-pack dist/lastlight-core.zip` |
+| Build audit index | `python src/main.py --build-index data/lastlight.index.json` |
+| Device self-check | `python src/main.py --self-check` |
+| Local web UI | `python src/main.py --serve` |
+| Run tests | `python -m unittest discover -s tests` |
 
 ## Knowledge
 
