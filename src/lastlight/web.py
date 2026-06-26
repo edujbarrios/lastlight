@@ -41,7 +41,20 @@ main {{
   margin: 0 auto;
   padding: 1rem;
 }}
-h1 {{ color: #c8c8c8; font-size: 1.25rem; margin: 0 0 1rem; }}
+.top {{
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}}
+h1 {{ color: #c8c8c8; font-size: 1.25rem; margin: 0; }}
+.clear {{
+  color: #666;
+  font-size: .9rem;
+  text-decoration: none;
+}}
+.clear:focus,
+.clear:hover {{ color: #999; }}
 form {{ display: flex; gap: .6rem; margin-bottom: 1rem; }}
 input {{
   flex: 1;
@@ -93,7 +106,10 @@ pre {{
 </head>
 <body>
 <main>
+<div class="top">
 <h1>LastLight</h1>
+<a class="clear" href="/?clear=1">Clear</a>
+</div>
 <form method="post">
 <input name="q" value="{escaped_query}" placeholder="Type a message..." autocomplete="off" autofocus>
 <button>Send</button>
@@ -131,6 +147,11 @@ def parse_query_string(path: str) -> str:
     return values.get("q", [""])[0].strip()
 
 
+def parse_clear(path: str) -> bool:
+    values = parse_qs(urlsplit(path).query, keep_blank_values=True)
+    return values.get("clear", [""])[0] == "1"
+
+
 def solution_answer(session: LastLightSession, query: str) -> str:
     return session.answer_passage(query)
 
@@ -141,6 +162,11 @@ def make_handler(app: LastLightApp) -> type[BaseHTTPRequestHandler]:
 
     class LastLightHandler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
+            if parse_clear(self.path):
+                session.clear()
+                history.clear()
+                self._send_page(render_page())
+                return
             query = parse_query_string(self.path)
             answer = self._record_answer(query) if query else ""
             self._send_page(render_page(query=query, answer=answer, history=history))

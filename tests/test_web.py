@@ -6,6 +6,7 @@ import helpers  # noqa: F401
 from lastlight.domain import KnowledgeDocument, SearchResult
 from lastlight.session import LastLightSession
 from lastlight.web import (
+    parse_clear,
     parse_query,
     parse_query_string,
     render_history,
@@ -29,6 +30,10 @@ class WebTests(unittest.TestCase):
     def test_parse_query_string_trims_url_value(self) -> None:
         self.assertEqual(parse_query_string("/?q=%20find%20north%20"), "find north")
 
+    def test_parse_clear_detects_clear_request(self) -> None:
+        self.assertTrue(parse_clear("/?clear=1"))
+        self.assertFalse(parse_clear("/?q=water"))
+
     def test_render_page_escapes_query_and_answer(self) -> None:
         html = render_page("<query>", "<answer>").decode("utf-8")
 
@@ -37,6 +42,7 @@ class WebTests(unittest.TestCase):
         self.assertNotIn("<query>", html)
         self.assertNotIn("<answer>", html)
         self.assertIn('placeholder="Type a message..."', html)
+        self.assertIn('href="/?clear=1"', html)
 
     def test_render_history_shows_multiple_turns(self) -> None:
         html = render_history(
