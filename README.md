@@ -62,6 +62,7 @@ The web session keeps short-lived context for follow-up questions.
 | List knowledge | `python src/main.py --list-knowledge` |
 | Validate pack | `python src/main.py --validate-pack` |
 | Export pack | `python src/main.py --export-pack dist/lastlight-core.zip` |
+| Import PDF | `python tools/pdf_to_markdown.py guide.pdf --output knowledge/en/imported/guide.md` |
 | Build audit index | `python src/main.py --build-index data/lastlight.index.json` |
 | Device self-check | `python src/main.py --self-check` |
 | Local web UI | `python src/main.py --serve` |
@@ -94,6 +95,7 @@ Knowledge packs can include `lastlight-pack.json` for reproducible metadata. See
 - [Platforms](docs/platforms.md)
 - [Native C core](docs/native_core.md)
 - [Local model packs](docs/local_models.md)
+- [PDF ingest](docs/pdf_ingest.md)
 
 ## License
 
