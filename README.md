@@ -38,6 +38,7 @@ Open `http://127.0.0.1:8765`.
 - Offline terminal search over `knowledge/en/`, `knowledge/es/`, or custom packs
 - Sourced answers with confidence, language, tags, and source paths
 - Lexical, BM25, and optional C-backed lexical retrieval
+- Lightweight session memory for follow-up questions in interactive and web modes
 - Directory and deterministic `.zip` knowledge packs
 - Pack validation, export, metadata, and SHA-256 audit indexes
 - Optional minimal dark local web UI

@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 
 SENTENCE_BOUNDARY_RE = re.compile(r"(?<=[.!?])\s+")
+BULLET_RE = re.compile(r"^\s*(?:[-*]|\d+[.)])\s+")
 
 
 def chunk_text(text: str, max_chars: int = 700) -> list[str]:
@@ -64,11 +65,7 @@ def sentence_windows(text: str, max_chars: int = 700) -> list[str]:
     for paragraph in (part.strip() for part in text.split("\n\n")):
         if not paragraph:
             continue
-        sentences = [
-            sentence.strip()
-            for sentence in SENTENCE_BOUNDARY_RE.split(paragraph)
-            if sentence.strip()
-        ]
+        sentences = _text_units(paragraph)
         if not sentences:
             continue
         for index in range(len(sentences)):
@@ -76,6 +73,17 @@ def sentence_windows(text: str, max_chars: int = 700) -> list[str]:
             if window and window not in windows:
                 windows.append(window)
     return windows or chunk_text(text, max_chars=max_chars)
+
+
+def _text_units(paragraph: str) -> list[str]:
+    lines = [line.strip() for line in paragraph.splitlines() if line.strip()]
+    if len(lines) > 1 and any(BULLET_RE.match(line) for line in lines):
+        return [BULLET_RE.sub("", line).strip() for line in lines if line.strip()]
+    return [
+        sentence.strip()
+        for sentence in SENTENCE_BOUNDARY_RE.split(paragraph)
+        if sentence.strip()
+    ]
 
 
 def _window_around_sentence(

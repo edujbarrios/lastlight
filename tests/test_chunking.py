@@ -36,6 +36,13 @@ class ChunkingTests(unittest.TestCase):
 
         self.assertTrue(all(len(window) <= 60 for window in windows))
 
+    def test_sentence_windows_handle_bulleted_steps(self) -> None:
+        text = "- Check breathing\n- Apply pressure\n- Call for help"
+
+        windows = sentence_windows(text, max_chars=80)
+
+        self.assertIn("Check breathing Apply pressure Call for help", windows)
+
 
 if __name__ == "__main__":
     unittest.main()

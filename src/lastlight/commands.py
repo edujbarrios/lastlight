@@ -18,6 +18,7 @@ from .local_model import summarize_local_model, write_local_model
 from .pack_export import export_pack, sha256_file
 from .pack_validation import format_validation_report, validate_pack
 from .safety import STARTUP_WARNING
+from .session import LastLightSession
 from .web import serve
 
 
@@ -26,8 +27,9 @@ class InteractiveCommand:
         self.app = app
 
     def execute(self) -> int:
+        session = LastLightSession(self.app)
         print(STARTUP_WARNING)
-        print("Type a question, or 'exit' to quit.")
+        print("Type a question, 'clear' to reset context, or 'exit' to quit.")
         while True:
             try:
                 query = input("> ").strip()
@@ -36,9 +38,13 @@ class InteractiveCommand:
                 return 0
             if query.casefold() in {"exit", "quit", ":q"}:
                 return 0
+            if query.casefold() in {"clear", ":clear"}:
+                session.clear()
+                print("Context cleared.")
+                continue
             if not query:
                 continue
-            print(self.app.answer(query))
+            print(session.answer(query))
         return 0
 
 

@@ -4,6 +4,7 @@ import unittest
 
 import helpers  # noqa: F401
 from lastlight.domain import KnowledgeDocument, SearchResult
+from lastlight.session import LastLightSession
 from lastlight.web import parse_query, parse_query_string, render_page, solution_answer
 
 
@@ -45,7 +46,7 @@ class WebTests(unittest.TestCase):
             passage="Boil water before drinking.",
         )
 
-        answer = solution_answer(FakeApp([result]), "water")
+        answer = solution_answer(LastLightSession(FakeApp([result])), "water")
 
         self.assertEqual(answer, "Boil water before drinking.")
         self.assertNotIn("Source:", answer)
@@ -60,7 +61,7 @@ class WebTests(unittest.TestCase):
             passage="Low confidence passage.",
         )
 
-        answer = solution_answer(FakeApp([result]), "unknown")
+        answer = solution_answer(LastLightSession(FakeApp([result])), "unknown")
 
         self.assertIn("not have enough confidence", answer)
 
