@@ -33,7 +33,7 @@ def render_page(query: str = "", answer: str = "") -> bytes:
 body {{
   margin: 0;
   background: #000;
-  color: #ddd;
+  color: #b8b8b8;
   font: 16px/1.45 system-ui, sans-serif;
 }}
 main {{
@@ -41,31 +41,37 @@ main {{
   margin: 0 auto;
   padding: 1rem;
 }}
-h1 {{ font-size: 1.25rem; margin: 0 0 1rem; }}
+h1 {{ color: #c8c8c8; font-size: 1.25rem; margin: 0 0 1rem; }}
 form {{ display: flex; gap: .5rem; margin-bottom: 1rem; }}
 input {{
   flex: 1;
   min-width: 0;
-  background: #050505;
-  color: #eee;
-  border: 1px solid #555;
+  background: #000;
+  color: #cfcfcf;
+  border: 1px solid #2a2a2a;
   padding: .7rem;
 }}
 button {{
-  background: #eee;
-  color: #000;
-  border: 0;
+  background: #080808;
+  color: #cfcfcf;
+  border: 1px solid #2a2a2a;
   padding: .7rem .9rem;
   font-weight: 700;
+}}
+button:focus,
+input:focus {{
+  border-color: #555;
+  outline: none;
 }}
 pre {{
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  background: #050505;
-  border: 1px solid #333;
+  background: #000;
+  color: #b8b8b8;
+  border: 1px solid #202020;
   padding: 1rem;
 }}
-.muted {{ color: #999; }}
+.muted {{ color: #777; }}
 </style>
 </head>
 <body>
