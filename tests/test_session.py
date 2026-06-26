@@ -44,6 +44,16 @@ class SessionTests(unittest.TestCase):
         self.assertIn("Generator Safety", app.queries[1])
         self.assertIn("indoors?", app.queries[1])
 
+    def test_natural_follow_up_query_uses_previous_context(self) -> None:
+        app = RecordingApp()
+        session = LastLightSession(app)
+
+        session.answer("How do I use a generator safely during a blackout?")
+        session.answer("Can I run it indoors if I open a window?")
+
+        self.assertIn("Generator Safety", app.queries[1])
+        self.assertIn("Can I run it indoors", app.queries[1])
+
     def test_clear_removes_context(self) -> None:
         app = RecordingApp()
         session = LastLightSession(app)
