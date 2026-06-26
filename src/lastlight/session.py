@@ -12,6 +12,8 @@ FOLLOW_UP_PREFIXES = (
     "and ",
     "also ",
     "what about",
+    "what if",
+    "what should",
     "how about",
     "then ",
     "next ",

@@ -8,15 +8,21 @@ from lastlight.session import LastLightSession
 
 
 class RecordingApp:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        title: str = "Generator Safety",
+        tags: tuple[str, ...] = ("generator", "carbon-monoxide"),
+        matched_terms: tuple[str, ...] = ("generator",),
+    ) -> None:
         self.queries: list[str] = []
         self.document = KnowledgeDocument(
-            title="Generator Safety",
-            path="knowledge/en/energy/generators.md",
+            title=title,
+            path="knowledge/en/doc.md",
             body="Never run a generator indoors.",
             language="en",
-            tags=("generator", "carbon-monoxide"),
+            tags=tags,
         )
+        self.matched_terms = matched_terms
 
     def search(self, text: str, top_k: int = 3) -> list[SearchResult]:
         self.queries.append(text)
@@ -26,7 +32,7 @@ class RecordingApp:
                 score=2.0,
                 confidence="HIGH",
                 passage="Never run a generator indoors.",
-                matched_terms=("generator",),
+                matched_terms=self.matched_terms,
             )
         ]
 
@@ -45,14 +51,18 @@ class SessionTests(unittest.TestCase):
         self.assertIn("indoors?", app.queries[1])
 
     def test_natural_follow_up_query_uses_previous_context(self) -> None:
-        app = RecordingApp()
+        app = RecordingApp(
+            title="Water Purification",
+            tags=("water", "purification", "boiling"),
+            matched_terms=("water",),
+        )
         session = LastLightSession(app)
 
-        session.answer("How do I use a generator safely during a blackout?")
-        session.answer("Can I run it indoors if I open a window?")
+        session.answer("I have dirty water after a blackout. How do I make it safer to drink?")
+        session.answer("What should I do if boiling is not possible?")
 
-        self.assertIn("Generator Safety", app.queries[1])
-        self.assertIn("Can I run it indoors", app.queries[1])
+        self.assertIn("Water Purification", app.queries[1])
+        self.assertIn("What should I do if boiling is not possible?", app.queries[1])
 
     def test_clear_removes_context(self) -> None:
         app = RecordingApp()
