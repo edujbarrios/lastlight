@@ -23,7 +23,7 @@ On Windows, use `python` instead of `python3` if needed.
 
 ## Frontend
 
-Start the optional local web UI. It uses a pure black, low-brightness theme:
+Start the optional local web UI. It uses a pure black, low-brightness theme and shows only the answer passage:
 
 ```bash
 python3 src/main.py --serve

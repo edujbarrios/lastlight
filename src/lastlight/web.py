@@ -8,6 +8,7 @@ from typing import Callable
 from urllib.parse import parse_qs, urlsplit
 
 from .app import LastLightApp
+from .safety import LOW_CONFIDENCE_RESPONSE
 
 DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8765
@@ -99,17 +100,25 @@ def parse_query_string(path: str) -> str:
     return values.get("q", [""])[0].strip()
 
 
+def solution_answer(app: LastLightApp, query: str) -> str:
+    results = app.search(query, top_k=3)
+    for result in results:
+        if result.confidence in {"HIGH", "MEDIUM"}:
+            return result.passage
+    return LOW_CONFIDENCE_RESPONSE
+
+
 def make_handler(app: LastLightApp) -> type[BaseHTTPRequestHandler]:
     class LastLightHandler(BaseHTTPRequestHandler):
         def do_GET(self) -> None:
             query = parse_query_string(self.path)
-            answer = app.answer(query) if query else ""
+            answer = solution_answer(app, query) if query else ""
             self._send_page(render_page(query=query, answer=answer))
 
         def do_POST(self) -> None:
             length = int(self.headers.get("Content-Length", "0"))
             query = parse_query(self.rfile.read(length))
-            answer = app.answer(query) if query else ""
+            answer = solution_answer(app, query) if query else ""
             self._send_page(render_page(query=query, answer=answer))
 
         def _send_page(self, body: bytes) -> None:

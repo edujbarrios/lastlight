@@ -3,7 +3,16 @@ from __future__ import annotations
 import unittest
 
 import helpers  # noqa: F401
-from lastlight.web import parse_query, parse_query_string, render_page
+from lastlight.domain import KnowledgeDocument, SearchResult
+from lastlight.web import parse_query, parse_query_string, render_page, solution_answer
+
+
+class FakeApp:
+    def __init__(self, results: list[SearchResult]) -> None:
+        self.results = results
+
+    def search(self, query: str, top_k: int = 3) -> list[SearchResult]:
+        return self.results
 
 
 class WebTests(unittest.TestCase):
@@ -20,6 +29,40 @@ class WebTests(unittest.TestCase):
         self.assertIn("&lt;answer&gt;", html)
         self.assertNotIn("<query>", html)
         self.assertNotIn("<answer>", html)
+
+    def test_solution_answer_returns_only_passage(self) -> None:
+        document = KnowledgeDocument(
+            title="Water",
+            path="knowledge/en/water.md",
+            body="Boil water.",
+            language="en",
+            tags=("water",),
+        )
+        result = SearchResult(
+            document=document,
+            score=2.0,
+            confidence="HIGH",
+            passage="Boil water before drinking.",
+        )
+
+        answer = solution_answer(FakeApp([result]), "water")
+
+        self.assertEqual(answer, "Boil water before drinking.")
+        self.assertNotIn("Source:", answer)
+        self.assertNotIn("HIGH", answer)
+
+    def test_solution_answer_refuses_when_confidence_is_low(self) -> None:
+        document = KnowledgeDocument(title="Low", path="low.md", body="Low.")
+        result = SearchResult(
+            document=document,
+            score=0.1,
+            confidence="LOW",
+            passage="Low confidence passage.",
+        )
+
+        answer = solution_answer(FakeApp([result]), "unknown")
+
+        self.assertIn("not have enough confidence", answer)
 
 
 if __name__ == "__main__":
