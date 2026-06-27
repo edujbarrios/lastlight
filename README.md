@@ -23,7 +23,7 @@ python src/main.py --knowledge path/to/pack.zip "find north without a compass"
 
 ## Frontend
 
-Start the optional local web UI. It uses a pure black, low-brightness theme and shows only the answer passage:
+Start the optional local web UI. It uses a pure black, low-brightness theme, opens with a short calm-and-safety checklist, and shows only the answer passage:
 
 ```bash
 python src/main.py --serve

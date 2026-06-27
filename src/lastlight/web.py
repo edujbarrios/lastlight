@@ -55,6 +55,23 @@ h1 {{ color: #c8c8c8; font-size: 1.25rem; margin: 0; }}
 }}
 .clear:focus,
 .clear:hover {{ color: #999; }}
+.calm {{
+  border: 1px solid #202020;
+  margin-bottom: 1rem;
+  padding: .85rem .95rem;
+}}
+.calm strong {{
+  color: #d0d0d0;
+  display: block;
+  font-size: .95rem;
+  margin-bottom: .45rem;
+}}
+.calm ol {{
+  color: #8f8f8f;
+  margin: 0;
+  padding-left: 1.2rem;
+}}
+.calm li {{ margin: .15rem 0; }}
 form {{ display: flex; gap: .6rem; margin-bottom: 1rem; }}
 input {{
   flex: 1;
@@ -110,6 +127,15 @@ pre {{
 <h1>LastLight</h1>
 <a class="clear" href="/?clear=1">Clear</a>
 </div>
+<section class="calm" aria-label="Blackout safety reminder">
+<strong>Keep calm. There is a blackout, but you can stay safer.</strong>
+<ol>
+<li>Breathe slowly for 30 seconds.</li>
+<li>Check for immediate danger: fire, gas smell, injuries, or flooding.</li>
+<li>Save battery: lower brightness and close unused apps.</li>
+<li>Ask one practical question at a time.</li>
+</ol>
+</section>
 <form method="post">
 <input name="q" value="{escaped_query}" placeholder="Type a message..." autocomplete="off" autofocus>
 <button>Send</button>
