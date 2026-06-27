@@ -6,6 +6,27 @@ LastLight is a tiny local RAG-style knowledge capsule. It searches Markdown know
 
 While much of current AI research focuses on general-purpose LLMs, disasters and infrastructure collapse expose a narrower and practical AI systems problem: people often need accurate, auditable information from a solid local knowledge base when compute, battery, and network access are constrained. LastLight explores that gap through a low-power RAG-inspired design for austere environments, prioritizing robust retrieval, source traceability, and refusal over unconstrained generation.
 
+## Benchmark
+
+The current retrieval benchmark uses 40 direct, scenario-based, multi-intent, and Spanish disaster-response queries from `data/eval.jsonl`.
+
+| Strategy | Top-1 | Top-3 | MRR | Mean search latency |
+| --- | ---: | ---: | ---: | ---: |
+| Lexical | 97.50% | 100.00% | 0.988 | 31.586 ms |
+| BM25 | 95.00% | 100.00% | 0.971 | 31.613 ms |
+
+Process-level timing on Windows 11 / Python 3.12.7 with 7 iterations and a 15 W energy estimate:
+
+| Operation | Median time | Estimated energy |
+| --- | ---: | ---: |
+| Lexical query | 333.4 ms | 1.3894 mWh |
+| BM25 query | 313.4 ms | 1.3060 mWh |
+| Lexical evaluation | 1419.8 ms | 5.9159 mWh |
+| BM25 evaluation | 1406.5 ms | 5.8606 mWh |
+| Unit tests | 743.1 ms | 3.0961 mWh |
+
+Full results are stored in [eval/results.json](eval/results.json), [eval/results-bm25.json](eval/results-bm25.json), and [eval/benchmark.md](eval/benchmark.md).
+
 ## Clone
 
 ```bash
@@ -48,27 +69,6 @@ The web session keeps short-lived context for follow-up questions.
 - Pack validation, export, metadata, and SHA-256 audit indexes
 - Optional minimal dark local web UI
 - Optional experimental n-gram synthesis and local model packs
-
-## Benchmark
-
-The current retrieval benchmark uses 40 direct, scenario-based, multi-intent, and Spanish disaster-response queries from `data/eval.jsonl`.
-
-| Strategy | Top-1 | Top-3 | MRR | Mean search latency |
-| --- | ---: | ---: | ---: | ---: |
-| Lexical | 97.50% | 100.00% | 0.988 | 31.586 ms |
-| BM25 | 95.00% | 100.00% | 0.971 | 31.613 ms |
-
-Process-level timing on Windows 11 / Python 3.12.7 with 7 iterations and a 15 W energy estimate:
-
-| Operation | Median time | Estimated energy |
-| --- | ---: | ---: |
-| Lexical query | 333.4 ms | 1.3894 mWh |
-| BM25 query | 313.4 ms | 1.3060 mWh |
-| Lexical evaluation | 1419.8 ms | 5.9159 mWh |
-| BM25 evaluation | 1406.5 ms | 5.8606 mWh |
-| Unit tests | 743.1 ms | 3.0961 mWh |
-
-Full results are stored in [eval/results.json](eval/results.json), [eval/results-bm25.json](eval/results-bm25.json), and [eval/benchmark.md](eval/benchmark.md).
 
 ## Commands
 
