@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .app import LastLightApp
-from .domain import SearchResult
 from .safety import LOW_CONFIDENCE_RESPONSE, safe_answer
+from .triage import append_follow_up_questions, first_acceptable_result
 
 FOLLOW_UP_PREFIXES = (
     "and ",
@@ -78,12 +78,16 @@ class LastLightSession:
         return results
 
     def answer(self, query: str) -> str:
-        return safe_answer(self.search(query, top_k=3))
+        results = self.search(query, top_k=3)
+        return append_follow_up_questions(
+            safe_answer(results), first_acceptable_result(results)
+        )
 
     def answer_passage(self, query: str) -> str:
-        for result in self.search(query, top_k=3):
-            if result.confidence in {"HIGH", "MEDIUM"}:
-                return result.passage
+        results = self.search(query, top_k=3)
+        result = first_acceptable_result(results)
+        if result is not None:
+            return result.passage
         return LOW_CONFIDENCE_RESPONSE
 
     def _contextual_query(self, query: str) -> str:

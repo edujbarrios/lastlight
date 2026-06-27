@@ -6,6 +6,7 @@ from .domain import SearchQuery, SearchResult
 from .interfaces import KnowledgeRepository, RetrievalStrategy
 from .safety import safe_answer
 from .synthesis import synthesize_answer
+from .triage import append_follow_up_questions, first_acceptable_result
 
 
 class LastLightApp:
@@ -30,7 +31,10 @@ class LastLightApp:
         return self.retrieval.search(SearchQuery(text=text, top_k=top_k), documents)
 
     def answer(self, text: str) -> str:
-        return safe_answer(self.search(text, top_k=3))
+        results = self.search(text, top_k=3)
+        return append_follow_up_questions(
+            safe_answer(results), first_acceptable_result(results)
+        )
 
     def synthesize(self, text: str) -> str:
         return synthesize_answer(text, self.search(text, top_k=3))

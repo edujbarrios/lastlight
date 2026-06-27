@@ -1,6 +1,6 @@
 # LastLight
 
-**Offline emergency knowledge retrieval for low-power, no-network conditions.**
+**Low-power RAG for offline blackout emergency guidance.**
 
 LastLight is a tiny local RAG-style knowledge capsule. It searches Markdown knowledge packs, returns sourced passages, and refuses to answer when confidence is too low. It uses only the Python standard library: no cloud API, embeddings, vector database, telemetry, package install, browser, or background service.
 
@@ -43,6 +43,7 @@ The web session keeps short-lived context for follow-up questions.
 - Sourced answers with confidence, language, tags, and source paths
 - Lexical, BM25, and optional C-backed lexical retrieval
 - Lightweight session memory for follow-up questions in interactive and web modes
+- Deterministic triage checks after accepted terminal answers
 - Directory and deterministic `.zip` knowledge packs
 - Pack validation, export, metadata, and SHA-256 audit indexes
 - Optional minimal dark local web UI

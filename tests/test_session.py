@@ -83,6 +83,24 @@ class SessionTests(unittest.TestCase):
 
         self.assertEqual(app.queries[-1], "water purification emergency")
 
+    def test_answer_adds_triage_checks_for_accepted_result(self) -> None:
+        app = RecordingApp()
+        session = LastLightSession(app)
+
+        answer = session.answer("generator safety")
+
+        self.assertIn("Never run a generator indoors.", answer)
+        self.assertIn("Follow-up checks:", answer)
+        self.assertIn("Can you move people to fresh air", answer)
+
+    def test_answer_passage_keeps_web_response_minimal(self) -> None:
+        app = RecordingApp()
+        session = LastLightSession(app)
+
+        answer = session.answer_passage("generator safety")
+
+        self.assertEqual(answer, "Never run a generator indoors.")
+
 
 if __name__ == "__main__":
     unittest.main()
