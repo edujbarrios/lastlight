@@ -4,7 +4,7 @@
 
 LastLight is a tiny local RAG-style knowledge capsule. It searches Markdown knowledge packs, returns sourced passages, and refuses to answer when confidence is too low. It uses only the Python standard library: no cloud API, embeddings, vector database, telemetry, package install, browser, or background service.
 
-While much of current AI research focuses on general-purpose LLMs, blackout response exposes a narrower systems problem: people often need accurate, auditable information from a solid local knowledge base when compute, battery, and network access are constrained. LastLight explores that gap as an offline retrieval system rather than a generative assistant.
+While much of current AI research focuses on general-purpose LLMs, blackout response exposes a narrower and practical AI systems problem: people often need accurate, auditable information from a solid local knowledge base when compute, battery, and network access are constrained. LastLight explores that gap through a low-power RAG-inspired design, prioritizing robust retrieval, source traceability, and refusal over unconstrained generation.
 
 ## Clone
 
