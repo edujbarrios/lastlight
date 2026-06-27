@@ -9,7 +9,7 @@ tags:
 priority: high
 ---
 
-Poor sanitation can cause illness quickly during a blackout, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.
+Poor sanitation can cause illness quickly during disasters, displacement, or infrastructure failure, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.
 
 Wash hands before handling food, after using the toilet, after touching trash or floodwater, and before caring for wounds. If running water is unavailable, use a small amount of safe water poured from a container. Soap and friction matter; do not dip dirty hands into stored drinking water.
 

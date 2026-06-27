@@ -5,11 +5,11 @@ tags:
   - navigation
   - compass
   - north
-  - blackout
+  - disaster
 priority: high
 ---
 
-If you need direction during a blackout and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.
+If you need direction during a disaster, evacuation, or infrastructure failure and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.
 
 Shadow stick method: place a straight stick upright in open sunlight. Mark the tip of the shadow with a stone. Wait 15 to 30 minutes, then mark the new shadow tip. In the northern hemisphere, a line from the first mark to the second mark points roughly west to east. Stand with west on your left and east on your right; you are facing roughly north.
 

@@ -238,7 +238,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 21.958399971481413,
+      "elapsed_ms": 25.958199985325336,
       "expected_language": "en",
       "expected_tag": "bleeding",
       "query": "how do I stop severe bleeding",
@@ -319,7 +319,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "scenario",
-      "elapsed_ms": 42.011700046714395,
+      "elapsed_ms": 26.740300003439188,
       "expected_language": "en",
       "expected_tag": "bleeding",
       "query": "blood is soaking through cloth and I cannot get help yet",
@@ -389,7 +389,7 @@
           ],
           "passage": "Keep trash sealed and away from food. Food scraps attract insects and rodents. If collection is unavailable, separate sharp objects, contaminated waste, and food waste so people do not get cut or exposed while moving trash later.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 0.401929660932901,
+          "score": 0.3982137445439227,
           "tags": [
             "sanitation",
             "hygiene",
@@ -405,7 +405,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 20.711700024548918,
+      "elapsed_ms": 18.925499985925853,
       "expected_language": "en",
       "expected_tag": "burns",
       "query": "what should I do for burns",
@@ -469,7 +469,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "scenario",
-      "elapsed_ms": 34.81969999847934,
+      "elapsed_ms": 28.852199960965663,
       "expected_language": "en",
       "expected_tag": "burns",
       "query": "a cooking pot burned my hand during the outage",
@@ -549,7 +549,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 34.23869999824092,
+      "elapsed_ms": 36.34249995229766,
       "expected_language": "en",
       "expected_tag": "wounds",
       "query": "how should I clean a minor wound",
@@ -633,7 +633,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 33.816699986346066,
+      "elapsed_ms": 33.13860000343993,
       "expected_language": "en",
       "expected_tag": "wounds",
       "query": "dirty cut with no running water and limited supplies",
@@ -714,7 +714,7 @@
           ],
           "passage": "Wash hands before handling food, after using the toilet, after touching trash or floodwater, and before caring for wounds. If running water is unavailable, use a small amount of safe water poured from a container. Soap and friction matter; do not dip dirty hands into stored drinking water.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 1.5397341168924696,
+          "score": 1.5254989812561752,
           "tags": [
             "sanitation",
             "hygiene",
@@ -730,7 +730,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 22.20510004553944,
+      "elapsed_ms": 26.051399996504188,
       "expected_language": "en",
       "expected_tag": "dehydration",
       "query": "what are signs of dehydration",
@@ -810,7 +810,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 27.416200027801096,
+      "elapsed_ms": 32.3363000061363,
       "expected_language": "en",
       "expected_tag": "dehydration",
       "query": "someone is confused weak and barely urinating in extreme heat",
@@ -890,23 +890,23 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 25.090400013141334,
+      "elapsed_ms": 28.27030001208186,
       "expected_language": "en",
       "expected_tag": "medication",
-      "query": "how do I manage insulin and medicine in a blackout",
+      "query": "how do I manage insulin and medicine during a disaster",
       "rank": 1,
       "reciprocal_rank": 1.0,
       "result": {
         "language": "en",
         "matched_terms": [
-          "blackout",
+          "disaster",
           "insulin",
           "medication",
           "medicine"
         ],
         "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
         "path": "knowledge/en/medical/medication_management.md",
-        "score": 1.8848463008059033,
+        "score": 1.867420537194397,
         "tags": [
           "medical",
           "medication",
@@ -920,14 +920,14 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
-            "blackout",
+            "disaster",
             "insulin",
             "medication",
             "medicine"
           ],
           "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
           "path": "knowledge/en/medical/medication_management.md",
-          "score": 1.8848463008059033,
+          "score": 1.867420537194397,
           "tags": [
             "medical",
             "medication",
@@ -940,35 +940,18 @@
           "confidence": "LOW",
           "language": "en",
           "matched_terms": [
-            "blackout"
+            "disaster"
           ],
-          "passage": "If you need direction during a blackout and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.",
+          "passage": "If you need direction during a disaster, evacuation, or infrastructure failure and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 0.40447218825645026,
+          "score": 0.4018931681978033,
           "tags": [
             "navigation",
             "compass",
             "north",
-            "blackout"
+            "disaster"
           ],
           "title": "Finding North Without a Compass"
-        },
-        {
-          "confidence": "LOW",
-          "language": "en",
-          "matched_terms": [
-            "blackout"
-          ],
-          "passage": "Poor sanitation can cause illness quickly during a blackout, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
-          "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 0.13945644481342553,
-          "tags": [
-            "sanitation",
-            "hygiene",
-            "waste",
-            "illness"
-          ],
-          "title": "Sanitation and Hygiene During Outage"
         }
       ],
       "top_1_correct": true,
@@ -977,7 +960,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 25.505199970211834,
+      "elapsed_ms": 25.965900043956935,
       "expected_language": "en",
       "expected_tag": "medication",
       "query": "which medicines should not be skipped when power is out",
@@ -989,9 +972,9 @@
           "medication",
           "medicines"
         ],
-        "passage": "During a blackout, gather essential medicines, written prescriptions, dosing instructions, medical devices, chargers, and health information in one place. Keep medicines dry, shaded, and away from children. Do not remove labels unless privacy or safety requires it.",
+        "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
         "path": "knowledge/en/medical/medication_management.md",
-        "score": 1.5574259179584269,
+        "score": 1.5430272182463214,
         "tags": [
           "medical",
           "medication",
@@ -1008,9 +991,9 @@
             "medication",
             "medicines"
           ],
-          "passage": "During a blackout, gather essential medicines, written prescriptions, dosing instructions, medical devices, chargers, and health information in one place. Keep medicines dry, shaded, and away from children. Do not remove labels unless privacy or safety requires it.",
+          "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
           "path": "knowledge/en/medical/medication_management.md",
-          "score": 1.5574259179584269,
+          "score": 1.5430272182463214,
           "tags": [
             "medical",
             "medication",
@@ -1060,7 +1043,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 26.59039996797219,
+      "elapsed_ms": 42.435600014869124,
       "expected_language": "en",
       "expected_tag": "purification",
       "query": "how can I purify water",
@@ -1139,10 +1122,10 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 24.917000031564385,
+      "elapsed_ms": 41.64179996587336,
       "expected_language": "en",
       "expected_tag": "purification",
-      "query": "I have dirty water after a blackout and boiling may not be possible",
+      "query": "I have dirty water after a disaster and boiling may not be possible",
       "rank": 1,
       "reciprocal_rank": 1.0,
       "result": {
@@ -1187,26 +1170,6 @@
           "confidence": "MEDIUM",
           "language": "en",
           "matched_terms": [
-            "blackout",
-            "dirty",
-            "possible",
-            "water"
-          ],
-          "passage": "Poor sanitation can cause illness quickly during a blackout, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
-          "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 1.3967487439589141,
-          "tags": [
-            "sanitation",
-            "hygiene",
-            "waste",
-            "illness"
-          ],
-          "title": "Sanitation and Hygiene During Outage"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
             "water"
           ],
           "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
@@ -1218,6 +1181,25 @@
             "sanitation"
           ],
           "title": "Water Storage"
+        },
+        {
+          "confidence": "MEDIUM",
+          "language": "en",
+          "matched_terms": [
+            "dirty",
+            "possible",
+            "water"
+          ],
+          "passage": "Poor sanitation can cause illness quickly during disasters, displacement, or infrastructure failure, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
+          "path": "knowledge/en/sanitation/hygiene.md",
+          "score": 1.2138970453913362,
+          "tags": [
+            "sanitation",
+            "hygiene",
+            "waste",
+            "illness"
+          ],
+          "title": "Sanitation and Hygiene During Outage"
         }
       ],
       "top_1_correct": true,
@@ -1226,7 +1208,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 31.364800001028925,
+      "elapsed_ms": 43.822099978569895,
       "expected_language": "en",
       "expected_tag": "purification",
       "query": "water smells like fuel or sewage after flooding",
@@ -1317,7 +1299,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 23.1571999611333,
+      "elapsed_ms": 30.88389994809404,
       "expected_language": "en",
       "expected_tag": "storage",
       "query": "how should I store treated water safely",
@@ -1387,7 +1369,7 @@
           ],
           "passage": "If toilets do not flush, keep human waste away from living, cooking, and water storage areas. Use a lined bucket or container only if necessary, cover waste after each use, and store it where people, animals, and floodwater cannot spread it. Wash or sanitize hands afterward.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 0.9562727644349178,
+          "score": 0.9474318403054333,
           "tags": [
             "sanitation",
             "hygiene",
@@ -1403,7 +1385,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 26.236700010485947,
+      "elapsed_ms": 41.830700007267296,
       "expected_language": "en",
       "expected_tag": "storage",
       "query": "what containers should I use so clean water does not get contaminated",
@@ -1488,7 +1470,7 @@
           ],
           "passage": "Keep trash sealed and away from food. Food scraps attract insects and rodents. If collection is unavailable, separate sharp objects, contaminated waste, and food waste so people do not get cut or exposed while moving trash later.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 1.8527784810926535,
+          "score": 1.835649190591777,
           "tags": [
             "sanitation",
             "hygiene",
@@ -1504,7 +1486,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 19.584499998018146,
+      "elapsed_ms": 41.8239000136964,
       "expected_language": "en",
       "expected_tag": "battery",
       "query": "how do I save phone battery",
@@ -1587,7 +1569,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 23.14689999911934,
+      "elapsed_ms": 46.026799944229424,
       "expected_language": "en",
       "expected_tag": "battery",
       "query": "phone is at 12 percent and I may need emergency calls later",
@@ -1672,7 +1654,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 24.649800034239888,
+      "elapsed_ms": 35.535299975890666,
       "expected_language": "en",
       "expected_tag": "lighting",
       "query": "what light should I use without wasting batteries",
@@ -1756,7 +1738,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 29.463499959092587,
+      "elapsed_ms": 32.99669997068122,
       "expected_language": "en",
       "expected_tag": "lighting",
       "query": "candles are risky and I need safe light at night",
@@ -1830,12 +1812,12 @@
           ],
           "passage": "Night method: in the northern hemisphere, find the Big Dipper if visible. The two outer stars of its bowl point toward Polaris, the North Star. Polaris sits roughly above true north. If clouds, buildings, smoke, or light pollution block the sky, do not rely on this method.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 0.4705084638901565,
+          "score": 0.46750837933213857,
           "tags": [
             "navigation",
             "compass",
             "north",
-            "blackout"
+            "disaster"
           ],
           "title": "Finding North Without a Compass"
         }
@@ -1846,7 +1828,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "direct",
-      "elapsed_ms": 32.67679997952655,
+      "elapsed_ms": 34.84129998832941,
       "expected_language": "en",
       "expected_tag": "generator",
       "query": "is it safe to run a generator indoors",
@@ -1932,7 +1914,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "scenario",
-      "elapsed_ms": 24.252100032754242,
+      "elapsed_ms": 33.29029999440536,
       "expected_language": "en",
       "expected_tag": "carbon-monoxide",
       "query": "generator is near a window and people feel dizzy",
@@ -1997,7 +1979,7 @@
           ],
           "passage": "Keep trash sealed and away from food. Food scraps attract insects and rodents. If collection is unavailable, separate sharp objects, contaminated waste, and food waste so people do not get cut or exposed while moving trash later.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 0.2589905403677903,
+          "score": 0.25659612341605487,
           "tags": [
             "sanitation",
             "hygiene",
@@ -2013,7 +1995,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 30.035600007977337,
+      "elapsed_ms": 35.282099968753755,
       "expected_language": "en",
       "expected_tag": "carbon-monoxide",
       "query": "what are carbon monoxide warning signs",
@@ -2101,7 +2083,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "direct",
-      "elapsed_ms": 27.620800014119595,
+      "elapsed_ms": 25.60939994873479,
       "expected_language": "en",
       "expected_tag": "cooking",
       "query": "can I cook with charcoal indoors",
@@ -2187,7 +2169,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 22.90979999816045,
+      "elapsed_ms": 22.91309996508062,
       "expected_language": "en",
       "expected_tag": "cooking",
       "query": "I want to use a camping stove in the garage during rain",
@@ -2272,7 +2254,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 36.2135999603197,
+      "elapsed_ms": 28.83059997111559,
       "expected_language": "en",
       "expected_tag": "food",
       "query": "is food in the fridge safe after a power outage",
@@ -2328,7 +2310,7 @@
           ],
           "passage": "Wash hands before handling food, after using the toilet, after touching trash or floodwater, and before caring for wounds. If running water is unavailable, use a small amount of safe water poured from a container. Soap and friction matter; do not dip dirty hands into stored drinking water.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 1.1853797809141169,
+          "score": 1.1744207187119433,
           "tags": [
             "sanitation",
             "hygiene",
@@ -2346,7 +2328,7 @@
           ],
           "passage": "Some medicines need refrigeration. Keep them in the coolest safe place available, such as an insulated bag with cool packs, but avoid freezing unless the label says freezing is safe. If temperature-sensitive medicine may have been damaged, keep it labeled and ask a pharmacist or clinician as soon as possible.",
           "path": "knowledge/en/medical/medication_management.md",
-          "score": 0.7854348841698212,
+          "score": 0.9064714505411081,
           "tags": [
             "medical",
             "medication",
@@ -2362,7 +2344,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "scenario",
-      "elapsed_ms": 32.17989997938275,
+      "elapsed_ms": 26.66279999539256,
       "expected_language": "en",
       "expected_tag": "food",
       "query": "freezer door stayed shut but power was out overnight",
@@ -2448,7 +2430,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 38.547499978449196,
+      "elapsed_ms": 31.79540002020076,
       "expected_language": "en",
       "expected_tag": "sanitation",
       "query": "how do I keep hygiene when toilets do not flush",
@@ -2465,7 +2447,7 @@
         ],
         "passage": "If toilets do not flush, keep human waste away from living, cooking, and water storage areas. Use a lined bucket or container only if necessary, cover waste after each use, and store it where people, animals, and floodwater cannot spread it. Wash or sanitize hands afterward.",
         "path": "knowledge/en/sanitation/hygiene.md",
-        "score": 1.7591397042064172,
+        "score": 1.7428761220607487,
         "tags": [
           "sanitation",
           "hygiene",
@@ -2487,7 +2469,7 @@
           ],
           "passage": "If toilets do not flush, keep human waste away from living, cooking, and water storage areas. Use a lined bucket or container only if necessary, cover waste after each use, and store it where people, animals, and floodwater cannot spread it. Wash or sanitize hands afterward.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 1.7591397042064172,
+          "score": 1.7428761220607487,
           "tags": [
             "sanitation",
             "hygiene",
@@ -2537,7 +2519,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 30.892200011294335,
+      "elapsed_ms": 25.868400000035763,
       "expected_language": "en",
       "expected_tag": "sanitation",
       "query": "human waste bucket sanitation while water service is down",
@@ -2552,9 +2534,9 @@
           "waste",
           "water"
         ],
-        "passage": "Poor sanitation can cause illness quickly during a blackout, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
+        "passage": "Poor sanitation can cause illness quickly during disasters, displacement, or infrastructure failure, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
         "path": "knowledge/en/sanitation/hygiene.md",
-        "score": 2.9146359612319426,
+        "score": 2.887689595763147,
         "tags": [
           "sanitation",
           "hygiene",
@@ -2574,9 +2556,9 @@
             "waste",
             "water"
           ],
-          "passage": "Poor sanitation can cause illness quickly during a blackout, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
+          "passage": "Poor sanitation can cause illness quickly during disasters, displacement, or infrastructure failure, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 2.9146359612319426,
+          "score": 2.887689595763147,
           "tags": [
             "sanitation",
             "hygiene",
@@ -2626,7 +2608,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 29.444399988278747,
+      "elapsed_ms": 35.22839996730909,
       "expected_language": "en",
       "expected_tag": "cold",
       "query": "how do I stay warm in cold shelter",
@@ -2707,7 +2689,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 30.16419999767095,
+      "elapsed_ms": 29.90180003689602,
       "expected_language": "en",
       "expected_tag": "hypothermia",
       "query": "wet clothes and no heating, how do I avoid hypothermia",
@@ -2791,7 +2773,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 25.820699986070395,
+      "elapsed_ms": 24.437099986243993,
       "expected_language": "en",
       "expected_tag": "heat",
       "query": "what should I do in extreme heat",
@@ -2871,7 +2853,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "direct",
-      "elapsed_ms": 30.025099986232817,
+      "elapsed_ms": 24.517000012565404,
       "expected_language": "en",
       "expected_tag": "compass",
       "query": "how do I use a compass",
@@ -2915,14 +2897,14 @@
           "matched_terms": [
             "compass"
           ],
-          "passage": "If you need direction during a blackout and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.",
+          "passage": "If you need direction during a disaster, evacuation, or infrastructure failure and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 0.8357716134890939,
+          "score": 0.8304425159189303,
           "tags": [
             "navigation",
             "compass",
             "north",
-            "blackout"
+            "disaster"
           ],
           "title": "Finding North Without a Compass"
         }
@@ -2933,28 +2915,28 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 33.5390999680385,
+      "elapsed_ms": 30.717400019057095,
       "expected_language": "en",
       "expected_tag": "north",
-      "query": "find north without a compass during a blackout",
+      "query": "find north without a compass during evacuation",
       "rank": 1,
       "reciprocal_rank": 1.0,
       "result": {
         "language": "en",
         "matched_terms": [
-          "blackout",
           "compass",
+          "evacuation",
           "find",
           "north"
         ],
         "passage": "Night method: in the northern hemisphere, find the Big Dipper if visible. The two outer stars of its bowl point toward Polaris, the North Star. Polaris sits roughly above true north. If clouds, buildings, smoke, or light pollution block the sky, do not rely on this method.",
         "path": "knowledge/en/navigation/finding_north.md",
-        "score": 2.511188536228464,
+        "score": 2.2163118965035737,
         "tags": [
           "navigation",
           "compass",
           "north",
-          "blackout"
+          "disaster"
         ],
         "title": "Finding North Without a Compass"
       },
@@ -2963,19 +2945,19 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
-            "blackout",
             "compass",
+            "evacuation",
             "find",
             "north"
           ],
           "passage": "Night method: in the northern hemisphere, find the Big Dipper if visible. The two outer stars of its bowl point toward Polaris, the North Star. Polaris sits roughly above true north. If clouds, buildings, smoke, or light pollution block the sky, do not rely on this method.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 2.511188536228464,
+          "score": 2.2163118965035737,
           "tags": [
             "navigation",
             "compass",
             "north",
-            "blackout"
+            "disaster"
           ],
           "title": "Finding North Without a Compass"
         },
@@ -3000,18 +2982,17 @@
           "confidence": "LOW",
           "language": "en",
           "matched_terms": [
-            "blackout"
+            "evacuation"
           ],
-          "passage": "During a blackout, gather essential medicines, written prescriptions, dosing instructions, medical devices, chargers, and health information in one place. Keep medicines dry, shaded, and away from children. Do not remove labels unless privacy or safety requires it.",
-          "path": "knowledge/en/medical/medication_management.md",
-          "score": 0.13945644481342553,
+          "passage": "Record important frequencies, times, weather alerts, evacuation routes, and instructions on paper. Share confirmed information calmly and avoid spreading rumors.",
+          "path": "knowledge/en/communications/emergency_radio.md",
+          "score": 0.19099680471611222,
           "tags": [
-            "medical",
-            "medication",
-            "chronic-conditions",
-            "refrigeration"
+            "communications",
+            "radio",
+            "emergency"
           ],
-          "title": "Medication Management During Outage"
+          "title": "Emergency Radio"
         }
       ],
       "top_1_correct": true,
@@ -3020,7 +3001,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 29.477300005964935,
+      "elapsed_ms": 27.06610003951937,
       "expected_language": "en",
       "expected_tag": "lost",
       "query": "I am lost and not sure whether to keep walking",
@@ -3085,7 +3066,7 @@
           ],
           "passage": "Some medicines need refrigeration. Keep them in the coolest safe place available, such as an insulated bag with cool packs, but avoid freezing unless the label says freezing is safe. If temperature-sensitive medicine may have been damaged, keep it labeled and ask a pharmacist or clinician as soon as possible.",
           "path": "knowledge/en/medical/medication_management.md",
-          "score": 0.3586022866630942,
+          "score": 0.35528694011453743,
           "tags": [
             "medical",
             "medication",
@@ -3101,7 +3082,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "direct",
-      "elapsed_ms": 22.449899988714606,
+      "elapsed_ms": 29.812299995683134,
       "expected_language": "en",
       "expected_tag": "signaling",
       "query": "how can I signal rescuers",
@@ -3149,12 +3130,12 @@
           ],
           "passage": "Avoid making travel decisions from one weak clue. Metal objects, electrical equipment, moving water, wind, slopes, and poor visibility can mislead improvised methods. If direction is uncertain and staying put is safe, conserve energy, mark your location, and signal for help.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 0.10730894790477255,
+          "score": 0.10662471809329475,
           "tags": [
             "navigation",
             "compass",
             "north",
-            "blackout"
+            "disaster"
           ],
           "title": "Finding North Without a Compass"
         }
@@ -3165,7 +3146,7 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "scenario",
-      "elapsed_ms": 22.23289996618405,
+      "elapsed_ms": 25.521600036881864,
       "expected_language": "en",
       "expected_tag": "signaling",
       "query": "three flashes whistle or marks to get rescue attention",
@@ -3255,7 +3236,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 24.97219998622313,
+      "elapsed_ms": 25.97270003752783,
       "expected_language": "en",
       "expected_tag": "radio",
       "query": "how can I use an emergency radio during an outage",
@@ -3299,6 +3280,24 @@
           "confidence": "MEDIUM",
           "language": "en",
           "matched_terms": [
+            "emergency",
+            "outage"
+          ],
+          "passage": "If evacuation is possible, carry medicines with you rather than leaving them behind. If supply is running low, contact pharmacies, clinics, emergency services, shelters, or neighbors early, before the last dose is gone.",
+          "path": "knowledge/en/medical/medication_management.md",
+          "score": 0.8127151746775497,
+          "tags": [
+            "medical",
+            "medication",
+            "chronic-conditions",
+            "refrigeration"
+          ],
+          "title": "Medication Management During Outage"
+        },
+        {
+          "confidence": "MEDIUM",
+          "language": "en",
+          "matched_terms": [
             "outage"
           ],
           "passage": "During a power outage, keep refrigerator and freezer doors closed as much as possible. A closed refrigerator can usually keep food cold for several hours, and a full freezer stays cold longer than a half-empty freezer. Opening the door repeatedly lets cold air escape quickly.",
@@ -3311,24 +3310,6 @@
             "outage"
           ],
           "title": "Food Safety During Power Outage"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
-            "emergency",
-            "outage"
-          ],
-          "passage": "If evacuation is possible, carry medicines with you rather than leaving them behind. If supply is running low, contact pharmacies, clinics, emergency services, shelters, or neighbors early, before the last dose is gone.",
-          "path": "knowledge/en/medical/medication_management.md",
-          "score": 0.6908037251892823,
-          "tags": [
-            "medical",
-            "medication",
-            "chronic-conditions",
-            "refrigeration"
-          ],
-          "title": "Medication Management During Outage"
         }
       ],
       "top_1_correct": true,
@@ -3337,23 +3318,22 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 28.150200028903782,
+      "elapsed_ms": 33.00260001560673,
       "expected_language": "es",
       "expected_tag": "agua",
-      "query": "como purificar agua en un apagon",
+      "query": "como purificar agua en una emergencia",
       "rank": 1,
       "reciprocal_rank": 1.0,
       "result": {
         "language": "es",
         "matched_terms": [
           "agua",
-          "apagon",
           "purificar",
           "water"
         ],
         "passage": "Para purificar agua que puede estar contaminada, hiervala antes de beberla cuando tenga combustible seguro. Lleve el agua a hervor fuerte por al menos un minuto. En zonas de gran altura, hierva por al menos tres minutos. Deje enfriar el agua en un recipiente limpio y cubierto.",
         "path": "knowledge/es/water/agua_segura.md",
-        "score": 2.4160783910851986,
+        "score": 1.9565324036779435,
         "tags": [
           "water",
           "agua",
@@ -3369,13 +3349,12 @@
           "language": "es",
           "matched_terms": [
             "agua",
-            "apagon",
             "purificar",
             "water"
           ],
           "passage": "Para purificar agua que puede estar contaminada, hiervala antes de beberla cuando tenga combustible seguro. Lleve el agua a hervor fuerte por al menos un minuto. En zonas de gran altura, hierva por al menos tres minutos. Deje enfriar el agua en un recipiente limpio y cubierto.",
           "path": "knowledge/es/water/agua_segura.md",
-          "score": 2.4160783910851986,
+          "score": 1.9565324036779435,
           "tags": [
             "water",
             "agua",
@@ -3384,6 +3363,23 @@
             "hervir"
           ],
           "title": "Agua segura durante un apagon"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "emergency",
+            "water"
+          ],
+          "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
+          "path": "knowledge/en/water/storage.md",
+          "score": 1.7060877759335449,
+          "tags": [
+            "water",
+            "storage",
+            "sanitation"
+          ],
+          "title": "Water Storage"
         },
         {
           "confidence": "HIGH",
@@ -3401,22 +3397,6 @@
             "survival"
           ],
           "title": "Water Purification"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
-            "water"
-          ],
-          "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
-          "path": "knowledge/en/water/storage.md",
-          "score": 1.28884941420633,
-          "tags": [
-            "water",
-            "storage",
-            "sanitation"
-          ],
-          "title": "Water Storage"
         }
       ],
       "top_1_correct": true,
@@ -3425,23 +3405,22 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 27.72539999568835,
+      "elapsed_ms": 36.74549999414012,
       "expected_language": "es",
       "expected_tag": "agua",
-      "query": "agua sucia despues de un apagon y no se si hervirla",
+      "query": "agua sucia despues de un desastre y no se si hervirla",
       "rank": 1,
       "reciprocal_rank": 1.0,
       "result": {
         "language": "es",
         "matched_terms": [
           "agua",
-          "apagon",
           "no",
           "water"
         ],
         "passage": "Guarde el agua tratada separada del agua sin tratar. Marque los recipientes con claridad. No meta vasos, manos o utensilios sucios dentro del recipiente de agua potable; mejor vierta el agua.",
         "path": "knowledge/es/water/agua_segura.md",
-        "score": 2.617446121088214,
+        "score": 2.1579001336809585,
         "tags": [
           "water",
           "agua",
@@ -3457,13 +3436,12 @@
           "language": "es",
           "matched_terms": [
             "agua",
-            "apagon",
             "no",
             "water"
           ],
           "passage": "Guarde el agua tratada separada del agua sin tratar. Marque los recipientes con claridad. No meta vasos, manos o utensilios sucios dentro del recipiente de agua potable; mejor vierta el agua.",
           "path": "knowledge/es/water/agua_segura.md",
-          "score": 2.617446121088214,
+          "score": 2.1579001336809585,
           "tags": [
             "water",
             "agua",
@@ -3513,7 +3491,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 35.384599992539734,
+      "elapsed_ms": 35.84600001340732,
       "expected_language": "es",
       "expected_tag": "spanish",
       "query": "necesito pedir ayuda en espanol durante una emergencia",
@@ -3603,10 +3581,10 @@
   },
   "correct": 39,
   "latency_ms": {
-    "max": 42.011700046714395,
-    "mean": 28.28997249744134,
-    "min": 19.584499998018146,
-    "p95": 38.547499978449196
+    "max": 46.026799944229424,
+    "mean": 31.585997494403273,
+    "min": 18.925499985925853,
+    "p95": 43.822099978569895
   },
   "mean_reciprocal_rank": 0.9875,
   "top_1_accuracy": 0.975,

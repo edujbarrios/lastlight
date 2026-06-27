@@ -127,12 +127,12 @@ pre {{
 <h1>LastLight</h1>
 <a class="clear" href="/?clear=1">Clear</a>
 </div>
-<section class="calm" aria-label="Blackout safety reminder">
-<strong>Keep calm. There is a blackout, but you can stay safer.</strong>
+<section class="calm" aria-label="Crisis safety reminder">
+<strong>Keep calm. The situation may be unstable, but you can still make safer decisions.</strong>
 <ol>
 <li>Breathe slowly for 30 seconds.</li>
 <li>Check for immediate danger: fire, gas smell, injuries, or flooding.</li>
-<li>Save battery: lower brightness and close unused apps.</li>
+<li>Preserve power, water, heat, and attention.</li>
 <li>Ask one practical question at a time.</li>
 </ol>
 </section>

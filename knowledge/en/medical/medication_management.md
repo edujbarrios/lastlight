@@ -9,7 +9,7 @@ tags:
 priority: high
 ---
 
-During a blackout, gather essential medicines, written prescriptions, dosing instructions, medical devices, chargers, and health information in one place. Keep medicines dry, shaded, and away from children. Do not remove labels unless privacy or safety requires it.
+During a disaster, outage, or infrastructure failure, gather essential medicines, written prescriptions, dosing instructions, medical devices, chargers, and health information in one place. Keep medicines dry, shaded, and away from children. Do not remove labels unless privacy or safety requires it.
 
 Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.
 

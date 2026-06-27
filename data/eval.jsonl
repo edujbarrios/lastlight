@@ -6,10 +6,10 @@
 {"query":"dirty cut with no running water and limited supplies","expected_tag":"wounds","difficulty":"scenario","expected_language":"en"}
 {"query":"what are signs of dehydration","expected_tag":"dehydration","difficulty":"direct","expected_language":"en"}
 {"query":"someone is confused weak and barely urinating in extreme heat","expected_tag":"dehydration","difficulty":"scenario","expected_language":"en"}
-{"query":"how do I manage insulin and medicine in a blackout","expected_tag":"medication","difficulty":"direct","expected_language":"en"}
+{"query":"how do I manage insulin and medicine during a disaster","expected_tag":"medication","difficulty":"direct","expected_language":"en"}
 {"query":"which medicines should not be skipped when power is out","expected_tag":"medication","difficulty":"scenario","expected_language":"en"}
 {"query":"how can I purify water","expected_tag":"purification","difficulty":"direct","expected_language":"en"}
-{"query":"I have dirty water after a blackout and boiling may not be possible","expected_tag":"purification","difficulty":"scenario","expected_language":"en"}
+{"query":"I have dirty water after a disaster and boiling may not be possible","expected_tag":"purification","difficulty":"scenario","expected_language":"en"}
 {"query":"water smells like fuel or sewage after flooding","expected_tag":"purification","difficulty":"scenario","expected_language":"en"}
 {"query":"how should I store treated water safely","expected_tag":"storage","difficulty":"direct","expected_language":"en"}
 {"query":"what containers should I use so clean water does not get contaminated","expected_tag":"storage","difficulty":"scenario","expected_language":"en"}
@@ -30,11 +30,11 @@
 {"query":"wet clothes and no heating, how do I avoid hypothermia","expected_tag":"hypothermia","difficulty":"scenario","expected_language":"en"}
 {"query":"what should I do in extreme heat","expected_tag":"heat","difficulty":"direct","expected_language":"en"}
 {"query":"how do I use a compass","expected_tag":"compass","difficulty":"direct","expected_language":"en"}
-{"query":"find north without a compass during a blackout","expected_tag":"north","difficulty":"scenario","expected_language":"en"}
+{"query":"find north without a compass during evacuation","expected_tag":"north","difficulty":"scenario","expected_language":"en"}
 {"query":"I am lost and not sure whether to keep walking","expected_tag":"lost","difficulty":"scenario","expected_language":"en"}
 {"query":"how can I signal rescuers","expected_tag":"signaling","difficulty":"direct","expected_language":"en"}
 {"query":"three flashes whistle or marks to get rescue attention","expected_tag":"signaling","difficulty":"scenario","expected_language":"en"}
 {"query":"how can I use an emergency radio during an outage","expected_tag":"radio","difficulty":"direct","expected_language":"en"}
-{"query":"como purificar agua en un apagon","expected_tag":"agua","difficulty":"direct","expected_language":"es"}
-{"query":"agua sucia despues de un apagon y no se si hervirla","expected_tag":"agua","difficulty":"scenario","expected_language":"es"}
+{"query":"como purificar agua en una emergencia","expected_tag":"agua","difficulty":"direct","expected_language":"es"}
+{"query":"agua sucia despues de un desastre y no se si hervirla","expected_tag":"agua","difficulty":"scenario","expected_language":"es"}
 {"query":"necesito pedir ayuda en espanol durante una emergencia","expected_tag":"spanish","difficulty":"scenario","expected_language":"es"}

@@ -1,10 +1,10 @@
 # LastLight
 
-**Low-power RAG for offline blackout emergency guidance.**
+**Low-power RAG for offline disaster and infrastructure-failure guidance.**
 
 LastLight is a tiny local RAG-style knowledge capsule. It searches Markdown knowledge packs, returns sourced passages, and refuses to answer when confidence is too low. It uses only the Python standard library: no cloud API, embeddings, vector database, telemetry, package install, browser, or background service.
 
-While much of current AI research focuses on general-purpose LLMs, blackout response exposes a narrower and practical AI systems problem: people often need accurate, auditable information from a solid local knowledge base when compute, battery, and network access are constrained. LastLight explores that gap through a low-power RAG-inspired design, prioritizing robust retrieval, source traceability, and refusal over unconstrained generation.
+While much of current AI research focuses on general-purpose LLMs, disasters and infrastructure collapse expose a narrower and practical AI systems problem: people often need accurate, auditable information from a solid local knowledge base when compute, battery, and network access are constrained. LastLight explores that gap through a low-power RAG-inspired design for austere environments, prioritizing robust retrieval, source traceability, and refusal over unconstrained generation.
 
 ## Clone
 
@@ -51,12 +51,12 @@ The web session keeps short-lived context for follow-up questions.
 
 ## Benchmark
 
-The current retrieval benchmark uses 40 direct, scenario-based, multi-intent, and Spanish blackout emergency queries from `data/eval.jsonl`.
+The current retrieval benchmark uses 40 direct, scenario-based, multi-intent, and Spanish disaster-response queries from `data/eval.jsonl`.
 
 | Strategy | Top-1 | Top-3 | MRR | Mean search latency |
 | --- | ---: | ---: | ---: | ---: |
-| Lexical | 97.50% | 100.00% | 0.988 | 28.290 ms |
-| BM25 | 95.00% | 100.00% | 0.971 | 33.297 ms |
+| Lexical | 97.50% | 100.00% | 0.988 | 31.586 ms |
+| BM25 | 95.00% | 100.00% | 0.971 | 31.613 ms |
 
 Process-level timing on Windows 11 / Python 3.12.7 with 7 iterations and a 15 W energy estimate:
 

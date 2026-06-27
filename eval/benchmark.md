@@ -14,8 +14,8 @@ Retrieval benchmark over 40 complex emergency cases:
 
 | Strategy | Cases | Top-1 | Top-3 | MRR | Mean search latency |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Lexical | 40 | 97.50% | 100.00% | 0.988 | 28.290 ms |
-| BM25 | 40 | 95.00% | 100.00% | 0.971 | 33.297 ms |
+| Lexical | 40 | 97.50% | 100.00% | 0.988 | 31.586 ms |
+| BM25 | 40 | 95.00% | 100.00% | 0.971 | 31.613 ms |
 
 Process-level timing and estimated energy:
 

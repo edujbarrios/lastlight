@@ -44,6 +44,7 @@ class WebTests(unittest.TestCase):
         self.assertIn('placeholder="Type a message..."', html)
         self.assertIn('href="/?clear=1"', html)
         self.assertIn("Keep calm.", html)
+        self.assertIn("The situation may be unstable", html)
         self.assertIn("Breathe slowly for 30 seconds.", html)
 
     def test_render_history_shows_multiple_turns(self) -> None:

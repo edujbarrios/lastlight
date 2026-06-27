@@ -58,7 +58,7 @@ class SessionTests(unittest.TestCase):
         )
         session = LastLightSession(app)
 
-        session.answer("I have dirty water after a blackout. How do I make it safer to drink?")
+        session.answer("I have dirty water after a disaster. How do I make it safer to drink?")
         session.answer("What should I do if boiling is not possible?")
 
         self.assertIn("Water Purification", app.queries[1])
