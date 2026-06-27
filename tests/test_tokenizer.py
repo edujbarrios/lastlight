@@ -19,6 +19,14 @@ class TokenizerTests(unittest.TestCase):
         self.assertIn("battery", tokens)
         self.assertIn("phone", tokens)
 
+    def test_expands_scenario_aliases(self) -> None:
+        tokens = expand_query_tokens(tokenize("burned cut containers percent stove"))
+        self.assertIn("burns", tokens)
+        self.assertIn("wounds", tokens)
+        self.assertIn("storage", tokens)
+        self.assertIn("battery", tokens)
+        self.assertIn("cooking", tokens)
+
 
 if __name__ == "__main__":
     unittest.main()

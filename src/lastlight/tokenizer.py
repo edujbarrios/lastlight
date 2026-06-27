@@ -8,7 +8,8 @@ import unicodedata
 ENGLISH_STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "for", "from",
     "how", "i", "if", "in", "is", "it", "of", "on", "or", "the", "this", "to",
-    "what", "when", "with", "you", "your",
+    "what", "when", "with", "you", "your", "after", "could", "during", "later",
+    "may", "might", "need", "not", "should", "use", "while", "without", "would",
 }
 
 SPANISH_STOPWORDS = {
@@ -21,16 +22,28 @@ TOKEN_RE = re.compile(r"[a-z0-9]+")
 
 QUERY_ALIASES = {
     "agua": ("water",),
+    "batteries": ("battery",),
     "bateria": ("battery",),
+    "burned": ("burns",),
+    "burnt": ("burns",),
     "brujula": ("compass",),
     "calor": ("heat",),
+    "camping": ("cooking",),
     "comunicacion": ("communications",),
+    "confused": ("dehydration",),
+    "container": ("storage",),
+    "containers": ("storage",),
+    "cut": ("wounds",),
     "emergencia": ("emergency",),
     "frio": ("cold",),
     "generador": ("generator",),
     "hemorragia": ("bleeding",),
     "incendio": ("fire",),
+    "light": ("lighting",),
     "linterna": ("lighting",),
+    "medicine": ("medication",),
+    "medicines": ("medication",),
+    "percent": ("battery",),
     "perdido": ("lost",),
     "quemadura": ("burns",),
     "quemaduras": ("burns",),
@@ -41,7 +54,12 @@ QUERY_ALIASES = {
     "sed": ("dehydration",),
     "senal": ("signaling",),
     "senales": ("signaling",),
+    "store": ("storage",),
+    "stove": ("cooking",),
     "telefono": ("phone",),
+    "treated": ("storage",),
+    "urinating": ("dehydration",),
+    "weak": ("dehydration",),
 }
 
 

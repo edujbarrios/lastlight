@@ -48,3 +48,5 @@ class SearchResult:
 class EvaluationCase:
     query: str
     expected_tag: str
+    difficulty: str = "standard"
+    expected_language: str | None = None

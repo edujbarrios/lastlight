@@ -45,6 +45,8 @@ class EvaluationTests(unittest.TestCase):
 
         self.assertIn("Total cases: 1", output)
         self.assertIn("Top-1 accuracy: 100.00%", output)
+        self.assertIn("Top-3 accuracy: 100.00%", output)
+        self.assertIn("MRR: 1.000", output)
         self.assertIn("- HIGH: 1", output)
 
     def test_builds_structured_report(self) -> None:
@@ -55,9 +57,17 @@ class EvaluationTests(unittest.TestCase):
 
         self.assertEqual(report["total_cases"], 1)
         self.assertEqual(report["correct"], 1)
+        self.assertEqual(report["top_1_correct"], 1)
+        self.assertEqual(report["top_k_correct"], 1)
         self.assertEqual(report["top_1_accuracy"], 1.0)
+        self.assertEqual(report["top_k_accuracy"], 1.0)
+        self.assertEqual(report["mean_reciprocal_rank"], 1.0)
+        self.assertIn("latency_ms", report)
+        self.assertIn("by_expected_tag", report)
         case = report["cases"][0]  # type: ignore[index]
-        self.assertTrue(case["correct"])
+        self.assertTrue(case["top_1_correct"])
+        self.assertTrue(case["top_k_correct"])
+        self.assertEqual(case["rank"], 1)
         self.assertEqual(case["result"]["path"], "knowledge/medical/bleeding.md")
 
     def test_writes_structured_report(self) -> None:

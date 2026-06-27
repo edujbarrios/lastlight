@@ -49,6 +49,27 @@ The web session keeps short-lived context for follow-up questions.
 - Optional minimal dark local web UI
 - Optional experimental n-gram synthesis and local model packs
 
+## Benchmark
+
+The current retrieval benchmark uses 40 direct, scenario-based, multi-intent, and Spanish blackout emergency queries from `data/eval.jsonl`.
+
+| Strategy | Top-1 | Top-3 | MRR | Mean search latency |
+| --- | ---: | ---: | ---: | ---: |
+| Lexical | 97.50% | 100.00% | 0.988 | 28.290 ms |
+| BM25 | 95.00% | 100.00% | 0.971 | 33.297 ms |
+
+Process-level timing on Windows 11 / Python 3.12.7 with 7 iterations and a 15 W energy estimate:
+
+| Operation | Median time | Estimated energy |
+| --- | ---: | ---: |
+| Lexical query | 333.4 ms | 1.3894 mWh |
+| BM25 query | 313.4 ms | 1.3060 mWh |
+| Lexical evaluation | 1419.8 ms | 5.9159 mWh |
+| BM25 evaluation | 1406.5 ms | 5.8606 mWh |
+| Unit tests | 743.1 ms | 3.0961 mWh |
+
+Full results are stored in [eval/results.json](eval/results.json), [eval/results-bm25.json](eval/results-bm25.json), and [eval/benchmark.md](eval/benchmark.md).
+
 ## Commands
 
 | Task | Command |
