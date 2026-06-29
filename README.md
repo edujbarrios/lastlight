@@ -58,7 +58,7 @@ Open `http://127.0.0.1:8765`.
 
 The web session keeps short-lived context for follow-up questions.
 
-![LastLight web UI](docs/screenshots/lastlight-web.png)
+<img src="docs/screenshots/lastlight-web.png" alt="LastLight web UI" width="720">
 
 ## Features
 
