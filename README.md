@@ -12,8 +12,8 @@ The current retrieval benchmark uses 40 direct, scenario-based, multi-intent, an
 
 | Strategy | Top-1 | Top-3 | MRR | Mean search latency |
 | --- | ---: | ---: | ---: | ---: |
-| Lexical | 97.50% | 100.00% | 0.988 | 31.586 ms |
-| BM25 | 95.00% | 100.00% | 0.971 | 31.613 ms |
+| Lexical | 100.00% | 100.00% | 1.000 | 52.557 ms |
+| BM25 | 92.50% | 100.00% | 0.958 | 52.535 ms |
 
 Process-level timing on Windows 11 / Python 3.12.7 with 7 iterations and a 15 W energy estimate:
 
@@ -62,7 +62,7 @@ The web session keeps short-lived context for follow-up questions.
 
 ## Features
 
-- Offline terminal search over `knowledge/en/`, `knowledge/es/`, or custom packs
+- Offline terminal search over mirrored English and Spanish knowledge packs, or custom packs
 - Sourced answers with confidence, language, tags, and source paths
 - Lexical, BM25, and optional C-backed lexical retrieval
 - Lightweight session memory for follow-up questions in interactive and web modes

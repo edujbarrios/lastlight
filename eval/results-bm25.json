@@ -6,17 +6,17 @@
   },
   "by_difficulty": {
     "direct": {
-      "mean_reciprocal_rank": 1.0,
-      "top_1_accuracy": 1.0,
-      "top_1_correct": 20,
+      "mean_reciprocal_rank": 0.95,
+      "top_1_accuracy": 0.9,
+      "top_1_correct": 18,
       "top_k_accuracy": 1.0,
       "top_k_correct": 20,
       "total": 20
     },
     "scenario": {
-      "mean_reciprocal_rank": 0.9416666666666667,
-      "top_1_accuracy": 0.9,
-      "top_1_correct": 18,
+      "mean_reciprocal_rank": 0.9666666666666666,
+      "top_1_accuracy": 0.95,
+      "top_1_correct": 19,
       "top_k_accuracy": 1.0,
       "top_k_correct": 20,
       "total": 20
@@ -24,9 +24,9 @@
   },
   "by_expected_language": {
     "en": {
-      "mean_reciprocal_rank": 0.9684684684684686,
-      "top_1_accuracy": 0.9459459459459459,
-      "top_1_correct": 35,
+      "mean_reciprocal_rank": 0.954954954954955,
+      "top_1_accuracy": 0.918918918918919,
+      "top_1_correct": 34,
       "top_k_accuracy": 1.0,
       "top_k_correct": 37,
       "total": 37
@@ -82,9 +82,9 @@
       "total": 2
     },
     "cold": {
-      "mean_reciprocal_rank": 1.0,
-      "top_1_accuracy": 1.0,
-      "top_1_correct": 1,
+      "mean_reciprocal_rank": 0.5,
+      "top_1_accuracy": 0.0,
+      "top_1_correct": 0,
       "top_k_accuracy": 1.0,
       "top_k_correct": 1,
       "total": 1
@@ -106,9 +106,9 @@
       "total": 2
     },
     "dehydration": {
-      "mean_reciprocal_rank": 0.75,
-      "top_1_accuracy": 0.5,
-      "top_1_correct": 1,
+      "mean_reciprocal_rank": 1.0,
+      "top_1_accuracy": 1.0,
+      "top_1_correct": 2,
       "top_k_accuracy": 1.0,
       "top_k_correct": 2,
       "total": 2
@@ -178,9 +178,9 @@
       "total": 1
     },
     "purification": {
-      "mean_reciprocal_rank": 1.0,
-      "top_1_accuracy": 1.0,
-      "top_1_correct": 3,
+      "mean_reciprocal_rank": 0.8333333333333334,
+      "top_1_accuracy": 0.6666666666666666,
+      "top_1_correct": 2,
       "top_k_accuracy": 1.0,
       "top_k_correct": 3,
       "total": 3
@@ -238,7 +238,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 29.89880001405254,
+      "elapsed_ms": 49.62319997139275,
       "expected_language": "en",
       "expected_tag": "bleeding",
       "query": "how do I stop severe bleeding",
@@ -252,7 +252,7 @@
         ],
         "passage": "For severe bleeding, apply firm direct pressure with clean cloth, gauze, or the cleanest available material. Keep pressure steady. Do not repeatedly lift the dressing to check the wound because that can restart bleeding.",
         "path": "knowledge/en/medical/bleeding.md",
-        "score": 11.290642923391434,
+        "score": 13.05647063129617,
         "tags": [
           "medical",
           "bleeding",
@@ -270,7 +270,7 @@
           ],
           "passage": "For severe bleeding, apply firm direct pressure with clean cloth, gauze, or the cleanest available material. Keep pressure steady. Do not repeatedly lift the dressing to check the wound because that can restart bleeding.",
           "path": "knowledge/en/medical/bleeding.md",
-          "score": 11.290642923391434,
+          "score": 13.05647063129617,
           "tags": [
             "medical",
             "bleeding",
@@ -283,11 +283,29 @@
           "language": "en",
           "matched_terms": [
             "bleeding",
+            "severe"
+          ],
+          "passage": "Shock can happen after severe bleeding, burns, infection, dehydration, allergic reaction, or major injury. Warning signs include pale or clammy skin, weakness, rapid breathing, fast pulse, confusion, dizziness, thirst, nausea, or loss of consciousness.",
+          "path": "knowledge/en/medical/shock.md",
+          "score": 10.675501156034258,
+          "tags": [
+            "medical",
+            "shock",
+            "bleeding",
+            "injury"
+          ],
+          "title": "Shock Warning Signs"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "bleeding",
             "stop"
           ],
           "passage": "For minor cuts and scrapes, first stop bleeding with gentle direct pressure. Wash your hands if possible, then rinse dirt from the wound with clean running water or the safest available water. Remove loose debris with clean tweezers if available.",
           "path": "knowledge/en/medical/wound_care.md",
-          "score": 5.665144487567665,
+          "score": 7.3695741007742335,
           "tags": [
             "medical",
             "wounds",
@@ -295,22 +313,6 @@
             "first-aid"
           ],
           "title": "Basic Wound Care"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "severe"
-          ],
-          "passage": "Do not use direct high heat, alcohol, or rough handling. Severe hypothermia is life-threatening and needs urgent medical care.",
-          "path": "knowledge/en/medical/hypothermia.md",
-          "score": 3.1854362884727645,
-          "tags": [
-            "medical",
-            "cold",
-            "hypothermia"
-          ],
-          "title": "Hypothermia"
         }
       ],
       "top_1_correct": true,
@@ -319,7 +321,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 35.6568000279367,
+      "elapsed_ms": 53.38529997970909,
       "expected_language": "en",
       "expected_tag": "bleeding",
       "query": "blood is soaking through cloth and I cannot get help yet",
@@ -335,7 +337,7 @@
         ],
         "passage": "If blood soaks through, add more material on top and continue pressure. If the bleeding is on an arm or leg and cannot be controlled with direct pressure, a tourniquet may be needed if one is available and the situation is life-threatening.",
         "path": "knowledge/en/medical/bleeding.md",
-        "score": 11.956855360013902,
+        "score": 17.339814332475317,
         "tags": [
           "medical",
           "bleeding",
@@ -355,7 +357,7 @@
           ],
           "passage": "If blood soaks through, add more material on top and continue pressure. If the bleeding is on an arm or leg and cannot be controlled with direct pressure, a tourniquet may be needed if one is available and the situation is life-threatening.",
           "path": "knowledge/en/medical/bleeding.md",
-          "score": 11.956855360013902,
+          "score": 17.339814332475317,
           "tags": [
             "medical",
             "bleeding",
@@ -372,7 +374,7 @@
           ],
           "passage": "Use visible and audible signals when safe: bright cloth, reflective surfaces, whistle blasts, lights, or ground markings. Conserve battery and energy.",
           "path": "knowledge/en/navigation/lost.md",
-          "score": 5.314872104141503,
+          "score": 7.764859414031392,
           "tags": [
             "navigation",
             "lost",
@@ -389,7 +391,7 @@
           ],
           "passage": "Keep trash sealed and away from food. Food scraps attract insects and rodents. If collection is unavailable, separate sharp objects, contaminated waste, and food waste so people do not get cut or exposed while moving trash later.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 5.034162778591116,
+          "score": 6.268355438802449,
           "tags": [
             "sanitation",
             "hygiene",
@@ -405,7 +407,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 27.535200002603233,
+      "elapsed_ms": 47.35040001105517,
       "expected_language": "en",
       "expected_tag": "burns",
       "query": "what should I do for burns",
@@ -419,7 +421,7 @@
         ],
         "passage": "Cool a burn with clean, cool running water for about 20 minutes if possible. Remove jewelry or tight clothing near the burn before swelling starts, but do not remove material stuck to the skin.",
         "path": "knowledge/en/medical/burns.md",
-        "score": 11.13712669682843,
+        "score": 13.944237421943688,
         "tags": [
           "medical",
           "burns",
@@ -437,7 +439,7 @@
           ],
           "passage": "Cool a burn with clean, cool running water for about 20 minutes if possible. Remove jewelry or tight clothing near the burn before swelling starts, but do not remove material stuck to the skin.",
           "path": "knowledge/en/medical/burns.md",
-          "score": 11.13712669682843,
+          "score": 13.944237421943688,
           "tags": [
             "medical",
             "burns",
@@ -446,21 +448,38 @@
           "title": "Burns"
         },
         {
-          "confidence": "MEDIUM",
+          "confidence": "HIGH",
+          "language": "es",
+          "matched_terms": [
+            "burns"
+          ],
+          "passage": "Cubra la quemadura con una gasa o tela limpia, seca y que no se pegue. No aplique mantequilla, aceite, pasta dental ni polvos. No rompa ampollas.",
+          "path": "knowledge/es/medical/quemaduras.md",
+          "score": 4.807472660082031,
+          "tags": [
+            "medical",
+            "quemaduras",
+            "burns",
+            "first-aid"
+          ],
+          "title": "Quemaduras"
+        },
+        {
+          "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
             "burns"
           ],
-          "passage": "Watch for infection: increasing redness, warmth, swelling, worsening pain, pus, red streaks, fever, or a bad smell. Infection risk is higher with animal bites, human bites, puncture wounds, dirty wounds, burns, diabetes, poor circulation, or weakened immunity.",
-          "path": "knowledge/en/medical/wound_care.md",
-          "score": 2.2920155165441303,
+          "passage": "Shock can happen after severe bleeding, burns, infection, dehydration, allergic reaction, or major injury. Warning signs include pale or clammy skin, weakness, rapid breathing, fast pulse, confusion, dizziness, thirst, nausea, or loss of consciousness.",
+          "path": "knowledge/en/medical/shock.md",
+          "score": 3.4712916750784997,
           "tags": [
             "medical",
-            "wounds",
-            "infection",
-            "first-aid"
+            "shock",
+            "bleeding",
+            "injury"
           ],
-          "title": "Basic Wound Care"
+          "title": "Shock Warning Signs"
         }
       ],
       "top_1_correct": true,
@@ -469,7 +488,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 29.147000052034855,
+      "elapsed_ms": 51.19290004950017,
       "expected_language": "en",
       "expected_tag": "burns",
       "query": "a cooking pot burned my hand during the outage",
@@ -484,7 +503,7 @@
         ],
         "passage": "Clean food preparation surfaces with the safest available method before eating. Use clean utensils when possible. If someone develops vomiting or diarrhea, isolate their waste and eating utensils, increase hand hygiene, and prioritize fluids to prevent dehydration.",
         "path": "knowledge/en/sanitation/hygiene.md",
-        "score": 7.005354350466781,
+        "score": 9.514104562345437,
         "tags": [
           "sanitation",
           "hygiene",
@@ -504,7 +523,7 @@
           ],
           "passage": "Clean food preparation surfaces with the safest available method before eating. Use clean utensils when possible. If someone develops vomiting or diarrhea, isolate their waste and eating utensils, increase hand hygiene, and prioritize fluids to prevent dehydration.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 7.005354350466781,
+          "score": 9.514104562345437,
           "tags": [
             "sanitation",
             "hygiene",
@@ -522,7 +541,7 @@
           ],
           "passage": "Cook food thoroughly when fuel is available, but cooking does not make spoiled food safe. When in doubt, choose lower-risk shelf-stable food and conserve fuel for water treatment, warmth, or medically important needs.",
           "path": "knowledge/en/food/food_safety.md",
-          "score": 5.559590084097631,
+          "score": 7.462617382809285,
           "tags": [
             "food",
             "safety",
@@ -539,7 +558,7 @@
           ],
           "passage": "Seek urgent care for burns that are deep, large, on the face, hands, feet, genitals, or major joints, or caused by chemicals, electricity, smoke inhalation, or explosion.",
           "path": "knowledge/en/medical/burns.md",
-          "score": 5.364991368711796,
+          "score": 6.194487704579204,
           "tags": [
             "medical",
             "burns",
@@ -554,7 +573,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 24.964000040199608,
+      "elapsed_ms": 49.13189995568246,
       "expected_language": "en",
       "expected_tag": "wounds",
       "query": "how should I clean a minor wound",
@@ -569,7 +588,7 @@
         ],
         "passage": "For minor cuts and scrapes, first stop bleeding with gentle direct pressure. Wash your hands if possible, then rinse dirt from the wound with clean running water or the safest available water. Remove loose debris with clean tweezers if available.",
         "path": "knowledge/en/medical/wound_care.md",
-        "score": 9.915318998428717,
+        "score": 14.347718496088206,
         "tags": [
           "medical",
           "wounds",
@@ -589,7 +608,7 @@
           ],
           "passage": "For minor cuts and scrapes, first stop bleeding with gentle direct pressure. Wash your hands if possible, then rinse dirt from the wound with clean running water or the safest available water. Remove loose debris with clean tweezers if available.",
           "path": "knowledge/en/medical/wound_care.md",
-          "score": 9.915318998428717,
+          "score": 14.347718496088206,
           "tags": [
             "medical",
             "wounds",
@@ -607,7 +626,7 @@
           ],
           "passage": "For severe bleeding, apply firm direct pressure with clean cloth, gauze, or the cleanest available material. Keep pressure steady. Do not repeatedly lift the dressing to check the wound because that can restart bleeding.",
           "path": "knowledge/en/medical/bleeding.md",
-          "score": 5.095909073168806,
+          "score": 7.6135475505614245,
           "tags": [
             "medical",
             "bleeding",
@@ -616,20 +635,22 @@
           "title": "Severe Bleeding"
         },
         {
-          "confidence": "MEDIUM",
+          "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
             "clean"
           ],
-          "passage": "Cover the burn with a clean, dry, non-stick dressing or cloth. Do not apply butter, oil, toothpaste, or powders. Do not break blisters.",
-          "path": "knowledge/en/medical/burns.md",
-          "score": 2.252500802284515,
+          "passage": "Clean hands before preparing food, eating, treating wounds, handling medicine, or touching clean water containers. Clean hands after using the toilet, handling waste, cleaning floodwater, or caring for someone sick.",
+          "path": "knowledge/en/sanitation/hand_hygiene.md",
+          "score": 4.064641665627245,
           "tags": [
-            "medical",
-            "burns",
-            "first-aid"
+            "sanitation",
+            "hygiene",
+            "handwashing",
+            "water",
+            "wounds"
           ],
-          "title": "Burns"
+          "title": "Hand Hygiene With Limited Water"
         }
       ],
       "top_1_correct": true,
@@ -638,7 +659,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 28.580799989867955,
+      "elapsed_ms": 57.508899946697056,
       "expected_language": "en",
       "expected_tag": "wounds",
       "query": "dirty cut with no running water and limited supplies",
@@ -656,7 +677,7 @@
         ],
         "passage": "Keep wounds dry and protected from floodwater, sewage, dirt, and shared towels. If supplies are limited, prioritize clean coverage for wounds that are bleeding, open, dirty, or likely to rub against clothing.",
         "path": "knowledge/en/medical/wound_care.md",
-        "score": 16.099928259319125,
+        "score": 19.36942705673111,
         "tags": [
           "medical",
           "wounds",
@@ -679,7 +700,7 @@
           ],
           "passage": "Keep wounds dry and protected from floodwater, sewage, dirt, and shared towels. If supplies are limited, prioritize clean coverage for wounds that are bleeding, open, dirty, or likely to rub against clothing.",
           "path": "knowledge/en/medical/wound_care.md",
-          "score": 16.099928259319125,
+          "score": 19.36942705673111,
           "tags": [
             "medical",
             "wounds",
@@ -687,6 +708,28 @@
             "first-aid"
           ],
           "title": "Basic Wound Care"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "dirty",
+            "limited",
+            "running",
+            "water",
+            "wounds"
+          ],
+          "passage": "Keep handwashing water away from drinking water containers and food surfaces. Dry hands with a clean towel or air dry rather than using a dirty shared cloth.",
+          "path": "knowledge/en/sanitation/hand_hygiene.md",
+          "score": 18.61102497602079,
+          "tags": [
+            "sanitation",
+            "hygiene",
+            "handwashing",
+            "water",
+            "wounds"
+          ],
+          "title": "Hand Hygiene With Limited Water"
         },
         {
           "confidence": "HIGH",
@@ -701,7 +744,7 @@
           ],
           "passage": "Wash hands before handling food, after using the toilet, after touching trash or floodwater, and before caring for wounds. If running water is unavailable, use a small amount of safe water poured from a container. Soap and friction matter; do not dip dirty hands into stored drinking water.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 12.616295537405298,
+          "score": 16.583629132773265,
           "tags": [
             "sanitation",
             "hygiene",
@@ -709,26 +752,6 @@
             "illness"
           ],
           "title": "Sanitation and Hygiene During Outage"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "cut",
-            "dirty",
-            "limited",
-            "water"
-          ],
-          "passage": "If you have ice, a cooler, or frozen water bottles, group high-risk foods together and keep them cold. Melted ice water can contaminate food if packaging leaks, so keep food sealed and drain dirty water away from eating surfaces.",
-          "path": "knowledge/en/food/food_safety.md",
-          "score": 7.064305074179457,
-          "tags": [
-            "food",
-            "safety",
-            "refrigeration",
-            "outage"
-          ],
-          "title": "Food Safety During Power Outage"
         }
       ],
       "top_1_correct": true,
@@ -737,7 +760,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 24.54989997204393,
+      "elapsed_ms": 59.133199974894524,
       "expected_language": "en",
       "expected_tag": "dehydration",
       "query": "what are signs of dehydration",
@@ -751,7 +774,7 @@
         ],
         "passage": "Warning signs include confusion, fainting, very little urine, rapid heartbeat, sunken eyes, inability to keep fluids down, or worsening weakness. These signs require urgent medical help when available.",
         "path": "knowledge/en/medical/dehydration.md",
-        "score": 7.469451165508545,
+        "score": 7.6530089570863495,
         "tags": [
           "medical",
           "dehydration",
@@ -769,7 +792,7 @@
           ],
           "passage": "Warning signs include confusion, fainting, very little urine, rapid heartbeat, sunken eyes, inability to keep fluids down, or worsening weakness. These signs require urgent medical help when available.",
           "path": "knowledge/en/medical/dehydration.md",
-          "score": 7.469451165508545,
+          "score": 7.6530089570863495,
           "tags": [
             "medical",
             "dehydration",
@@ -786,7 +809,7 @@
           ],
           "passage": "Prevent dehydration by drinking small amounts regularly, resting during the hottest part of the day, and reducing unnecessary exertion. Dark urine, dizziness, dry mouth, confusion, and inability to sweat can be warning signs.",
           "path": "knowledge/en/water/dehydration_prevention.md",
-          "score": 6.950285163499767,
+          "score": 6.944927219796777,
           "tags": [
             "water",
             "dehydration",
@@ -795,14 +818,104 @@
           "title": "Dehydration Prevention"
         },
         {
-          "confidence": "MEDIUM",
+          "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
+            "dehydration",
             "signs"
+          ],
+          "passage": "Shock can happen after severe bleeding, burns, infection, dehydration, allergic reaction, or major injury. Warning signs include pale or clammy skin, weakness, rapid breathing, fast pulse, confusion, dizziness, thirst, nausea, or loss of consciousness.",
+          "path": "knowledge/en/medical/shock.md",
+          "score": 6.648890665603357,
+          "tags": [
+            "medical",
+            "shock",
+            "bleeding",
+            "injury"
+          ],
+          "title": "Shock Warning Signs"
+        }
+      ],
+      "top_1_correct": true,
+      "top_k_correct": true
+    },
+    {
+      "confidence": "HIGH",
+      "difficulty": "scenario",
+      "elapsed_ms": 68.3634999440983,
+      "expected_language": "en",
+      "expected_tag": "dehydration",
+      "query": "someone is confused weak and barely urinating in extreme heat",
+      "rank": 1,
+      "reciprocal_rank": 1.0,
+      "result": {
+        "language": "en",
+        "matched_terms": [
+          "dehydration",
+          "extreme",
+          "heat"
+        ],
+        "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
+        "path": "knowledge/en/shelter/heat.md",
+        "score": 14.426871300630012,
+        "tags": [
+          "shelter",
+          "heat",
+          "cooling",
+          "dehydration"
+        ],
+        "title": "Extreme Heat"
+      },
+      "results": [
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "dehydration",
+            "extreme",
+            "heat"
+          ],
+          "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
+          "path": "knowledge/en/shelter/heat.md",
+          "score": 14.426871300630012,
+          "tags": [
+            "shelter",
+            "heat",
+            "cooling",
+            "dehydration"
+          ],
+          "title": "Extreme Heat"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "confused",
+            "dehydration",
+            "heat",
+            "someone"
+          ],
+          "passage": "Confusion, fainting, seizure, very high body temperature, or worsening symptoms are emergency signs. Cool first while seeking urgent medical help. Do not give alcohol. Do not force fluids into someone who is confused, unconscious, or unable to swallow safely.",
+          "path": "knowledge/en/medical/heat_illness.md",
+          "score": 14.335949811337995,
+          "tags": [
+            "medical",
+            "heat",
+            "dehydration",
+            "cooling"
+          ],
+          "title": "Heat Illness"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "heat",
+            "weak"
           ],
           "passage": "Hypothermia can occur when the body loses heat faster than it can produce it. Warning signs include intense shivering, clumsiness, confusion, slurred speech, drowsiness, and weak pulse.",
           "path": "knowledge/en/medical/hypothermia.md",
-          "score": 2.1129388674548464,
+          "score": 7.65369556164747,
           "tags": [
             "medical",
             "cold",
@@ -816,89 +929,8 @@
     },
     {
       "confidence": "HIGH",
-      "difficulty": "scenario",
-      "elapsed_ms": 43.38599997572601,
-      "expected_language": "en",
-      "expected_tag": "dehydration",
-      "query": "someone is confused weak and barely urinating in extreme heat",
-      "rank": 2,
-      "reciprocal_rank": 0.5,
-      "result": {
-        "language": "en",
-        "matched_terms": [
-          "extreme",
-          "heat"
-        ],
-        "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
-        "path": "knowledge/en/shelter/heat.md",
-        "score": 8.39192129068226,
-        "tags": [
-          "shelter",
-          "heat",
-          "cooling"
-        ],
-        "title": "Extreme Heat"
-      },
-      "results": [
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "extreme",
-            "heat"
-          ],
-          "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
-          "path": "knowledge/en/shelter/heat.md",
-          "score": 8.39192129068226,
-          "tags": [
-            "shelter",
-            "heat",
-            "cooling"
-          ],
-          "title": "Extreme Heat"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "dehydration",
-            "heat"
-          ],
-          "passage": "Prevent dehydration by drinking small amounts regularly, resting during the hottest part of the day, and reducing unnecessary exertion. Dark urine, dizziness, dry mouth, confusion, and inability to sweat can be warning signs.",
-          "path": "knowledge/en/water/dehydration_prevention.md",
-          "score": 7.299787671778937,
-          "tags": [
-            "water",
-            "dehydration",
-            "heat"
-          ],
-          "title": "Dehydration Prevention"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "heat",
-            "weak"
-          ],
-          "passage": "Hypothermia can occur when the body loses heat faster than it can produce it. Warning signs include intense shivering, clumsiness, confusion, slurred speech, drowsiness, and weak pulse.",
-          "path": "knowledge/en/medical/hypothermia.md",
-          "score": 5.513831618729195,
-          "tags": [
-            "medical",
-            "cold",
-            "hypothermia"
-          ],
-          "title": "Hypothermia"
-        }
-      ],
-      "top_1_correct": false,
-      "top_k_correct": true
-    },
-    {
-      "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 29.502599965780973,
+      "elapsed_ms": 51.139999995939434,
       "expected_language": "en",
       "expected_tag": "medication",
       "query": "how do I manage insulin and medicine during a disaster",
@@ -914,7 +946,7 @@
         ],
         "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
         "path": "knowledge/en/medical/medication_management.md",
-        "score": 16.42324924054169,
+        "score": 17.735190872735508,
         "tags": [
           "medical",
           "medication",
@@ -935,7 +967,7 @@
           ],
           "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
           "path": "knowledge/en/medical/medication_management.md",
-          "score": 16.42324924054169,
+          "score": 17.735190872735508,
           "tags": [
             "medical",
             "medication",
@@ -948,11 +980,29 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
+            "medication",
+            "medicine"
+          ],
+          "passage": "Check the bag regularly. Replace expired food, rotate water, update medicine lists, and charge battery banks. Keep shoes, keys, glasses, and critical medicine in predictable places so they are not forgotten during a rushed departure.",
+          "path": "knowledge/en/planning/evacuation_bag.md",
+          "score": 7.755773326646148,
+          "tags": [
+            "planning",
+            "evacuation",
+            "supplies",
+            "documents"
+          ],
+          "title": "Evacuation Bag"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
             "disaster"
           ],
           "passage": "If you need direction during a disaster, evacuation, or infrastructure failure and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 3.4514110385272114,
+          "score": 4.970538417226855,
           "tags": [
             "navigation",
             "compass",
@@ -968,7 +1018,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 38.32930000498891,
+      "elapsed_ms": 49.36180007643998,
       "expected_language": "en",
       "expected_tag": "medication",
       "query": "which medicines should not be skipped when power is out",
@@ -982,7 +1032,7 @@
         ],
         "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
         "path": "knowledge/en/medical/medication_management.md",
-        "score": 11.421769228063711,
+        "score": 13.699468828420628,
         "tags": [
           "medical",
           "medication",
@@ -1001,7 +1051,7 @@
           ],
           "passage": "Prioritize medicines that prevent immediate harm, such as insulin, seizure medicine, heart medicine, asthma inhalers, blood pressure medicine, anticoagulants, and psychiatric medicines. Do not intentionally skip critical medicine to stretch supply unless a qualified clinician tells you to.",
           "path": "knowledge/en/medical/medication_management.md",
-          "score": 11.421769228063711,
+          "score": 13.699468828420628,
           "tags": [
             "medical",
             "medication",
@@ -1019,11 +1069,12 @@
           ],
           "passage": "Confusion, fainting, hot skin, or stopped sweating can indicate heat stroke, which is a medical emergency.",
           "path": "knowledge/en/shelter/heat.md",
-          "score": 5.8111796664261535,
+          "score": 7.840578199261882,
           "tags": [
             "shelter",
             "heat",
-            "cooling"
+            "cooling",
+            "dehydration"
           ],
           "title": "Extreme Heat"
         },
@@ -1031,17 +1082,19 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
-            "out"
+            "out",
+            "power"
           ],
-          "passage": "Move the person out of wind and wet conditions. Remove wet clothing if dry coverings are available. Warm the core first with blankets, dry layers, body heat, or warm packs wrapped in cloth placed near the chest, neck, or groin.",
-          "path": "knowledge/en/medical/hypothermia.md",
-          "score": 3.8802857395905535,
+          "passage": "Avoid forwarding unconfirmed warnings. Bad information can send people toward danger or waste scarce power and attention.",
+          "path": "knowledge/en/communications/message_plan.md",
+          "score": 6.421378985575281,
           "tags": [
-            "medical",
-            "cold",
-            "hypothermia"
+            "communications",
+            "phone",
+            "battery",
+            "contacts"
           ],
-          "title": "Hypothermia"
+          "title": "Low-Power Message Plan"
         }
       ],
       "top_1_correct": true,
@@ -1050,27 +1103,27 @@
     {
       "confidence": "MEDIUM",
       "difficulty": "direct",
-      "elapsed_ms": 32.3672000085935,
+      "elapsed_ms": 51.23840004671365,
       "expected_language": "en",
       "expected_tag": "purification",
       "query": "how can I purify water",
-      "rank": 1,
-      "reciprocal_rank": 1.0,
+      "rank": 2,
+      "reciprocal_rank": 0.5,
       "result": {
         "language": "en",
         "matched_terms": [
           "water"
         ],
-        "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
-        "path": "knowledge/en/water/purification.md",
-        "score": 1.757533557317297,
+        "passage": "When water is limited, first separate safe drinking water from water for washing, cleaning, or flushing. Label containers clearly. Protect drinking water from dirty hands, open cups, and reused containers that held chemicals or fuel.",
+        "path": "knowledge/en/water/rationing.md",
+        "score": 2.7103468549784937,
         "tags": [
           "water",
-          "purification",
-          "boiling",
-          "survival"
+          "rationing",
+          "storage",
+          "dehydration"
         ],
-        "title": "Water Purification"
+        "title": "Water Rationing"
       },
       "results": [
         {
@@ -1079,9 +1132,26 @@
           "matched_terms": [
             "water"
           ],
+          "passage": "When water is limited, first separate safe drinking water from water for washing, cleaning, or flushing. Label containers clearly. Protect drinking water from dirty hands, open cups, and reused containers that held chemicals or fuel.",
+          "path": "knowledge/en/water/rationing.md",
+          "score": 2.7103468549784937,
+          "tags": [
+            "water",
+            "rationing",
+            "storage",
+            "dehydration"
+          ],
+          "title": "Water Rationing"
+        },
+        {
+          "confidence": "MEDIUM",
+          "language": "en",
+          "matched_terms": [
+            "water"
+          ],
           "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
           "path": "knowledge/en/water/purification.md",
-          "score": 1.757533557317297,
+          "score": 2.7052620011728234,
           "tags": [
             "water",
             "purification",
@@ -1096,40 +1166,26 @@
           "matched_terms": [
             "water"
           ],
-          "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
-          "path": "knowledge/en/water/storage.md",
-          "score": 1.696770205534211,
+          "passage": "Keep handwashing water away from drinking water containers and food surfaces. Dry hands with a clean towel or air dry rather than using a dirty shared cloth.",
+          "path": "knowledge/en/sanitation/hand_hygiene.md",
+          "score": 2.621569590477179,
           "tags": [
+            "sanitation",
+            "hygiene",
+            "handwashing",
             "water",
-            "storage",
-            "sanitation"
+            "wounds"
           ],
-          "title": "Water Storage"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
-            "water"
-          ],
-          "passage": "When sweating heavily, water alone may not be enough. Food, broth, or an oral rehydration solution can help replace salts. Do not ration water to the point that people stop drinking; dehydration can reduce judgment and physical ability quickly.",
-          "path": "knowledge/en/water/dehydration_prevention.md",
-          "score": 1.5969303786555729,
-          "tags": [
-            "water",
-            "dehydration",
-            "heat"
-          ],
-          "title": "Dehydration Prevention"
+          "title": "Hand Hygiene With Limited Water"
         }
       ],
-      "top_1_correct": true,
+      "top_1_correct": false,
       "top_k_correct": true
     },
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 36.713400040753186,
+      "elapsed_ms": 52.997599937953055,
       "expected_language": "en",
       "expected_tag": "purification",
       "query": "I have dirty water after a disaster and boiling may not be possible",
@@ -1144,7 +1200,7 @@
         ],
         "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
         "path": "knowledge/en/water/purification.md",
-        "score": 8.486504442263792,
+        "score": 12.509012004134197,
         "tags": [
           "water",
           "purification",
@@ -1164,7 +1220,7 @@
           ],
           "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
           "path": "knowledge/en/water/purification.md",
-          "score": 8.486504442263792,
+          "score": 12.509012004134197,
           "tags": [
             "water",
             "purification",
@@ -1184,7 +1240,7 @@
           ],
           "passage": "If you need direction during a disaster, evacuation, or infrastructure failure and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 6.4175690416887585,
+          "score": 9.76946405761767,
           "tags": [
             "navigation",
             "compass",
@@ -1198,19 +1254,20 @@
           "language": "en",
           "matched_terms": [
             "dirty",
+            "have",
             "possible",
             "water"
           ],
-          "passage": "For minor cuts and scrapes, first stop bleeding with gentle direct pressure. Wash your hands if possible, then rinse dirt from the wound with clean running water or the safest available water. Remove loose debris with clean tweezers if available.",
-          "path": "knowledge/en/medical/wound_care.md",
-          "score": 5.814007870461063,
+          "passage": "If you have ice, a cooler, or frozen water bottles, group high-risk foods together and keep them cold. Melted ice water can contaminate food if packaging leaks, so keep food sealed and drain dirty water away from eating surfaces.",
+          "path": "knowledge/en/food/food_safety.md",
+          "score": 8.34429651584159,
           "tags": [
-            "medical",
-            "wounds",
-            "infection",
-            "first-aid"
+            "food",
+            "safety",
+            "refrigeration",
+            "outage"
           ],
-          "title": "Basic Wound Care"
+          "title": "Food Safety During Power Outage"
         }
       ],
       "top_1_correct": true,
@@ -1219,7 +1276,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 56.46150000393391,
+      "elapsed_ms": 51.704399986192584,
       "expected_language": "en",
       "expected_tag": "purification",
       "query": "water smells like fuel or sewage after flooding",
@@ -1236,7 +1293,7 @@
         ],
         "passage": "Boiling helps kill many disease-causing organisms, but it does not remove fuel, heavy metals, salt, or chemical contamination. If water smells like fuel, solvents, pesticides, or sewage, avoid it when any safer source exists.",
         "path": "knowledge/en/water/purification.md",
-        "score": 13.343766970180827,
+        "score": 17.25240758075964,
         "tags": [
           "water",
           "purification",
@@ -1258,7 +1315,7 @@
           ],
           "passage": "Boiling helps kill many disease-causing organisms, but it does not remove fuel, heavy metals, salt, or chemical contamination. If water smells like fuel, solvents, pesticides, or sewage, avoid it when any safer source exists.",
           "path": "knowledge/en/water/purification.md",
-          "score": 13.343766970180827,
+          "score": 17.25240758075964,
           "tags": [
             "water",
             "purification",
@@ -1271,13 +1328,34 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
+            "fuel",
+            "like",
+            "sewage",
+            "smells",
+            "water"
+          ],
+          "passage": "If water smells like fuel, solvents, or chemicals, avoid skin contact and do not try to treat it for drinking. Seek a safer water source.",
+          "path": "knowledge/en/shelter/flood_cleanup.md",
+          "score": 15.962138723303013,
+          "tags": [
+            "shelter",
+            "flood",
+            "cleanup",
+            "sanitation"
+          ],
+          "title": "Flood Cleanup Safety"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
             "sewage",
             "smell",
             "water"
           ],
           "passage": "For minor cuts and scrapes, first stop bleeding with gentle direct pressure. Wash your hands if possible, then rinse dirt from the wound with clean running water or the safest available water. Remove loose debris with clean tweezers if available.",
           "path": "knowledge/en/medical/wound_care.md",
-          "score": 5.629888961002452,
+          "score": 7.721153535782314,
           "tags": [
             "medical",
             "wounds",
@@ -1285,25 +1363,6 @@
             "first-aid"
           ],
           "title": "Basic Wound Care"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "fuel",
-            "smells",
-            "water"
-          ],
-          "passage": "Cook food thoroughly when fuel is available, but cooking does not make spoiled food safe. When in doubt, choose lower-risk shelf-stable food and conserve fuel for water treatment, warmth, or medically important needs.",
-          "path": "knowledge/en/food/food_safety.md",
-          "score": 5.141221678917725,
-          "tags": [
-            "food",
-            "safety",
-            "refrigeration",
-            "outage"
-          ],
-          "title": "Food Safety During Power Outage"
         }
       ],
       "top_1_correct": true,
@@ -1312,7 +1371,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 43.634200002998114,
+      "elapsed_ms": 55.40199996903539,
       "expected_language": "en",
       "expected_tag": "storage",
       "query": "how should I store treated water safely",
@@ -1327,7 +1386,7 @@
         ],
         "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
         "path": "knowledge/en/water/storage.md",
-        "score": 9.088728652164884,
+        "score": 11.478421140746622,
         "tags": [
           "water",
           "storage",
@@ -1346,7 +1405,7 @@
           ],
           "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
           "path": "knowledge/en/water/storage.md",
-          "score": 9.088728652164884,
+          "score": 11.478421140746622,
           "tags": [
             "water",
             "storage",
@@ -1363,7 +1422,7 @@
           ],
           "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
           "path": "knowledge/en/water/purification.md",
-          "score": 6.614597606282037,
+          "score": 9.277832278587193,
           "tags": [
             "water",
             "purification",
@@ -1382,7 +1441,7 @@
           ],
           "passage": "If toilets do not flush, keep human waste away from living, cooking, and water storage areas. Use a lined bucket or container only if necessary, cover waste after each use, and store it where people, animals, and floodwater cannot spread it. Wash or sanitize hands afterward.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 5.365624211101333,
+          "score": 7.311229667184486,
           "tags": [
             "sanitation",
             "hygiene",
@@ -1398,7 +1457,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 41.165700007695705,
+      "elapsed_ms": 56.769799906760454,
       "expected_language": "en",
       "expected_tag": "storage",
       "query": "what containers should I use so clean water does not get contaminated",
@@ -1416,7 +1475,7 @@
         ],
         "passage": "Do not touch the inside of caps or container mouths. Pour water instead of dipping cups into storage containers. If a container becomes contaminated, clean and disinfect it before reuse.",
         "path": "knowledge/en/water/storage.md",
-        "score": 18.948709359022324,
+        "score": 25.007106790775524,
         "tags": [
           "water",
           "storage",
@@ -1438,7 +1497,7 @@
           ],
           "passage": "Do not touch the inside of caps or container mouths. Pour water instead of dipping cups into storage containers. If a container becomes contaminated, clean and disinfect it before reuse.",
           "path": "knowledge/en/water/storage.md",
-          "score": 18.948709359022324,
+          "score": 25.007106790775524,
           "tags": [
             "water",
             "storage",
@@ -1460,7 +1519,7 @@
           ],
           "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
           "path": "knowledge/en/water/purification.md",
-          "score": 15.379430895783681,
+          "score": 21.746727151180487,
           "tags": [
             "water",
             "purification",
@@ -1483,7 +1542,7 @@
           ],
           "passage": "Keep trash sealed and away from food. Food scraps attract insects and rodents. If collection is unavailable, separate sharp objects, contaminated waste, and food waste so people do not get cut or exposed while moving trash later.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 14.51759446212386,
+          "score": 19.35590737708461,
           "tags": [
             "sanitation",
             "hygiene",
@@ -1499,7 +1558,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 31.319100002292544,
+      "elapsed_ms": 46.78059997968376,
       "expected_language": "en",
       "expected_tag": "battery",
       "query": "how do I save phone battery",
@@ -1509,20 +1568,40 @@
         "language": "en",
         "matched_terms": [
           "battery",
-          "phone"
-        ],
-        "passage": "To extend phone battery life, reduce screen brightness, enable low-power mode, turn off Bluetooth, Wi-Fi, mobile data, location, and background app refresh when not needed. Use airplane mode when communication is not currently required.",
-        "path": "knowledge/en/energy/battery_saving.md",
-        "score": 8.159015193833955,
-        "tags": [
-          "energy",
-          "battery",
           "phone",
-          "low-power"
+          "save"
         ],
-        "title": "Battery Saving"
+        "passage": "Use scheduled check-in times instead of keeping the phone active all day. Turn off background apps, dim the screen, and keep the phone warm in cold weather. Save voice calls for urgent decisions or when text messages are not working.",
+        "path": "knowledge/en/communications/message_plan.md",
+        "score": 11.093125487434571,
+        "tags": [
+          "communications",
+          "phone",
+          "battery",
+          "contacts"
+        ],
+        "title": "Low-Power Message Plan"
       },
       "results": [
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "battery",
+            "phone",
+            "save"
+          ],
+          "passage": "Use scheduled check-in times instead of keeping the phone active all day. Turn off background apps, dim the screen, and keep the phone warm in cold weather. Save voice calls for urgent decisions or when text messages are not working.",
+          "path": "knowledge/en/communications/message_plan.md",
+          "score": 11.093125487434571,
+          "tags": [
+            "communications",
+            "phone",
+            "battery",
+            "contacts"
+          ],
+          "title": "Low-Power Message Plan"
+        },
         {
           "confidence": "HIGH",
           "language": "en",
@@ -1532,7 +1611,7 @@
           ],
           "passage": "To extend phone battery life, reduce screen brightness, enable low-power mode, turn off Bluetooth, Wi-Fi, mobile data, location, and background app refresh when not needed. Use airplane mode when communication is not currently required.",
           "path": "knowledge/en/energy/battery_saving.md",
-          "score": 8.159015193833955,
+          "score": 9.201654491556088,
           "tags": [
             "energy",
             "battery",
@@ -1543,37 +1622,23 @@
         },
         {
           "confidence": "HIGH",
-          "language": "en",
+          "language": "es",
           "matched_terms": [
             "battery",
             "phone"
           ],
-          "passage": "Use a whistle, mirror, flashlight, bright fabric, smoke only when fire risk is controlled, or large ground symbols in open areas. Avoid using up phone battery for constant signaling unless rescuers are nearby.",
-          "path": "knowledge/en/communications/signaling.md",
-          "score": 4.284899851262344,
+          "passage": "Evite reenviar advertencias sin confirmar. La mala informacion puede mandar a la gente hacia peligro o gastar energia y atencion escasas.",
+          "path": "knowledge/es/communications/plan_mensajes.md",
+          "score": 5.620261763543661,
           "tags": [
             "communications",
-            "signaling",
-            "rescue",
-            "rescuers"
+            "comunicaciones",
+            "phone",
+            "telefono",
+            "battery",
+            "contacts"
           ],
-          "title": "Emergency Signaling"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
-            "battery"
-          ],
-          "passage": "Preserve night vision by using dim light and avoiding unnecessary bright flashes. Keep one light source in a known location so it can be found in darkness.",
-          "path": "knowledge/en/energy/lighting.md",
-          "score": 2.055483202603176,
-          "tags": [
-            "energy",
-            "lighting",
-            "battery"
-          ],
-          "title": "Emergency Lighting"
+          "title": "Plan de Mensajes de Bajo Consumo"
         }
       ],
       "top_1_correct": true,
@@ -1582,7 +1647,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 34.15710001718253,
+      "elapsed_ms": 54.643700015731156,
       "expected_language": "en",
       "expected_tag": "battery",
       "query": "phone is at 12 percent and I may need emergency calls later",
@@ -1592,20 +1657,40 @@
         "language": "en",
         "matched_terms": [
           "battery",
+          "calls",
           "phone"
         ],
-        "passage": "To extend phone battery life, reduce screen brightness, enable low-power mode, turn off Bluetooth, Wi-Fi, mobile data, location, and background app refresh when not needed. Use airplane mode when communication is not currently required.",
-        "path": "knowledge/en/energy/battery_saving.md",
-        "score": 8.159015193833955,
+        "passage": "Choose one out-of-area contact to collect updates and share them with others. This reduces repeated calls and saves battery. Write important numbers on paper in case the phone dies.",
+        "path": "knowledge/en/communications/message_plan.md",
+        "score": 13.246494093848115,
         "tags": [
-          "energy",
-          "battery",
+          "communications",
           "phone",
-          "low-power"
+          "battery",
+          "contacts"
         ],
-        "title": "Battery Saving"
+        "title": "Low-Power Message Plan"
       },
       "results": [
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "battery",
+            "calls",
+            "phone"
+          ],
+          "passage": "Choose one out-of-area contact to collect updates and share them with others. This reduces repeated calls and saves battery. Write important numbers on paper in case the phone dies.",
+          "path": "knowledge/en/communications/message_plan.md",
+          "score": 13.246494093848115,
+          "tags": [
+            "communications",
+            "phone",
+            "battery",
+            "contacts"
+          ],
+          "title": "Low-Power Message Plan"
+        },
         {
           "confidence": "HIGH",
           "language": "en",
@@ -1615,7 +1700,7 @@
           ],
           "passage": "To extend phone battery life, reduce screen brightness, enable low-power mode, turn off Bluetooth, Wi-Fi, mobile data, location, and background app refresh when not needed. Use airplane mode when communication is not currently required.",
           "path": "knowledge/en/energy/battery_saving.md",
-          "score": 8.159015193833955,
+          "score": 9.201654491556088,
           "tags": [
             "energy",
             "battery",
@@ -1623,25 +1708,6 @@
             "low-power"
           ],
           "title": "Battery Saving"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "battery",
-            "emergency",
-            "phone"
-          ],
-          "passage": "Use a whistle, mirror, flashlight, bright fabric, smoke only when fire risk is controlled, or large ground symbols in open areas. Avoid using up phone battery for constant signaling unless rescuers are nearby.",
-          "path": "knowledge/en/communications/signaling.md",
-          "score": 5.813815072928014,
-          "tags": [
-            "communications",
-            "signaling",
-            "rescue",
-            "rescuers"
-          ],
-          "title": "Emergency Signaling"
         },
         {
           "confidence": "HIGH",
@@ -1653,7 +1719,7 @@
           ],
           "passage": "If carbon monoxide is suspected, move everyone to fresh air immediately. Do not stay inside to gather belongings. Call emergency services when possible. If someone is unconscious, not breathing normally, or has chest pain, treat it as life-threatening.",
           "path": "knowledge/en/shelter/carbon_monoxide.md",
-          "score": 5.7400314718331265,
+          "score": 7.531449186381554,
           "tags": [
             "shelter",
             "carbon-monoxide",
@@ -1669,7 +1735,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 32.929600041825324,
+      "elapsed_ms": 53.28160000499338,
       "expected_language": "en",
       "expected_tag": "lighting",
       "query": "what light should I use without wasting batteries",
@@ -1684,7 +1750,7 @@
         ],
         "passage": "Preserve night vision by using dim light and avoiding unnecessary bright flashes. Keep one light source in a known location so it can be found in darkness.",
         "path": "knowledge/en/energy/lighting.md",
-        "score": 10.52068269639272,
+        "score": 13.040074387687087,
         "tags": [
           "energy",
           "lighting",
@@ -1703,7 +1769,7 @@
           ],
           "passage": "Preserve night vision by using dim light and avoiding unnecessary bright flashes. Keep one light source in a known location so it can be found in darkness.",
           "path": "knowledge/en/energy/lighting.md",
-          "score": 10.52068269639272,
+          "score": 13.040074387687087,
           "tags": [
             "energy",
             "lighting",
@@ -1716,18 +1782,19 @@
           "language": "en",
           "matched_terms": [
             "batteries",
-            "battery"
-          ],
-          "passage": "Check messages in scheduled batches instead of keeping radios active constantly. Prefer text messages over voice or video. Keep devices warm in cold weather because batteries lose capacity when cold.",
-          "path": "knowledge/en/energy/battery_saving.md",
-          "score": 5.6121119617406645,
-          "tags": [
-            "energy",
             "battery",
-            "phone",
-            "low-power"
+            "light"
           ],
-          "title": "Battery Saving"
+          "passage": "An evacuation bag should help you leave quickly without depending on power, internet, or open stores. Keep it light enough to carry. Pack water, ready-to-eat food, needed medicine, copies of important documents, a flashlight, spare batteries, a phone charging cable, hygiene supplies, a small first aid kit, cash, and weather-appropriate clothing.",
+          "path": "knowledge/en/planning/evacuation_bag.md",
+          "score": 8.444958234938305,
+          "tags": [
+            "planning",
+            "evacuation",
+            "supplies",
+            "documents"
+          ],
+          "title": "Evacuation Bag"
         },
         {
           "confidence": "HIGH",
@@ -1736,15 +1803,16 @@
             "batteries",
             "battery"
           ],
-          "passage": "Keep radio volume low and use headphones when possible. Store spare batteries with the radio, protected from moisture and extreme heat.",
-          "path": "knowledge/en/communications/emergency_radio.md",
-          "score": 4.068431951315853,
+          "passage": "Check messages in scheduled batches instead of keeping radios active constantly. Prefer text messages over voice or video. Keep devices warm in cold weather because batteries lose capacity when cold.",
+          "path": "knowledge/en/energy/battery_saving.md",
+          "score": 7.611614078144964,
           "tags": [
-            "communications",
-            "radio",
-            "emergency"
+            "energy",
+            "battery",
+            "phone",
+            "low-power"
           ],
-          "title": "Emergency Radio"
+          "title": "Battery Saving"
         }
       ],
       "top_1_correct": true,
@@ -1753,7 +1821,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 34.974200010765344,
+      "elapsed_ms": 50.87869998533279,
       "expected_language": "en",
       "expected_tag": "lighting",
       "query": "candles are risky and I need safe light at night",
@@ -1770,7 +1838,7 @@
         ],
         "passage": "Preserve night vision by using dim light and avoiding unnecessary bright flashes. Keep one light source in a known location so it can be found in darkness.",
         "path": "knowledge/en/energy/lighting.md",
-        "score": 16.13225479976723,
+        "score": 20.42219672404698,
         "tags": [
           "energy",
           "lighting",
@@ -1791,7 +1859,7 @@
           ],
           "passage": "Preserve night vision by using dim light and avoiding unnecessary bright flashes. Keep one light source in a known location so it can be found in darkness.",
           "path": "knowledge/en/energy/lighting.md",
-          "score": 16.13225479976723,
+          "score": 20.42219672404698,
           "tags": [
             "energy",
             "lighting",
@@ -1809,7 +1877,7 @@
           ],
           "passage": "Night method: in the northern hemisphere, find the Big Dipper if visible. The two outer stars of its bowl point toward Polaris, the North Star. Polaris sits roughly above true north. If clouds, buildings, smoke, or light pollution block the sky, do not rely on this method.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 4.238039365537891,
+          "score": 5.936229516279994,
           "tags": [
             "navigation",
             "compass",
@@ -1827,7 +1895,7 @@
           ],
           "passage": "Use the least fuel necessary. Plan meals before lighting a stove, cook foods together when safe, cover pots to reduce heat loss, and avoid long simmering if fuel is scarce. Do not leave a flame unattended.",
           "path": "knowledge/en/energy/cooking_safety.md",
-          "score": 4.081952470700808,
+          "score": 5.642550254738243,
           "tags": [
             "energy",
             "cooking",
@@ -1843,7 +1911,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 30.907200009096414,
+      "elapsed_ms": 51.13030003849417,
       "expected_language": "en",
       "expected_tag": "generator",
       "query": "is it safe to run a generator indoors",
@@ -1859,7 +1927,7 @@
         ],
         "passage": "Keep generators and fuel-burning equipment outside and far from windows, doors, vents, garages, crawl spaces, and neighboring homes. Opening a window is not enough to make indoor generator or charcoal use safe.",
         "path": "knowledge/en/shelter/carbon_monoxide.md",
-        "score": 11.942326348712045,
+        "score": 14.843796293871401,
         "tags": [
           "shelter",
           "carbon-monoxide",
@@ -1880,7 +1948,7 @@
           ],
           "passage": "Keep generators and fuel-burning equipment outside and far from windows, doors, vents, garages, crawl spaces, and neighboring homes. Opening a window is not enough to make indoor generator or charcoal use safe.",
           "path": "knowledge/en/shelter/carbon_monoxide.md",
-          "score": 11.942326348712045,
+          "score": 14.843796293871401,
           "tags": [
             "shelter",
             "carbon-monoxide",
@@ -1893,17 +1961,23 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
-            "generator"
+            "indoor",
+            "indoors",
+            "run",
+            "safe"
           ],
-          "passage": "Do not connect a generator directly to household wiring unless a proper transfer switch has been installed by qualified personnel. Backfeeding can injure or kill utility workers and neighbors.",
-          "path": "knowledge/en/energy/generators.md",
-          "score": 5.330681334889583,
+          "passage": "When outdoor air is smoky, dusty, or irritating, reduce the amount entering the shelter. Close windows and doors, block obvious drafts with damp towels or tape if safe, and avoid activities that add indoor smoke such as candles, frying, or burning fuel indoors.",
+          "path": "knowledge/en/shelter/smoke_air_quality.md",
+          "score": 14.651407704838178,
           "tags": [
-            "energy",
-            "generator",
+            "shelter",
+            "smoke",
+            "air",
+            "breathing",
+            "cooking",
             "carbon-monoxide"
           ],
-          "title": "Generator Safety"
+          "title": "Smoke and Poor Air Quality"
         },
         {
           "confidence": "HIGH",
@@ -1914,11 +1988,12 @@
           ],
           "passage": "Cool the body with wet cloths, misting, fans when power is available, and cool showers if safe water is available. Avoid unnecessary cooking indoors because it adds heat.",
           "path": "knowledge/en/shelter/heat.md",
-          "score": 4.196902182127273,
+          "score": 6.234183028756629,
           "tags": [
             "shelter",
             "heat",
-            "cooling"
+            "cooling",
+            "dehydration"
           ],
           "title": "Extreme Heat"
         }
@@ -1929,7 +2004,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 22.63880003010854,
+      "elapsed_ms": 49.47990004438907,
       "expected_language": "en",
       "expected_tag": "carbon-monoxide",
       "query": "generator is near a window and people feel dizzy",
@@ -1944,7 +2019,7 @@
         ],
         "passage": "Keep generators and fuel-burning equipment outside and far from windows, doors, vents, garages, crawl spaces, and neighboring homes. Opening a window is not enough to make indoor generator or charcoal use safe.",
         "path": "knowledge/en/shelter/carbon_monoxide.md",
-        "score": 9.31750408010729,
+        "score": 11.674447910988343,
         "tags": [
           "shelter",
           "carbon-monoxide",
@@ -1964,7 +2039,7 @@
           ],
           "passage": "Keep generators and fuel-burning equipment outside and far from windows, doors, vents, garages, crawl spaces, and neighboring homes. Opening a window is not enough to make indoor generator or charcoal use safe.",
           "path": "knowledge/en/shelter/carbon_monoxide.md",
-          "score": 9.31750408010729,
+          "score": 11.674447910988343,
           "tags": [
             "shelter",
             "carbon-monoxide",
@@ -1977,33 +2052,35 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
+            "near",
+            "people"
+          ],
+          "passage": "Choose two meeting places: one near the home and one outside the neighborhood. If people are separated and phones do not work, the plan should say where to go, who to check on, and how long to wait before moving to the backup location.",
+          "path": "knowledge/en/planning/household_emergency_plan.md",
+          "score": 7.267576142668213,
+          "tags": [
+            "planning",
+            "household",
+            "emergency",
+            "contacts"
+          ],
+          "title": "Household Emergency Plan"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
             "generator"
           ],
           "passage": "Do not connect a generator directly to household wiring unless a proper transfer switch has been installed by qualified personnel. Backfeeding can injure or kill utility workers and neighbors.",
           "path": "knowledge/en/energy/generators.md",
-          "score": 5.330681334889583,
+          "score": 6.157625880831365,
           "tags": [
             "energy",
             "generator",
             "carbon-monoxide"
           ],
           "title": "Generator Safety"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "near"
-          ],
-          "passage": "Cool a burn with clean, cool running water for about 20 minutes if possible. Remove jewelry or tight clothing near the burn before swelling starts, but do not remove material stuck to the skin.",
-          "path": "knowledge/en/medical/burns.md",
-          "score": 3.229871376916814,
-          "tags": [
-            "medical",
-            "burns",
-            "first-aid"
-          ],
-          "title": "Burns"
         }
       ],
       "top_1_correct": true,
@@ -2012,7 +2089,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 22.927400015760213,
+      "elapsed_ms": 49.94339996483177,
       "expected_language": "en",
       "expected_tag": "carbon-monoxide",
       "query": "what are carbon monoxide warning signs",
@@ -2028,7 +2105,7 @@
         ],
         "passage": "Battery-powered carbon monoxide alarms are valuable during outages. If an alarm sounds, leave the building first, then seek help. Do not re-enter until the source is found and the space is safe.",
         "path": "knowledge/en/shelter/carbon_monoxide.md",
-        "score": 12.975614999956978,
+        "score": 16.05977284685188,
         "tags": [
           "shelter",
           "carbon-monoxide",
@@ -2049,7 +2126,7 @@
           ],
           "passage": "Battery-powered carbon monoxide alarms are valuable during outages. If an alarm sounds, leave the building first, then seek help. Do not re-enter until the source is found and the space is safe.",
           "path": "knowledge/en/shelter/carbon_monoxide.md",
-          "score": 12.975614999956978,
+          "score": 16.05977284685188,
           "tags": [
             "shelter",
             "carbon-monoxide",
@@ -2062,18 +2139,19 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
-            "carbon",
-            "monoxide"
+            "signs",
+            "warning"
           ],
-          "passage": "Operate fuel generators outdoors only, far from doors, windows, vents, garages, and enclosed spaces. Carbon monoxide is invisible and odorless and can kill quickly.",
-          "path": "knowledge/en/energy/generators.md",
-          "score": 7.018516354181437,
+          "passage": "Shock can happen after severe bleeding, burns, infection, dehydration, allergic reaction, or major injury. Warning signs include pale or clammy skin, weakness, rapid breathing, fast pulse, confusion, dizziness, thirst, nausea, or loss of consciousness.",
+          "path": "knowledge/en/medical/shock.md",
+          "score": 8.996305656956919,
           "tags": [
-            "energy",
-            "generator",
-            "carbon-monoxide"
+            "medical",
+            "shock",
+            "bleeding",
+            "injury"
           ],
-          "title": "Generator Safety"
+          "title": "Shock Warning Signs"
         },
         {
           "confidence": "HIGH",
@@ -2085,7 +2163,7 @@
           ],
           "passage": "Never use outdoor grills, charcoal, or fuel stoves indoors for heat. Carbon monoxide can build up without smell or warning.",
           "path": "knowledge/en/shelter/cold_weather.md",
-          "score": 6.813739234619766,
+          "score": 8.468889860978791,
           "tags": [
             "shelter",
             "cold",
@@ -2100,7 +2178,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 28.42139999847859,
+      "elapsed_ms": 47.56209999322891,
       "expected_language": "en",
       "expected_tag": "cooking",
       "query": "can I cook with charcoal indoors",
@@ -2110,21 +2188,44 @@
         "language": "en",
         "matched_terms": [
           "charcoal",
-          "cook",
+          "indoor",
           "indoors"
         ],
-        "passage": "Cook outdoors or in a very well-ventilated area when using charcoal, camp stoves, grills, or fuel burners. Never use charcoal grills, gas grills, camping stoves, or generators inside a home, tent, vehicle, garage, or enclosed room. Carbon monoxide can kill without warning.",
-        "path": "knowledge/en/energy/cooking_safety.md",
-        "score": 8.213700041910252,
+        "passage": "Do not run generators, grills, charcoal, or fuel stoves indoors or near openings. Smoke precautions must not create carbon monoxide danger.",
+        "path": "knowledge/en/shelter/smoke_air_quality.md",
+        "score": 12.534807584378592,
         "tags": [
-          "energy",
+          "shelter",
+          "smoke",
+          "air",
+          "breathing",
           "cooking",
-          "fire",
-          "ventilation"
+          "carbon-monoxide"
         ],
-        "title": "Emergency Cooking Safety"
+        "title": "Smoke and Poor Air Quality"
       },
       "results": [
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "charcoal",
+            "indoor",
+            "indoors"
+          ],
+          "passage": "Do not run generators, grills, charcoal, or fuel stoves indoors or near openings. Smoke precautions must not create carbon monoxide danger.",
+          "path": "knowledge/en/shelter/smoke_air_quality.md",
+          "score": 12.534807584378592,
+          "tags": [
+            "shelter",
+            "smoke",
+            "air",
+            "breathing",
+            "cooking",
+            "carbon-monoxide"
+          ],
+          "title": "Smoke and Poor Air Quality"
+        },
         {
           "confidence": "HIGH",
           "language": "en",
@@ -2135,7 +2236,7 @@
           ],
           "passage": "Cook outdoors or in a very well-ventilated area when using charcoal, camp stoves, grills, or fuel burners. Never use charcoal grills, gas grills, camping stoves, or generators inside a home, tent, vehicle, garage, or enclosed room. Carbon monoxide can kill without warning.",
           "path": "knowledge/en/energy/cooking_safety.md",
-          "score": 8.213700041910252,
+          "score": 11.556314161518007,
           "tags": [
             "energy",
             "cooking",
@@ -2153,7 +2254,7 @@
           ],
           "passage": "Keep generators and fuel-burning equipment outside and far from windows, doors, vents, garages, crawl spaces, and neighboring homes. Opening a window is not enough to make indoor generator or charcoal use safe.",
           "path": "knowledge/en/shelter/carbon_monoxide.md",
-          "score": 6.400721449521432,
+          "score": 8.224094802855053,
           "tags": [
             "shelter",
             "carbon-monoxide",
@@ -2161,23 +2262,6 @@
             "ventilation"
           ],
           "title": "Carbon Monoxide Warning"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "charcoal",
-            "indoors"
-          ],
-          "passage": "Never use outdoor grills, charcoal, or fuel stoves indoors for heat. Carbon monoxide can build up without smell or warning.",
-          "path": "knowledge/en/shelter/cold_weather.md",
-          "score": 5.583527322777581,
-          "tags": [
-            "shelter",
-            "cold",
-            "insulation"
-          ],
-          "title": "Cold Weather Shelter"
         }
       ],
       "top_1_correct": true,
@@ -2186,7 +2270,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 29.657699982635677,
+      "elapsed_ms": 51.993299974128604,
       "expected_language": "en",
       "expected_tag": "cooking",
       "query": "I want to use a camping stove in the garage during rain",
@@ -2202,7 +2286,7 @@
         ],
         "passage": "Cook outdoors or in a very well-ventilated area when using charcoal, camp stoves, grills, or fuel burners. Never use charcoal grills, gas grills, camping stoves, or generators inside a home, tent, vehicle, garage, or enclosed room. Carbon monoxide can kill without warning.",
         "path": "knowledge/en/energy/cooking_safety.md",
-        "score": 12.258712404992018,
+        "score": 15.915157854046459,
         "tags": [
           "energy",
           "cooking",
@@ -2223,7 +2307,7 @@
           ],
           "passage": "Cook outdoors or in a very well-ventilated area when using charcoal, camp stoves, grills, or fuel burners. Never use charcoal grills, gas grills, camping stoves, or generators inside a home, tent, vehicle, garage, or enclosed room. Carbon monoxide can kill without warning.",
           "path": "knowledge/en/energy/cooking_safety.md",
-          "score": 12.258712404992018,
+          "score": 15.915157854046459,
           "tags": [
             "energy",
             "cooking",
@@ -2234,35 +2318,39 @@
         },
         {
           "confidence": "HIGH",
+          "language": "es",
+          "matched_terms": [
+            "camping",
+            "cooking"
+          ],
+          "passage": "Cocine al aire libre o en un area muy bien ventilada cuando use carbon, estufas de campamento, parrillas o quemadores de combustible. Nunca use parrillas de carbon, parrillas de gas, estufas de camping o generadores dentro de una casa, tienda, vehiculo, garaje o habitacion cerrada. El monoxido de carbono puede matar sin aviso.",
+          "path": "knowledge/es/energy/cocina_segura.md",
+          "score": 6.291984748377085,
+          "tags": [
+            "energy",
+            "energia",
+            "cooking",
+            "cocina",
+            "fire",
+            "ventilation"
+          ],
+          "title": "Seguridad al Cocinar en Emergencia"
+        },
+        {
+          "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
             "rain"
           ],
           "passage": "Keep generators dry and protect them from rain without enclosing them. Let the engine cool before refueling. Store fuel in approved containers away from living areas and ignition sources.",
           "path": "knowledge/en/energy/generators.md",
-          "score": 3.8450203887238135,
+          "score": 5.234797982668708,
           "tags": [
             "energy",
             "generator",
             "carbon-monoxide"
           ],
           "title": "Generator Safety"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
-            "cooking"
-          ],
-          "passage": "Cool the body with wet cloths, misting, fans when power is available, and cool showers if safe water is available. Avoid unnecessary cooking indoors because it adds heat.",
-          "path": "knowledge/en/shelter/heat.md",
-          "score": 2.488612306201071,
-          "tags": [
-            "shelter",
-            "heat",
-            "cooling"
-          ],
-          "title": "Extreme Heat"
         }
       ],
       "top_1_correct": true,
@@ -2271,7 +2359,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 25.23759996984154,
+      "elapsed_ms": 53.378700045868754,
       "expected_language": "en",
       "expected_tag": "food",
       "query": "is food in the fridge safe after a power outage",
@@ -2287,7 +2375,7 @@
         ],
         "passage": "During a power outage, keep refrigerator and freezer doors closed as much as possible. A closed refrigerator can usually keep food cold for several hours, and a full freezer stays cold longer than a half-empty freezer. Opening the door repeatedly lets cold air escape quickly.",
         "path": "knowledge/en/food/food_safety.md",
-        "score": 11.355401381996092,
+        "score": 14.639608326880584,
         "tags": [
           "food",
           "safety",
@@ -2308,7 +2396,7 @@
           ],
           "passage": "During a power outage, keep refrigerator and freezer doors closed as much as possible. A closed refrigerator can usually keep food cold for several hours, and a full freezer stays cold longer than a half-empty freezer. Opening the door repeatedly lets cold air escape quickly.",
           "path": "knowledge/en/food/food_safety.md",
-          "score": 11.355401381996092,
+          "score": 14.639608326880584,
           "tags": [
             "food",
             "safety",
@@ -2327,7 +2415,7 @@
           ],
           "passage": "Wash hands before handling food, after using the toilet, after touching trash or floodwater, and before caring for wounds. If running water is unavailable, use a small amount of safe water poured from a container. Soap and friction matter; do not dip dirty hands into stored drinking water.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 7.257277057259842,
+          "score": 9.526418410356355,
           "tags": [
             "sanitation",
             "hygiene",
@@ -2345,7 +2433,7 @@
           ],
           "passage": "Some medicines need refrigeration. Keep them in the coolest safe place available, such as an insulated bag with cool packs, but avoid freezing unless the label says freezing is safe. If temperature-sensitive medicine may have been damaged, keep it labeled and ask a pharmacist or clinician as soon as possible.",
           "path": "knowledge/en/medical/medication_management.md",
-          "score": 4.7214849252492765,
+          "score": 6.884487396402164,
           "tags": [
             "medical",
             "medication",
@@ -2361,7 +2449,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 32.86589996423572,
+      "elapsed_ms": 48.023900017142296,
       "expected_language": "en",
       "expected_tag": "food",
       "query": "freezer door stayed shut but power was out overnight",
@@ -2377,7 +2465,7 @@
         ],
         "passage": "During a power outage, keep refrigerator and freezer doors closed as much as possible. A closed refrigerator can usually keep food cold for several hours, and a full freezer stays cold longer than a half-empty freezer. Opening the door repeatedly lets cold air escape quickly.",
         "path": "knowledge/en/food/food_safety.md",
-        "score": 11.605040217578841,
+        "score": 15.705905793668773,
         "tags": [
           "food",
           "safety",
@@ -2398,7 +2486,7 @@
           ],
           "passage": "During a power outage, keep refrigerator and freezer doors closed as much as possible. A closed refrigerator can usually keep food cold for several hours, and a full freezer stays cold longer than a half-empty freezer. Opening the door repeatedly lets cold air escape quickly.",
           "path": "knowledge/en/food/food_safety.md",
-          "score": 11.605040217578841,
+          "score": 15.705905793668773,
           "tags": [
             "food",
             "safety",
@@ -2411,17 +2499,19 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
-            "out"
+            "out",
+            "power"
           ],
-          "passage": "Move the person out of wind and wet conditions. Remove wet clothing if dry coverings are available. Warm the core first with blankets, dry layers, body heat, or warm packs wrapped in cloth placed near the chest, neck, or groin.",
-          "path": "knowledge/en/medical/hypothermia.md",
-          "score": 3.8802857395905535,
+          "passage": "Avoid forwarding unconfirmed warnings. Bad information can send people toward danger or waste scarce power and attention.",
+          "path": "knowledge/en/communications/message_plan.md",
+          "score": 6.421378985575281,
           "tags": [
-            "medical",
-            "cold",
-            "hypothermia"
+            "communications",
+            "phone",
+            "battery",
+            "contacts"
           ],
-          "title": "Hypothermia"
+          "title": "Low-Power Message Plan"
         },
         {
           "confidence": "HIGH",
@@ -2431,7 +2521,7 @@
           ],
           "passage": "If power is scarce, assign one device for communication and keep others off as backups. Write down critical phone numbers and information so the phone does not need to stay on for reference.",
           "path": "knowledge/en/energy/battery_saving.md",
-          "score": 3.6311191361692443,
+          "score": 4.556635361415513,
           "tags": [
             "energy",
             "battery",
@@ -2447,7 +2537,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 29.517600021790713,
+      "elapsed_ms": 52.281100070104,
       "expected_language": "en",
       "expected_tag": "sanitation",
       "query": "how do I keep hygiene when toilets do not flush",
@@ -2464,7 +2554,7 @@
         ],
         "passage": "If toilets do not flush, keep human waste away from living, cooking, and water storage areas. Use a lined bucket or container only if necessary, cover waste after each use, and store it where people, animals, and floodwater cannot spread it. Wash or sanitize hands afterward.",
         "path": "knowledge/en/sanitation/hygiene.md",
-        "score": 13.924196947814837,
+        "score": 17.104519199243448,
         "tags": [
           "sanitation",
           "hygiene",
@@ -2486,7 +2576,7 @@
           ],
           "passage": "If toilets do not flush, keep human waste away from living, cooking, and water storage areas. Use a lined bucket or container only if necessary, cover waste after each use, and store it where people, animals, and floodwater cannot spread it. Wash or sanitize hands afterward.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 13.924196947814837,
+          "score": 17.104519199243448,
           "tags": [
             "sanitation",
             "hygiene",
@@ -2500,33 +2590,37 @@
           "language": "en",
           "matched_terms": [
             "hygiene",
+            "keep",
+            "toilet"
+          ],
+          "passage": "Keep handwashing water away from drinking water containers and food surfaces. Dry hands with a clean towel or air dry rather than using a dirty shared cloth.",
+          "path": "knowledge/en/sanitation/hand_hygiene.md",
+          "score": 9.616269437305949,
+          "tags": [
+            "sanitation",
+            "hygiene",
+            "handwashing",
+            "water",
+            "wounds"
+          ],
+          "title": "Hand Hygiene With Limited Water"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "hygiene",
             "keep"
           ],
           "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
           "path": "knowledge/en/water/storage.md",
-          "score": 3.908063025060924,
+          "score": 4.521002236911515,
           "tags": [
             "water",
             "storage",
             "sanitation"
           ],
           "title": "Water Storage"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
-            "keep"
-          ],
-          "passage": "Seek emergency medical care as soon as possible. Watch for shock: pale or clammy skin, weakness, rapid breathing, confusion, or loss of consciousness. Keep the person still and warm.",
-          "path": "knowledge/en/medical/bleeding.md",
-          "score": 1.1089488207534675,
-          "tags": [
-            "medical",
-            "bleeding",
-            "pressure"
-          ],
-          "title": "Severe Bleeding"
         }
       ],
       "top_1_correct": true,
@@ -2535,7 +2629,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 31.20570001192391,
+      "elapsed_ms": 51.423100056126714,
       "expected_language": "en",
       "expected_tag": "sanitation",
       "query": "human waste bucket sanitation while water service is down",
@@ -2552,7 +2646,7 @@
         ],
         "passage": "Poor sanitation can cause illness quickly during disasters, displacement, or infrastructure failure, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
         "path": "knowledge/en/sanitation/hygiene.md",
-        "score": 18.673663720809312,
+        "score": 21.225232244709424,
         "tags": [
           "sanitation",
           "hygiene",
@@ -2574,7 +2668,7 @@
           ],
           "passage": "Poor sanitation can cause illness quickly during disasters, displacement, or infrastructure failure, especially when water is limited. Separate drinking water, handwashing water, dirty water, trash, human waste, and food preparation areas as much as possible.",
           "path": "knowledge/en/sanitation/hygiene.md",
-          "score": 18.673663720809312,
+          "score": 21.225232244709424,
           "tags": [
             "sanitation",
             "hygiene",
@@ -2588,34 +2682,40 @@
           "language": "en",
           "matched_terms": [
             "sanitation",
+            "waste",
             "water"
           ],
-          "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
-          "path": "knowledge/en/water/storage.md",
-          "score": 5.850995022333629,
+          "passage": "Clean hands before preparing food, eating, treating wounds, handling medicine, or touching clean water containers. Clean hands after using the toilet, handling waste, cleaning floodwater, or caring for someone sick.",
+          "path": "knowledge/en/sanitation/hand_hygiene.md",
+          "score": 8.99548374475643,
           "tags": [
+            "sanitation",
+            "hygiene",
+            "handwashing",
             "water",
-            "storage",
-            "sanitation"
+            "wounds"
           ],
-          "title": "Water Storage"
+          "title": "Hand Hygiene With Limited Water"
         },
         {
           "confidence": "HIGH",
-          "language": "en",
+          "language": "es",
           "matched_terms": [
-            "down",
-            "water"
+            "sanitation",
+            "waste"
           ],
-          "passage": "Mild dehydration may improve with rest in shade and frequent small sips of safe water or oral rehydration solution. If the person vomits, wait a few minutes and resume with very small sips.",
-          "path": "knowledge/en/medical/dehydration.md",
-          "score": 4.2009028315431,
+          "passage": "Mantenga la basura sellada y lejos de comida. Los restos atraen insectos y roedores. Si no hay recoleccion, separe objetos filosos, desechos contaminados y restos de comida para que nadie se corte o se exponga al mover basura despues.",
+          "path": "knowledge/es/sanitation/higiene.md",
+          "score": 6.543087699703518,
           "tags": [
-            "medical",
-            "dehydration",
-            "rehydration"
+            "sanitation",
+            "saneamiento",
+            "hygiene",
+            "higiene",
+            "waste",
+            "illness"
           ],
-          "title": "Dehydration"
+          "title": "Saneamiento e Higiene Durante un Apagon"
         }
       ],
       "top_1_correct": true,
@@ -2624,46 +2724,31 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 23.87450000969693,
+      "elapsed_ms": 47.2171000437811,
       "expected_language": "en",
       "expected_tag": "cold",
       "query": "how do I stay warm in cold shelter",
-      "rank": 1,
-      "reciprocal_rank": 1.0,
+      "rank": 2,
+      "reciprocal_rank": 0.5,
       "result": {
         "language": "en",
         "matched_terms": [
           "cold",
-          "shelter"
+          "stay",
+          "warm"
         ],
-        "passage": "In cold conditions, reduce heat loss by blocking wind, staying dry, insulating from the ground, and wearing loose layers. Wet clothing removes heat quickly.",
-        "path": "knowledge/en/shelter/cold_weather.md",
-        "score": 8.518074026537839,
+        "passage": "Check messages in scheduled batches instead of keeping radios active constantly. Prefer text messages over voice or video. Keep devices warm in cold weather because batteries lose capacity when cold.",
+        "path": "knowledge/en/energy/battery_saving.md",
+        "score": 9.992596097709699,
         "tags": [
-          "shelter",
-          "cold",
-          "insulation"
+          "energy",
+          "battery",
+          "phone",
+          "low-power"
         ],
-        "title": "Cold Weather Shelter"
+        "title": "Battery Saving"
       },
       "results": [
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "cold",
-            "shelter"
-          ],
-          "passage": "In cold conditions, reduce heat loss by blocking wind, staying dry, insulating from the ground, and wearing loose layers. Wet clothing removes heat quickly.",
-          "path": "knowledge/en/shelter/cold_weather.md",
-          "score": 8.518074026537839,
-          "tags": [
-            "shelter",
-            "cold",
-            "insulation"
-          ],
-          "title": "Cold Weather Shelter"
-        },
         {
           "confidence": "HIGH",
           "language": "en",
@@ -2674,7 +2759,7 @@
           ],
           "passage": "Check messages in scheduled batches instead of keeping radios active constantly. Prefer text messages over voice or video. Keep devices warm in cold weather because batteries lose capacity when cold.",
           "path": "knowledge/en/energy/battery_saving.md",
-          "score": 7.7102297886549245,
+          "score": 9.992596097709699,
           "tags": [
             "energy",
             "battery",
@@ -2687,27 +2772,44 @@
           "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
-            "shelter",
-            "stay"
+            "cold",
+            "shelter"
           ],
-          "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
-          "path": "knowledge/en/shelter/heat.md",
-          "score": 6.546401230267082,
+          "passage": "In cold conditions, reduce heat loss by blocking wind, staying dry, insulating from the ground, and wearing loose layers. Wet clothing removes heat quickly.",
+          "path": "knowledge/en/shelter/cold_weather.md",
+          "score": 9.175560051560256,
           "tags": [
             "shelter",
-            "heat",
-            "cooling"
+            "cold",
+            "insulation"
           ],
-          "title": "Extreme Heat"
+          "title": "Cold Weather Shelter"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "en",
+          "matched_terms": [
+            "cold",
+            "warm"
+          ],
+          "passage": "Move the person out of wind and wet conditions. Remove wet clothing if dry coverings are available. Warm the core first with blankets, dry layers, body heat, or warm packs wrapped in cloth placed near the chest, neck, or groin.",
+          "path": "knowledge/en/medical/hypothermia.md",
+          "score": 8.202296977420719,
+          "tags": [
+            "medical",
+            "cold",
+            "hypothermia"
+          ],
+          "title": "Hypothermia"
         }
       ],
-      "top_1_correct": true,
+      "top_1_correct": false,
       "top_k_correct": true
     },
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 36.219900008291006,
+      "elapsed_ms": 59.19739999808371,
       "expected_language": "en",
       "expected_tag": "hypothermia",
       "query": "wet clothes and no heating, how do I avoid hypothermia",
@@ -2722,7 +2824,7 @@
         ],
         "passage": "Move the person out of wind and wet conditions. Remove wet clothing if dry coverings are available. Warm the core first with blankets, dry layers, body heat, or warm packs wrapped in cloth placed near the chest, neck, or groin.",
         "path": "knowledge/en/medical/hypothermia.md",
-        "score": 11.673583744233882,
+        "score": 14.756647085101516,
         "tags": [
           "medical",
           "cold",
@@ -2741,13 +2843,32 @@
           ],
           "passage": "Move the person out of wind and wet conditions. Remove wet clothing if dry coverings are available. Warm the core first with blankets, dry layers, body heat, or warm packs wrapped in cloth placed near the chest, neck, or groin.",
           "path": "knowledge/en/medical/hypothermia.md",
-          "score": 11.673583744233882,
+          "score": 14.756647085101516,
           "tags": [
             "medical",
             "cold",
             "hypothermia"
           ],
           "title": "Hypothermia"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "es",
+          "matched_terms": [
+            "hypothermia",
+            "no"
+          ],
+          "passage": "No use calor alto directo, alcohol ni manipule a la persona bruscamente. La hipotermia severa amenaza la vida y necesita atencion medica urgente.",
+          "path": "knowledge/es/medical/hipotermia.md",
+          "score": 6.823032549431319,
+          "tags": [
+            "medical",
+            "cold",
+            "frio",
+            "hypothermia",
+            "hipotermia"
+          ],
+          "title": "Hipotermia"
         },
         {
           "confidence": "HIGH",
@@ -2758,31 +2879,14 @@
           ],
           "passage": "Cool the body with wet cloths, misting, fans when power is available, and cool showers if safe water is available. Avoid unnecessary cooking indoors because it adds heat.",
           "path": "knowledge/en/shelter/heat.md",
-          "score": 4.252462320056574,
+          "score": 5.8503175360899045,
           "tags": [
             "shelter",
             "heat",
-            "cooling"
+            "cooling",
+            "dehydration"
           ],
           "title": "Extreme Heat"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "es",
-          "matched_terms": [
-            "no"
-          ],
-          "passage": "Guarde el agua tratada separada del agua sin tratar. Marque los recipientes con claridad. No meta vasos, manos o utensilios sucios dentro del recipiente de agua potable; mejor vierta el agua.",
-          "path": "knowledge/es/water/agua_segura.md",
-          "score": 4.112035520354339,
-          "tags": [
-            "water",
-            "agua",
-            "purification",
-            "purificacion",
-            "hervir"
-          ],
-          "title": "Agua segura durante un apagon"
         }
       ],
       "top_1_correct": true,
@@ -2791,7 +2895,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 25.07759997388348,
+      "elapsed_ms": 50.48850004095584,
       "expected_language": "en",
       "expected_tag": "heat",
       "query": "what should I do in extreme heat",
@@ -2805,11 +2909,12 @@
         ],
         "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
         "path": "knowledge/en/shelter/heat.md",
-        "score": 8.39192129068226,
+        "score": 11.327300491972402,
         "tags": [
           "shelter",
           "heat",
-          "cooling"
+          "cooling",
+          "dehydration"
         ],
         "title": "Extreme Heat"
       },
@@ -2823,11 +2928,12 @@
           ],
           "passage": "During extreme heat, stay in shade, reduce activity, drink safe fluids, and use airflow when possible. Close curtains or coverings on sun-facing windows during the hottest hours.",
           "path": "knowledge/en/shelter/heat.md",
-          "score": 8.39192129068226,
+          "score": 11.327300491972402,
           "tags": [
             "shelter",
             "heat",
-            "cooling"
+            "cooling",
+            "dehydration"
           ],
           "title": "Extreme Heat"
         },
@@ -2840,7 +2946,7 @@
           ],
           "passage": "Keep radio volume low and use headphones when possible. Store spare batteries with the radio, protected from moisture and extreme heat.",
           "path": "knowledge/en/communications/emergency_radio.md",
-          "score": 4.472047685763385,
+          "score": 6.159220532404795,
           "tags": [
             "communications",
             "radio",
@@ -2849,20 +2955,21 @@
           "title": "Emergency Radio"
         },
         {
-          "confidence": "MEDIUM",
+          "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
             "heat"
           ],
-          "passage": "In cold conditions, reduce heat loss by blocking wind, staying dry, insulating from the ground, and wearing loose layers. Wet clothing removes heat quickly.",
-          "path": "knowledge/en/shelter/cold_weather.md",
-          "score": 2.8179020079082817,
+          "passage": "Prevent heat illness by resting during the hottest hours, reducing work intensity, wearing light loose clothing, and checking on people who may not notice early symptoms.",
+          "path": "knowledge/en/medical/heat_illness.md",
+          "score": 4.24242808638553,
           "tags": [
-            "shelter",
-            "cold",
-            "insulation"
+            "medical",
+            "heat",
+            "dehydration",
+            "cooling"
           ],
-          "title": "Cold Weather Shelter"
+          "title": "Heat Illness"
         }
       ],
       "top_1_correct": true,
@@ -2871,7 +2978,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 29.596099979244173,
+      "elapsed_ms": 49.67989993747324,
       "expected_language": "en",
       "expected_tag": "compass",
       "query": "how do I use a compass",
@@ -2884,7 +2991,7 @@
         ],
         "passage": "If you need direction during a disaster, evacuation, or infrastructure failure and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.",
         "path": "knowledge/en/navigation/finding_north.md",
-        "score": 4.616771486580076,
+        "score": 5.889245115465698,
         "tags": [
           "navigation",
           "compass",
@@ -2902,7 +3009,7 @@
           ],
           "passage": "If you need direction during a disaster, evacuation, or infrastructure failure and do not have a compass, use more than one method when possible. Treat improvised direction finding as approximate, then confirm with landmarks, maps, roads, stars, sunrise, sunset, or repeated checks.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 4.616771486580076,
+          "score": 5.889245115465698,
           "tags": [
             "navigation",
             "compass",
@@ -2919,13 +3026,31 @@
           ],
           "passage": "A compass points toward magnetic north, not always true north. Keep it away from phones, speakers, magnets, vehicles, and metal tools while taking a bearing.",
           "path": "knowledge/en/navigation/compass.md",
-          "score": 4.577484960023037,
+          "score": 5.772992869247094,
           "tags": [
             "navigation",
             "compass",
             "map"
           ],
           "title": "Compass Navigation"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "es",
+          "matched_terms": [
+            "compass"
+          ],
+          "passage": "Al navegar con mapa, considere la declinacion magnetica local si la conoce. Con poca visibilidad, avance despacio y use tramos cortos entre puntos identificables.",
+          "path": "knowledge/es/navigation/brujula.md",
+          "score": 4.493870029187581,
+          "tags": [
+            "navigation",
+            "navegacion",
+            "compass",
+            "brujula",
+            "map"
+          ],
+          "title": "Navegacion con Brujula"
         }
       ],
       "top_1_correct": true,
@@ -2934,7 +3059,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 23.420600045938045,
+      "elapsed_ms": 48.486400046385825,
       "expected_language": "en",
       "expected_tag": "north",
       "query": "find north without a compass during evacuation",
@@ -2950,7 +3075,7 @@
         ],
         "passage": "Night method: in the northern hemisphere, find the Big Dipper if visible. The two outer stars of its bowl point toward Polaris, the North Star. Polaris sits roughly above true north. If clouds, buildings, smoke, or light pollution block the sky, do not rely on this method.",
         "path": "knowledge/en/navigation/finding_north.md",
-        "score": 13.503190850146474,
+        "score": 17.352253019201584,
         "tags": [
           "navigation",
           "compass",
@@ -2971,7 +3096,7 @@
           ],
           "passage": "Night method: in the northern hemisphere, find the Big Dipper if visible. The two outer stars of its bowl point toward Polaris, the North Star. Polaris sits roughly above true north. If clouds, buildings, smoke, or light pollution block the sky, do not rely on this method.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 13.503190850146474,
+          "score": 17.352253019201584,
           "tags": [
             "navigation",
             "compass",
@@ -2989,7 +3114,7 @@
           ],
           "passage": "A compass points toward magnetic north, not always true north. Keep it away from phones, speakers, magnets, vehicles, and metal tools while taking a bearing.",
           "path": "knowledge/en/navigation/compass.md",
-          "score": 8.562488531136147,
+          "score": 10.828102494393526,
           "tags": [
             "navigation",
             "compass",
@@ -2998,20 +3123,21 @@
           "title": "Compass Navigation"
         },
         {
-          "confidence": "MEDIUM",
+          "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
             "evacuation"
           ],
-          "passage": "Record important frequencies, times, weather alerts, evacuation routes, and instructions on paper. Share confirmed information calmly and avoid spreading rumors.",
-          "path": "knowledge/en/communications/emergency_radio.md",
-          "score": 2.40550064279968,
+          "passage": "If evacuation is ordered, leave early when you can. Roads, fuel, public transport, and visibility can get worse quickly.",
+          "path": "knowledge/en/planning/evacuation_bag.md",
+          "score": 5.1896247472725126,
           "tags": [
-            "communications",
-            "radio",
-            "emergency"
+            "planning",
+            "evacuation",
+            "supplies",
+            "documents"
           ],
-          "title": "Emergency Radio"
+          "title": "Evacuation Bag"
         }
       ],
       "top_1_correct": true,
@@ -3020,7 +3146,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 30.037600023206323,
+      "elapsed_ms": 49.40570006147027,
       "expected_language": "en",
       "expected_tag": "lost",
       "query": "I am lost and not sure whether to keep walking",
@@ -3034,7 +3160,7 @@
         ],
         "passage": "If you become lost, stop moving unless staying put is immediately unsafe. Panic walking wastes energy and can move you farther from known routes.",
         "path": "knowledge/en/navigation/lost.md",
-        "score": 10.66148025179983,
+        "score": 13.13426341498576,
         "tags": [
           "navigation",
           "lost",
@@ -3052,13 +3178,31 @@
           ],
           "passage": "If you become lost, stop moving unless staying put is immediately unsafe. Panic walking wastes energy and can move you farther from known routes.",
           "path": "knowledge/en/navigation/lost.md",
-          "score": 10.66148025179983,
+          "score": 13.13426341498576,
           "tags": [
             "navigation",
             "lost",
             "signaling"
           ],
           "title": "If You Are Lost"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "es",
+          "matched_terms": [
+            "lost"
+          ],
+          "passage": "Si esta perdido, detengase, respire y evite caminar impulsivamente. Moverse sin plan puede alejarlo de rutas, refugio o rescatistas. Revise peligros inmediatos como clima, lesiones, agua, fuego o trafico.",
+          "path": "knowledge/es/navigation/perdido.md",
+          "score": 5.6853427236964516,
+          "tags": [
+            "navigation",
+            "navegacion",
+            "lost",
+            "perdido",
+            "safety"
+          ],
+          "title": "Si Esta Perdido"
         },
         {
           "confidence": "MEDIUM",
@@ -3068,30 +3212,13 @@
           ],
           "passage": "Seek emergency medical care as soon as possible. Watch for shock: pale or clammy skin, weakness, rapid breathing, confusion, or loss of consciousness. Keep the person still and warm.",
           "path": "knowledge/en/medical/bleeding.md",
-          "score": 1.1089488207534675,
+          "score": 2.1690572841627094,
           "tags": [
             "medical",
             "bleeding",
             "pressure"
           ],
           "title": "Severe Bleeding"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
-            "keep"
-          ],
-          "passage": "If you have ice, a cooler, or frozen water bottles, group high-risk foods together and keep them cold. Melted ice water can contaminate food if packaging leaks, so keep food sealed and drain dirty water away from eating surfaces.",
-          "path": "knowledge/en/food/food_safety.md",
-          "score": 1.035434858629231,
-          "tags": [
-            "food",
-            "safety",
-            "refrigeration",
-            "outage"
-          ],
-          "title": "Food Safety During Power Outage"
         }
       ],
       "top_1_correct": true,
@@ -3100,7 +3227,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 24.459399981424212,
+      "elapsed_ms": 45.59700004756451,
       "expected_language": "en",
       "expected_tag": "signaling",
       "query": "how can I signal rescuers",
@@ -3113,7 +3240,7 @@
         ],
         "passage": "Signals for rescuers should be simple, repeated, and easy to notice. Three repeated sounds, flashes, or marks are widely recognized as a distress pattern in many contexts.",
         "path": "knowledge/en/communications/signaling.md",
-        "score": 5.108370818603034,
+        "score": 5.918161976369553,
         "tags": [
           "communications",
           "signaling",
@@ -3131,7 +3258,7 @@
           ],
           "passage": "Signals for rescuers should be simple, repeated, and easy to notice. Three repeated sounds, flashes, or marks are widely recognized as a distress pattern in many contexts.",
           "path": "knowledge/en/communications/signaling.md",
-          "score": 5.108370818603034,
+          "score": 5.918161976369553,
           "tags": [
             "communications",
             "signaling",
@@ -3141,14 +3268,33 @@
           "title": "Emergency Signaling"
         },
         {
-          "confidence": "MEDIUM",
+          "confidence": "HIGH",
+          "language": "es",
+          "matched_terms": [
+            "rescuers"
+          ],
+          "passage": "Haga senales desde un lugar seguro. No suba estructuras inestables ni entre en areas peligrosas solo para mejorar la visibilidad.",
+          "path": "knowledge/es/communications/senales_rescate.md",
+          "score": 4.855988897399754,
+          "tags": [
+            "communications",
+            "comunicaciones",
+            "signaling",
+            "senales",
+            "rescue",
+            "rescuers"
+          ],
+          "title": "Senales de Emergencia"
+        },
+        {
+          "confidence": "HIGH",
           "language": "en",
           "matched_terms": [
             "signal"
           ],
           "passage": "Avoid making travel decisions from one weak clue. Metal objects, electrical equipment, moving water, wind, slopes, and poor visibility can mislead improvised methods. If direction is uncertain and staying put is safe, conserve energy, mark your location, and signal for help.",
           "path": "knowledge/en/navigation/finding_north.md",
-          "score": 2.2322027404151874,
+          "score": 3.1066741436917416,
           "tags": [
             "navigation",
             "compass",
@@ -3164,7 +3310,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 28.63769995747134,
+      "elapsed_ms": 51.34429992176592,
       "expected_language": "en",
       "expected_tag": "signaling",
       "query": "three flashes whistle or marks to get rescue attention",
@@ -3181,7 +3327,7 @@
         ],
         "passage": "Signals for rescuers should be simple, repeated, and easy to notice. Three repeated sounds, flashes, or marks are widely recognized as a distress pattern in many contexts.",
         "path": "knowledge/en/communications/signaling.md",
-        "score": 15.660512763202556,
+        "score": 21.05106977076208,
         "tags": [
           "communications",
           "signaling",
@@ -3203,7 +3349,7 @@
           ],
           "passage": "Signals for rescuers should be simple, repeated, and easy to notice. Three repeated sounds, flashes, or marks are widely recognized as a distress pattern in many contexts.",
           "path": "knowledge/en/communications/signaling.md",
-          "score": 15.660512763202556,
+          "score": 21.05106977076208,
           "tags": [
             "communications",
             "signaling",
@@ -3221,7 +3367,7 @@
           ],
           "passage": "Use visible and audible signals when safe: bright cloth, reflective surfaces, whistle blasts, lights, or ground markings. Conserve battery and energy.",
           "path": "knowledge/en/navigation/lost.md",
-          "score": 5.839109675076256,
+          "score": 8.692608305310989,
           "tags": [
             "navigation",
             "lost",
@@ -3238,7 +3384,7 @@
           ],
           "passage": "If water may be contaminated, bring it to a rolling boil for at least one full minute. At elevations above 2,000 meters, boil for at least three minutes. Let the water cool in a covered, clean container.",
           "path": "knowledge/en/water/purification.md",
-          "score": 5.1465165555036325,
+          "score": 7.711624295934199,
           "tags": [
             "water",
             "purification",
@@ -3254,7 +3400,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 30.01269995002076,
+      "elapsed_ms": 56.10349995549768,
       "expected_language": "en",
       "expected_tag": "radio",
       "query": "how can I use an emergency radio during an outage",
@@ -3268,7 +3414,7 @@
         ],
         "passage": "Keep radio volume low and use headphones when possible. Store spare batteries with the radio, protected from moisture and extreme heat.",
         "path": "knowledge/en/communications/emergency_radio.md",
-        "score": 7.359005565943345,
+        "score": 9.162018444752258,
         "tags": [
           "communications",
           "radio",
@@ -3286,13 +3432,31 @@
           ],
           "passage": "Keep radio volume low and use headphones when possible. Store spare batteries with the radio, protected from moisture and extreme heat.",
           "path": "knowledge/en/communications/emergency_radio.md",
-          "score": 7.359005565943345,
+          "score": 9.162018444752258,
           "tags": [
             "communications",
             "radio",
             "emergency"
           ],
           "title": "Emergency Radio"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "es",
+          "matched_terms": [
+            "emergency",
+            "radio"
+          ],
+          "passage": "Mantenga el volumen bajo y use audifonos cuando sea posible. Guarde baterias de repuesto con la radio, protegidas de humedad y calor extremo.",
+          "path": "knowledge/es/communications/radio_emergencia.md",
+          "score": 8.501966041436013,
+          "tags": [
+            "communications",
+            "comunicaciones",
+            "radio",
+            "emergency"
+          ],
+          "title": "Radio de Emergencia"
         },
         {
           "confidence": "HIGH",
@@ -3303,7 +3467,7 @@
           ],
           "passage": "If evacuation is possible, carry medicines with you rather than leaving them behind. If supply is running low, contact pharmacies, clinics, emergency services, shelters, or neighbors early, before the last dose is gone.",
           "path": "knowledge/en/medical/medication_management.md",
-          "score": 4.561104713521536,
+          "score": 6.4260015288917804,
           "tags": [
             "medical",
             "medication",
@@ -3311,23 +3475,6 @@
             "refrigeration"
           ],
           "title": "Medication Management During Outage"
-        },
-        {
-          "confidence": "HIGH",
-          "language": "en",
-          "matched_terms": [
-            "outage"
-          ],
-          "passage": "During a power outage, keep refrigerator and freezer doors closed as much as possible. A closed refrigerator can usually keep food cold for several hours, and a full freezer stays cold longer than a half-empty freezer. Opening the door repeatedly lets cold air escape quickly.",
-          "path": "knowledge/en/food/food_safety.md",
-          "score": 3.9927908995888077,
-          "tags": [
-            "food",
-            "safety",
-            "refrigeration",
-            "outage"
-          ],
-          "title": "Food Safety During Power Outage"
         }
       ],
       "top_1_correct": true,
@@ -3336,7 +3483,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "direct",
-      "elapsed_ms": 36.21390002081171,
+      "elapsed_ms": 64.68559999484569,
       "expected_language": "es",
       "expected_tag": "agua",
       "query": "como purificar agua en una emergencia",
@@ -3351,7 +3498,7 @@
         ],
         "passage": "Para purificar agua que puede estar contaminada, hiervala antes de beberla cuando tenga combustible seguro. Lleve el agua a hervor fuerte por al menos un minuto. En zonas de gran altura, hierva por al menos tres minutos. Deje enfriar el agua en un recipiente limpio y cubierto.",
         "path": "knowledge/es/water/agua_segura.md",
-        "score": 10.848414583404663,
+        "score": 8.452869116439933,
         "tags": [
           "water",
           "agua",
@@ -3372,7 +3519,7 @@
           ],
           "passage": "Para purificar agua que puede estar contaminada, hiervala antes de beberla cuando tenga combustible seguro. Lleve el agua a hervor fuerte por al menos un minuto. En zonas de gran altura, hierva por al menos tres minutos. Deje enfriar el agua en un recipiente limpio y cubierto.",
           "path": "knowledge/es/water/agua_segura.md",
-          "score": 10.848414583404663,
+          "score": 8.452869116439933,
           "tags": [
             "water",
             "agua",
@@ -3386,35 +3533,42 @@
           "confidence": "HIGH",
           "language": "es",
           "matched_terms": [
+            "agua",
+            "emergencia",
+            "water"
+          ],
+          "passage": "Guarde agua potable en recipientes limpios, aptos para alimentos y con tapas ajustadas. Mantenga los recipientes cerrados, a la sombra y lejos de combustible, quimicos, basura y agua de inundacion.",
+          "path": "knowledge/es/water/almacenamiento.md",
+          "score": 7.175609690345116,
+          "tags": [
+            "water",
+            "agua",
+            "storage",
+            "almacenamiento",
+            "sanitation"
+          ],
+          "title": "Almacenamiento de Agua"
+        },
+        {
+          "confidence": "HIGH",
+          "language": "es",
+          "matched_terms": [
+            "agua",
             "emergencia",
             "emergency"
           ],
-          "passage": "En una emergencia, use mensajes cortos y claros. Diga donde esta, cuantas personas necesitan ayuda, que peligro existe y que recursos tiene.",
+          "passage": "En una emergencia, use mensajes cortos y claros para pedir ayuda en espanol. Diga donde esta, cuantas personas necesitan ayuda, que peligro existe y que recursos tiene.",
           "path": "knowledge/es/communications/spanish_basics.md",
-          "score": 6.700210037562629,
+          "score": 6.178927154550346,
           "tags": [
             "communications",
+            "comunicaciones",
             "spanish",
-            "emergency"
+            "espanol",
+            "emergency",
+            "ayuda"
           ],
           "title": "Comunicacion de emergencia"
-        },
-        {
-          "confidence": "MEDIUM",
-          "language": "en",
-          "matched_terms": [
-            "emergency",
-            "water"
-          ],
-          "passage": "Store drinking water in clean, food-grade containers with tight lids. Keep containers closed, shaded, and away from fuel, chemicals, trash, and floodwater.",
-          "path": "knowledge/en/water/storage.md",
-          "score": 2.907919291024535,
-          "tags": [
-            "water",
-            "storage",
-            "sanitation"
-          ],
-          "title": "Water Storage"
         }
       ],
       "top_1_correct": true,
@@ -3423,7 +3577,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 36.120900011155754,
+      "elapsed_ms": 57.486799894832075,
       "expected_language": "es",
       "expected_tag": "agua",
       "query": "agua sucia despues de un desastre y no se si hervirla",
@@ -3433,12 +3587,16 @@
         "language": "es",
         "matched_terms": [
           "agua",
+          "desastre",
+          "despues",
+          "hervirla",
           "no",
+          "sucia",
           "water"
         ],
-        "passage": "Guarde el agua tratada separada del agua sin tratar. Marque los recipientes con claridad. No meta vasos, manos o utensilios sucios dentro del recipiente de agua potable; mejor vierta el agua.",
+        "passage": "Si tiene agua sucia despues de un desastre y no sabe si hervirla, trate primero el sedimento visible con una tela limpia y luego hierva cuando pueda hacerlo con combustible seguro. No use agua que huela a gasolina, solventes, pesticidas o aguas negras si existe otra opcion mas segura.",
         "path": "knowledge/es/water/agua_segura.md",
-        "score": 11.960602323485604,
+        "score": 17.81128315855025,
         "tags": [
           "water",
           "agua",
@@ -3454,12 +3612,16 @@
           "language": "es",
           "matched_terms": [
             "agua",
+            "desastre",
+            "despues",
+            "hervirla",
             "no",
+            "sucia",
             "water"
           ],
-          "passage": "Guarde el agua tratada separada del agua sin tratar. Marque los recipientes con claridad. No meta vasos, manos o utensilios sucios dentro del recipiente de agua potable; mejor vierta el agua.",
+          "passage": "Si tiene agua sucia despues de un desastre y no sabe si hervirla, trate primero el sedimento visible con una tela limpia y luego hierva cuando pueda hacerlo con combustible seguro. No use agua que huela a gasolina, solventes, pesticidas o aguas negras si existe otra opcion mas segura.",
           "path": "knowledge/es/water/agua_segura.md",
-          "score": 11.960602323485604,
+          "score": 17.81128315855025,
           "tags": [
             "water",
             "agua",
@@ -3473,34 +3635,47 @@
           "confidence": "HIGH",
           "language": "es",
           "matched_terms": [
-            "no"
+            "agua",
+            "despues",
+            "no",
+            "se",
+            "sucia"
           ],
-          "passage": "No comparta rumores. Comparta solamente informacion observada directamente o confirmada por una fuente confiable.",
-          "path": "knowledge/es/communications/spanish_basics.md",
-          "score": 3.717531910393748,
+          "passage": "Lavese las manos antes de manipular comida, despues de usar el inodoro, despues de tocar basura o agua de inundacion, y antes de cuidar heridas. Si no hay agua corriente, use una pequena cantidad de agua segura vertida desde un recipiente. El jabon y la friccion importan; no meta manos sucias en agua potable almacenada.",
+          "path": "knowledge/es/sanitation/higiene.md",
+          "score": 12.553577242469428,
           "tags": [
-            "communications",
-            "spanish",
-            "emergency"
+            "sanitation",
+            "saneamiento",
+            "hygiene",
+            "higiene",
+            "waste",
+            "illness"
           ],
-          "title": "Comunicacion de emergencia"
+          "title": "Saneamiento e Higiene Durante un Apagon"
         },
         {
-          "confidence": "MEDIUM",
-          "language": "en",
+          "confidence": "HIGH",
+          "language": "es",
           "matched_terms": [
-            "water"
+            "agua",
+            "despues",
+            "no",
+            "se",
+            "sucia"
           ],
-          "passage": "If boiling is not possible, use a clean cloth to remove visible sediment, then use a known disinfectant method only when instructions and supplies are available. Mark treated water containers so untreated water is not confused with treated water.",
-          "path": "knowledge/en/water/purification.md",
-          "score": 1.757533557317297,
+          "passage": "Deseche comida perecedera que haya estado caliente demasiado tiempo, huela mal, se sienta babosa, tenga moho visible o se haya filtrado de envases danados. No pruebe comida dudosa para comprobarla. La intoxicacion alimentaria puede volverse peligrosa cuando hay poca ayuda medica, agua limpia o transporte.",
+          "path": "knowledge/es/food/seguridad_alimentaria.md",
+          "score": 9.49059510616043,
           "tags": [
-            "water",
-            "purification",
-            "boiling",
-            "survival"
+            "food",
+            "comida",
+            "safety",
+            "seguridad",
+            "refrigeration",
+            "outage"
           ],
-          "title": "Water Purification"
+          "title": "Seguridad Alimentaria Durante un Apagon"
         }
       ],
       "top_1_correct": true,
@@ -3509,7 +3684,7 @@
     {
       "confidence": "HIGH",
       "difficulty": "scenario",
-      "elapsed_ms": 32.181100046727806,
+      "elapsed_ms": 56.58530001528561,
       "expected_language": "es",
       "expected_tag": "spanish",
       "query": "necesito pedir ayuda en espanol durante una emergencia",
@@ -3520,15 +3695,21 @@
         "matched_terms": [
           "ayuda",
           "emergencia",
-          "emergency"
+          "emergency",
+          "espanol",
+          "necesito",
+          "pedir"
         ],
-        "passage": "En una emergencia, use mensajes cortos y claros. Diga donde esta, cuantas personas necesitan ayuda, que peligro existe y que recursos tiene.",
+        "passage": "En una emergencia, use mensajes cortos y claros para pedir ayuda en espanol. Diga donde esta, cuantas personas necesitan ayuda, que peligro existe y que recursos tiene.",
         "path": "knowledge/es/communications/spanish_basics.md",
-        "score": 9.608108667018293,
+        "score": 22.39000471465748,
         "tags": [
           "communications",
+          "comunicaciones",
           "spanish",
-          "emergency"
+          "espanol",
+          "emergency",
+          "ayuda"
         ],
         "title": "Comunicacion de emergencia"
       },
@@ -3539,15 +3720,21 @@
           "matched_terms": [
             "ayuda",
             "emergencia",
-            "emergency"
+            "emergency",
+            "espanol",
+            "necesito",
+            "pedir"
           ],
-          "passage": "En una emergencia, use mensajes cortos y claros. Diga donde esta, cuantas personas necesitan ayuda, que peligro existe y que recursos tiene.",
+          "passage": "En una emergencia, use mensajes cortos y claros para pedir ayuda en espanol. Diga donde esta, cuantas personas necesitan ayuda, que peligro existe y que recursos tiene.",
           "path": "knowledge/es/communications/spanish_basics.md",
-          "score": 9.608108667018293,
+          "score": 22.39000471465748,
           "tags": [
             "communications",
+            "comunicaciones",
             "spanish",
-            "emergency"
+            "espanol",
+            "emergency",
+            "ayuda"
           ],
           "title": "Comunicacion de emergencia"
         },
@@ -3556,35 +3743,42 @@
           "language": "es",
           "matched_terms": [
             "ayuda",
-            "durante"
+            "durante",
+            "emergencia",
+            "emergency"
           ],
-          "passage": "Hervir ayuda contra muchos organismos que causan enfermedad, pero no elimina combustible, metales pesados, sal, pesticidas ni otros quimicos. Si el agua huele a gasolina, solventes, aguas negras o quimicos, evitela si existe otra fuente mas segura.",
-          "path": "knowledge/es/water/agua_segura.md",
-          "score": 7.471666909780156,
+          "passage": "Revise el plan cuando cambien las condiciones. Un plan seguro durante un apagon puede no ser seguro durante inundacion, incendio, humo quimico u ordenes de evacuacion. Siga instrucciones oficiales cuando esten disponibles.",
+          "path": "knowledge/es/planning/plan_hogar.md",
+          "score": 9.81958520753569,
           "tags": [
-            "water",
-            "agua",
-            "purification",
-            "purificacion",
-            "hervir"
+            "planning",
+            "planificacion",
+            "household",
+            "hogar",
+            "emergency",
+            "contacts"
           ],
-          "title": "Agua segura durante un apagon"
+          "title": "Plan de Emergencia del Hogar"
         },
         {
-          "confidence": "MEDIUM",
-          "language": "en",
+          "confidence": "HIGH",
+          "language": "es",
           "matched_terms": [
-            "emergency"
+            "ayuda",
+            "durante",
+            "emergencia"
           ],
-          "passage": "Battery, hand-crank, or solar radios can provide official emergency information when phones and internet fail. Use scheduled listening windows to conserve power.",
-          "path": "knowledge/en/communications/emergency_radio.md",
-          "score": 1.7513444035631998,
+          "passage": "Si puede haber evacuacion, lleve las medicinas con usted. Si el suministro baja, contacte farmacias, clinicas, servicios de emergencia, refugios o vecinos temprano, antes de que quede la ultima dosis.",
+          "path": "knowledge/es/medical/medicamentos.md",
+          "score": 6.547311254142328,
           "tags": [
-            "communications",
-            "radio",
-            "emergency"
+            "medical",
+            "medication",
+            "medicamentos",
+            "chronic-conditions",
+            "refrigeration"
           ],
-          "title": "Emergency Radio"
+          "title": "Manejo de Medicamentos Durante un Apagon"
         }
       ],
       "top_1_correct": true,
@@ -3597,16 +3791,16 @@
     "MEDIUM": 1,
     "NONE": 0
   },
-  "correct": 38,
+  "correct": 37,
   "latency_ms": {
-    "max": 56.46150000393391,
-    "mean": 31.612592504825443,
-    "min": 22.63880003010854,
-    "p95": 43.634200002998114
+    "max": 68.3634999440983,
+    "mean": 52.53452999750152,
+    "min": 45.59700004756451,
+    "p95": 64.68559999484569
   },
-  "mean_reciprocal_rank": 0.9708333333333333,
-  "top_1_accuracy": 0.95,
-  "top_1_correct": 38,
+  "mean_reciprocal_rank": 0.9583333333333334,
+  "top_1_accuracy": 0.925,
+  "top_1_correct": 37,
   "top_k_accuracy": 1.0,
   "top_k_correct": 40,
   "top_result_languages": {

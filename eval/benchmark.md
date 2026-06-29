@@ -1,6 +1,7 @@
 # LastLight Benchmark
 
-Run on Windows 11 with Python 3.12.7 on 2026-06-27.
+Process timing run on Windows 11 with Python 3.12.7 on 2026-06-27.
+Retrieval results refreshed on 2026-06-29 after expanding the core knowledge pack.
 
 Commands:
 
@@ -14,8 +15,8 @@ Retrieval benchmark over 40 complex emergency cases:
 
 | Strategy | Cases | Top-1 | Top-3 | MRR | Mean search latency |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Lexical | 40 | 97.50% | 100.00% | 0.988 | 31.586 ms |
-| BM25 | 40 | 95.00% | 100.00% | 0.971 | 31.613 ms |
+| Lexical | 40 | 100.00% | 100.00% | 1.000 | 52.557 ms |
+| BM25 | 40 | 92.50% | 100.00% | 0.958 | 52.535 ms |
 
 Process-level timing and estimated energy:
 
