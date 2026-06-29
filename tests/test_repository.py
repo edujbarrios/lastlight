@@ -40,6 +40,30 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(docs[0].title, "Packed Water")
         self.assertEqual(docs[0].path, "pack.zip:water/purification.md")
 
+    def test_loads_zip_pack_with_uppercase_extension(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pack = Path(tmp) / "pack.ZIP"
+            with ZipFile(pack, "w") as archive:
+                archive.writestr("water.md", "Boil water.")
+
+            docs = MarkdownKnowledgeRepository(pack).list_documents()
+
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0].path, "pack.ZIP:water.md")
+
+    def test_ignores_zip_metadata_markdown(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pack = Path(tmp) / "pack.zip"
+            with ZipFile(pack, "w") as archive:
+                archive.writestr("__MACOSX/water.md", "metadata")
+                archive.writestr(".hidden/notes.md", "hidden")
+                archive.writestr("water.md", "Boil water.")
+
+            docs = MarkdownKnowledgeRepository(pack).list_documents()
+
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0].path, "pack.zip:water.md")
+
     def test_reads_directory_pack_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

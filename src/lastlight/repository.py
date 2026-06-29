@@ -19,7 +19,7 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
         self.knowledge_dir = Path(knowledge_dir) if knowledge_dir else project_root() / "knowledge"
 
     def describe_pack(self) -> KnowledgePack:
-        if self.knowledge_dir.is_file() and self.knowledge_dir.suffix == ".zip":
+        if _is_zip_pack(self.knowledge_dir):
             return self._describe_zip_pack(self.knowledge_dir)
 
         manifest_path = self.knowledge_dir / PACK_MANIFEST
@@ -33,7 +33,7 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
         if not self.knowledge_dir.exists():
             return []
 
-        if self.knowledge_dir.is_file() and self.knowledge_dir.suffix == ".zip":
+        if _is_zip_pack(self.knowledge_dir):
             return self._list_zip_documents(self.knowledge_dir)
 
         root = project_root()
@@ -60,7 +60,7 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
         documents: list[KnowledgeDocument] = []
         with ZipFile(pack_path) as archive:
             for name in sorted(archive.namelist()):
-                if name.endswith("/") or not name.casefold().endswith(".md"):
+                if not _is_zip_markdown_document(name):
                     continue
                 data = archive.read(name)
                 text = data.decode("utf-8")
@@ -95,3 +95,17 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
             languages=languages,
             path=str(self.knowledge_dir),
         )
+
+
+def _is_zip_pack(path: Path) -> bool:
+    return path.is_file() and path.suffix.casefold() == ".zip"
+
+
+def _is_zip_markdown_document(name: str) -> bool:
+    normalized = name.replace("\\", "/")
+    parts = tuple(part for part in normalized.split("/") if part)
+    if not parts or normalized.endswith("/"):
+        return False
+    if any(part.startswith(".") or part == "__MACOSX" for part in parts):
+        return False
+    return parts[-1].casefold().endswith(".md")
