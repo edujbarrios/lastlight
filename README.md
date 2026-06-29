@@ -39,6 +39,7 @@ cd lastlight
 ```bash
 python src/main.py
 python src/main.py "how do I purify water"
+python src/main.py --format json --top-k 5 "how do I purify water"
 
 # Use --knowledge when adding an external knowledge pack beyond this repo's built-in knowledge.
 python src/main.py --knowledge path/to/pack.zip "find north without a compass"
@@ -76,6 +77,7 @@ The web session keeps short-lived context for follow-up questions.
 | --- | --- |
 | Interactive mode | `python src/main.py` |
 | Single query | `python src/main.py "stop bleeding"` |
+| JSON query output | `python src/main.py --format json --top-k 5 "stop bleeding"` |
 | Use another pack | `python src/main.py --knowledge path/to/pack.zip "save battery"` |
 | Filter language | `python src/main.py --language es "necesito ayuda"` |
 | Evaluate retrieval | `python src/main.py --eval` |

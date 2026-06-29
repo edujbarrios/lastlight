@@ -26,7 +26,7 @@ The optional index builder writes a human-readable JSON summary of the current k
 
 Interactive mode, single-query mode, and evaluation mode are command objects. The CLI only selects a command and executes it.
 
-Index building and streaming query output are also command-level behaviors. They do not introduce background workers or persistent services.
+Index building, streaming query output, and JSON query output are also command-level behaviors. They do not introduce background workers or persistent services. JSON output intentionally omits the startup warning so automation can parse a single valid JSON document.
 
 ## Value Objects
 

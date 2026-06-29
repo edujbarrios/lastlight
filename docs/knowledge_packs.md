@@ -3,6 +3,7 @@
 LastLight knowledge packs are ordinary directories or `.zip` files containing Markdown.
 They can optionally include `lastlight-pack.json` at the pack root.
 The bundled pack keeps English documents under `en/` and Spanish documents under `es/`.
+Archive entries under hidden directories or `__MACOSX/` are ignored when loading `.zip` packs.
 
 ```json
 {

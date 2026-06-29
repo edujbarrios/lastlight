@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .app import LastLightApp
+from .domain import SearchResult
 from .safety import LOW_CONFIDENCE_RESPONSE, safe_answer
 from .triage import append_follow_up_questions, first_acceptable_result
 
