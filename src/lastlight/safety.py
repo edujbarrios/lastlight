@@ -39,3 +39,17 @@ def format_result(result: SearchResult) -> str:
         f"{DISCLAIMER}"
     )
 
+
+def result_to_dict(result: SearchResult) -> dict[str, object]:
+    doc = result.document
+    return {
+        "title": doc.title,
+        "source": doc.path,
+        "language": doc.language,
+        "tags": list(doc.tags),
+        "priority": doc.priority,
+        "score": result.score,
+        "confidence": result.confidence,
+        "passage": result.passage,
+        "matched_terms": list(result.matched_terms),
+    }

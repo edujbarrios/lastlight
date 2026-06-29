@@ -42,6 +42,22 @@ class AppTests(unittest.TestCase):
         self.assertIn("Follow-up checks:", answer)
         self.assertIn("fresh air", answer)
 
+    def test_answer_passes_top_k_to_retrieval(self) -> None:
+        class RecordingRetrieval(Retrieval):
+            top_k = 0
+
+            def search(
+                self, query: SearchQuery, documents: list[KnowledgeDocument]
+            ) -> list[SearchResult]:
+                self.top_k = query.top_k
+                return super().search(query, documents)
+
+        retrieval = RecordingRetrieval()
+
+        LastLightApp(Repository(), retrieval).answer("generator safety", top_k=7)
+
+        self.assertEqual(retrieval.top_k, 7)
+
 
 if __name__ == "__main__":
     unittest.main()

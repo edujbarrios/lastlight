@@ -128,6 +128,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="print query output line by line with flushing",
     )
     parser.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        help="output format for single-query mode",
+    )
+    parser.add_argument(
+        "--top-k",
+        type=int,
+        default=3,
+        help="number of ranked results to consider for single-query mode",
+    )
+    parser.add_argument(
         "--synthesize",
         action="store_true",
         help="experimental citation-aware n-gram synthesis from retrieved passage",
@@ -217,5 +229,7 @@ def main(argv: list[str] | None = None) -> int:
             " ".join(args.query),
             stream=args.stream,
             synthesize=args.synthesize,
+            output_format=args.format,
+            top_k=args.top_k,
         ).execute()
     return InteractiveCommand(app).execute()

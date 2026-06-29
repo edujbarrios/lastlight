@@ -30,11 +30,11 @@ class LastLightApp:
             ]
         return self.retrieval.search(SearchQuery(text=text, top_k=top_k), documents)
 
-    def answer(self, text: str) -> str:
-        results = self.search(text, top_k=3)
+    def answer(self, text: str, top_k: int = 3) -> str:
+        results = self.search(text, top_k=top_k)
         return append_follow_up_questions(
             safe_answer(results), first_acceptable_result(results)
         )
 
-    def synthesize(self, text: str) -> str:
-        return synthesize_answer(text, self.search(text, top_k=3))
+    def synthesize(self, text: str, top_k: int = 3) -> str:
+        return synthesize_answer(text, self.search(text, top_k=top_k))

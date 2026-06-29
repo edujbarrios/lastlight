@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import io
+import json
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -50,7 +51,7 @@ class CliTests(unittest.TestCase):
         create.assert_called_once_with(
             knowledge_dir=None, strategy="lexical", language=None
         )
-        app.answer.assert_called_once_with("hello")
+        app.answer.assert_called_once_with("hello", top_k=3)
 
     def test_query_passes_language_filter(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
@@ -64,7 +65,33 @@ class CliTests(unittest.TestCase):
         create.assert_called_once_with(
             knowledge_dir=None, strategy="lexical", language="es"
         )
-        app.answer.assert_called_once_with("hola")
+        app.answer.assert_called_once_with("hola", top_k=3)
+
+    def test_query_passes_top_k(self) -> None:
+        with patch.object(cli.ApplicationFactory, "create") as create:
+            app = create.return_value
+            app.answer.return_value = "answer"
+
+            with redirect_stdout(io.StringIO()):
+                exit_code = cli.main(["--top-k", "5", "hello"])
+
+        self.assertEqual(exit_code, 0)
+        app.answer.assert_called_once_with("hello", top_k=5)
+
+    def test_query_json_output_is_machine_readable(self) -> None:
+        with patch.object(cli.ApplicationFactory, "create") as create:
+            app = create.return_value
+            app.search.return_value = []
+            output = io.StringIO()
+
+            with redirect_stdout(output):
+                exit_code = cli.main(["--format", "json", "unknown"])
+
+        self.assertEqual(exit_code, 0)
+        data = json.loads(output.getvalue())
+        self.assertEqual(data["query"], "unknown")
+        self.assertFalse(data["accepted"])
+        self.assertEqual(data["results"], [])
 
     def test_serve_creates_application_and_runs_server_command(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:

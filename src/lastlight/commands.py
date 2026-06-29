@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from .app import LastLightApp
@@ -18,8 +19,15 @@ from .local_model import summarize_local_model, write_local_model
 from .pack_export import export_pack, sha256_file
 from .pack_validation import format_validation_report, validate_pack
 from .pdf_ingest import document_to_markdown, load_pdf
-from .safety import STARTUP_WARNING
+from .safety import (
+    LOW_CONFIDENCE_RESPONSE,
+    STARTUP_WARNING,
+    result_to_dict,
+    safe_answer,
+)
 from .session import LastLightSession
+from .synthesis import synthesize_answer
+from .triage import first_acceptable_result
 from .web import serve
 
 
@@ -56,22 +64,51 @@ class QueryCommand:
         query: str,
         stream: bool = False,
         synthesize: bool = False,
+        output_format: str = "text",
+        top_k: int = 3,
     ) -> None:
         self.app = app
         self.query = query
         self.stream = stream
         self.synthesize = synthesize
+        self.output_format = output_format
+        self.top_k = max(top_k, 1)
 
     def execute(self) -> int:
+        if self.output_format == "json":
+            print(self._json_output())
+            return 0
+
         print(STARTUP_WARNING)
         print()
-        answer = self.app.synthesize(self.query) if self.synthesize else self.app.answer(self.query)
+        answer = (
+            self.app.synthesize(self.query, top_k=self.top_k)
+            if self.synthesize
+            else self.app.answer(self.query, top_k=self.top_k)
+        )
         if self.stream:
             for line in answer.splitlines():
                 print(line, flush=True)
         else:
             print(answer)
         return 0
+
+    def _json_output(self) -> str:
+        results = self.app.search(self.query, top_k=self.top_k)
+        accepted = first_acceptable_result(results)
+        payload: dict[str, object] = {
+            "query": self.query,
+            "accepted": accepted is not None,
+            "answer": (
+                synthesize_answer(self.query, results)
+                if self.synthesize
+                else safe_answer(results)
+            ),
+            "results": [result_to_dict(result) for result in results],
+        }
+        if accepted is None:
+            payload["message"] = LOW_CONFIDENCE_RESPONSE
+        return json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True)
 
 
 class EvaluationCommand:
