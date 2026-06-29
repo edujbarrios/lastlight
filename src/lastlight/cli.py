@@ -136,7 +136,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--format",
-        choices=("text", "json"),
+        choices=("text", "json", "sources"),
         default="text",
         help="output format for single-query mode",
     )

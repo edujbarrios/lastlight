@@ -78,6 +78,9 @@ class QueryCommand:
         if self.output_format == "json":
             print(self._json_output())
             return 0
+        if self.output_format == "sources":
+            print(self._sources_output())
+            return 0
 
         print(STARTUP_WARNING)
         print()
@@ -109,6 +112,21 @@ class QueryCommand:
         if accepted is None:
             payload["message"] = LOW_CONFIDENCE_RESPONSE
         return json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True)
+
+    def _sources_output(self) -> str:
+        results = self.app.search(self.query, top_k=self.top_k)
+        if not results:
+            return LOW_CONFIDENCE_RESPONSE
+
+        lines = [f"Sources for: {self.query}"]
+        for index, result in enumerate(results, start=1):
+            document = result.document
+            tags = ", ".join(document.tags) if document.tags else "none"
+            lines.append(
+                f"{index}. [{result.confidence}] {document.title} | "
+                f"{document.path} | score={result.score:.3f} | tags={tags}"
+            )
+        return "\n".join(lines)
 
 
 class EvaluationCommand:

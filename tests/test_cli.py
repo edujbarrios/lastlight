@@ -10,6 +10,7 @@ from unittest.mock import patch
 
 import helpers  # noqa: F401
 from lastlight import cli
+from lastlight.domain import KnowledgeDocument, SearchResult
 
 
 class CliTests(unittest.TestCase):
@@ -98,6 +99,32 @@ class CliTests(unittest.TestCase):
         self.assertEqual(data["query"], "unknown")
         self.assertFalse(data["accepted"])
         self.assertEqual(data["results"], [])
+
+    def test_query_sources_output_lists_ranked_sources(self) -> None:
+        document = KnowledgeDocument(
+            title="Water",
+            path="knowledge/en/water/purification.md",
+            body="Boil water.",
+            tags=("water",),
+        )
+        with patch.object(cli.ApplicationFactory, "create") as create:
+            app = create.return_value
+            app.search.return_value = [
+                SearchResult(
+                    document=document,
+                    score=2.0,
+                    confidence="HIGH",
+                    passage="Boil water.",
+                )
+            ]
+            output = io.StringIO()
+
+            with redirect_stdout(output):
+                exit_code = cli.main(["--format", "sources", "water"])
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("Sources for: water", output.getvalue())
+        self.assertIn("knowledge/en/water/purification.md", output.getvalue())
 
     def test_serve_creates_application_and_runs_server_command(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
