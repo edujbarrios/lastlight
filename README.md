@@ -40,6 +40,7 @@ cd lastlight
 python src/main.py
 python src/main.py "how do I purify water"
 python src/main.py --format json --top-k 5 "how do I purify water"
+python src/main.py --format sources "how do I purify water"
 
 # Use --knowledge when adding an external knowledge pack beyond this repo's built-in knowledge.
 python src/main.py --knowledge path/to/pack.zip "find north without a compass"
@@ -78,6 +79,7 @@ The web session keeps short-lived context for follow-up questions.
 | Interactive mode | `python src/main.py` |
 | Single query | `python src/main.py "stop bleeding"` |
 | JSON query output | `python src/main.py --format json --top-k 5 "stop bleeding"` |
+| Ranked source list | `python src/main.py --format sources "stop bleeding"` |
 | Use another pack | `python src/main.py --knowledge path/to/pack.zip "save battery"` |
 | Filter language | `python src/main.py --language es "necesito ayuda"` |
 | Evaluate retrieval | `python src/main.py --eval` |
@@ -88,6 +90,7 @@ The web session keeps short-lived context for follow-up questions.
 | List knowledge | `python src/main.py --list-knowledge` |
 | Validate pack | `python src/main.py --validate-pack` |
 | Export pack | `python src/main.py --export-pack dist/lastlight-core.zip` |
+| Export only if valid | `python src/main.py --export-pack dist/lastlight-core.zip --require-valid-pack` |
 | Import PDF | `python src/main.py --import-pdf guide.pdf --import-output knowledge/en/imported/guide.md --language en` |
 | Build audit index | `python src/main.py --build-index data/lastlight.index.json` |
 | Device self-check | `python src/main.py --self-check` |

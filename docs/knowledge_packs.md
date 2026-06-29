@@ -39,10 +39,12 @@ Export a directory pack as a deterministic `.zip`:
 
 ```bash
 python3 src/main.py --export-pack dist/lastlight-core.zip
+python3 src/main.py --export-pack dist/lastlight-core.zip --require-valid-pack
 ```
 
 The export command prints a SHA-256 checksum so the copied pack can be verified
-on another machine.
+on another machine. Use `--require-valid-pack` to stop the export when validation
+finds missing manifest fields or document-language mismatches.
 
 Build an audit index that includes pack metadata:
 
