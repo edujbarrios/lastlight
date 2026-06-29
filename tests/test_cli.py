@@ -161,6 +161,19 @@ class CliTests(unittest.TestCase):
         create.assert_not_called()
         execute.assert_called_once_with()
 
+    def test_export_pack_passes_require_valid_flag(self) -> None:
+        with patch.object(cli, "ExportPackCommand") as command_class:
+            command_class.return_value.execute.return_value = 0
+            with redirect_stdout(io.StringIO()):
+                exit_code = cli.main([
+                    "--export-pack",
+                    "dist/pack.zip",
+                    "--require-valid-pack",
+                ])
+
+        self.assertEqual(exit_code, 0)
+        self.assertTrue(command_class.call_args.kwargs["require_valid"])
+
 
 if __name__ == "__main__":
     unittest.main()

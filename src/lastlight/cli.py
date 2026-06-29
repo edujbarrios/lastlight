@@ -87,6 +87,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="write a deterministic .zip knowledge pack and exit",
     )
     parser.add_argument(
+        "--require-valid-pack",
+        action="store_true",
+        help="fail --export-pack when pack validation does not pass",
+    )
+    parser.add_argument(
         "--import-pdf",
         metavar="PATH",
         help="convert a text-based PDF into LastLight Markdown and exit",
@@ -192,7 +197,11 @@ def main(argv: list[str] | None = None) -> int:
         return ValidatePackCommand(repository).execute()
     if args.export_pack:
         repository = MarkdownKnowledgeRepository(args.knowledge)
-        return ExportPackCommand(repository.knowledge_dir, Path(args.export_pack)).execute()
+        return ExportPackCommand(
+            repository,
+            Path(args.export_pack),
+            require_valid=args.require_valid_pack,
+        ).execute()
     if args.import_pdf:
         tags = tuple(tag.strip() for tag in args.import_tags.split(",") if tag.strip())
         return ImportPdfCommand(

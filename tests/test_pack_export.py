@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import io
 import tempfile
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from zipfile import ZipFile
 
 import helpers  # noqa: F401
+from lastlight.commands import ExportPackCommand
 from lastlight.pack_export import export_pack, sha256_file
+from lastlight.repository import MarkdownKnowledgeRepository
 
 
 class PackExportTests(unittest.TestCase):
@@ -59,6 +63,23 @@ class PackExportTests(unittest.TestCase):
 
             with self.assertRaises(ValueError):
                 export_pack(source, Path(tmp) / "output.zip")
+
+    def test_export_command_can_require_valid_pack(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "knowledge"
+            root.mkdir()
+            (root / "water.md").write_text("Water", encoding="utf-8")
+            output = Path(tmp) / "pack.zip"
+
+            with redirect_stdout(io.StringIO()):
+                exit_code = ExportPackCommand(
+                    MarkdownKnowledgeRepository(root),
+                    output,
+                    require_valid=True,
+                ).execute()
+
+        self.assertEqual(exit_code, 1)
+        self.assertFalse(output.exists())
 
 
 if __name__ == "__main__":

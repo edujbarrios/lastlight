@@ -233,13 +233,30 @@ class ValidatePackCommand:
 
 
 class ExportPackCommand:
-    def __init__(self, source_dir: Path | str, output_path: Path | str) -> None:
-        self.source_dir = source_dir
+    def __init__(
+        self,
+        repository: KnowledgeRepository,
+        output_path: Path | str,
+        require_valid: bool = False,
+    ) -> None:
+        self.repository = repository
         self.output_path = output_path
+        self.require_valid = require_valid
 
     def execute(self) -> int:
+        if self.require_valid:
+            report = validate_pack(self.repository)
+            if not report.ok:
+                print(format_validation_report(report))
+                return 1
+
+        source_dir = getattr(self.repository, "knowledge_dir", None)
+        if source_dir is None:
+            print("Export failed: repository does not expose a knowledge directory")
+            return 1
+
         try:
-            output = export_pack(self.source_dir, self.output_path)
+            output = export_pack(source_dir, self.output_path)
         except ValueError as error:
             print(f"Export failed: {error}")
             return 1
