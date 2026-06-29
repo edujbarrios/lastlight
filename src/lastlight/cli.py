@@ -25,6 +25,13 @@ from .factory import ApplicationFactory
 from .repository import MarkdownKnowledgeRepository
 
 
+def positive_int(value: str) -> int:
+    parsed = int(value)
+    if parsed < 1:
+        raise argparse.ArgumentTypeError("must be at least 1")
+    return parsed
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="lastlight",
@@ -135,7 +142,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--top-k",
-        type=int,
+        type=positive_int,
         default=3,
         help="number of ranked results to consider for single-query mode",
     )

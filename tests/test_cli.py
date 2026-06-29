@@ -4,7 +4,7 @@ import io
 import json
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -77,6 +77,12 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 0)
         app.answer.assert_called_once_with("hello", top_k=5)
+
+    def test_rejects_non_positive_top_k(self) -> None:
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(io.StringIO()):
+                with redirect_stderr(io.StringIO()):
+                    cli.main(["--top-k", "0", "hello"])
 
     def test_query_json_output_is_machine_readable(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
