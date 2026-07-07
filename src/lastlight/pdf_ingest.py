@@ -89,10 +89,14 @@ def document_to_markdown(
     priority: str = "normal",
     max_summary_items: int = 8,
 ) -> str:
-    resolved_title = title or infer_title(document)
+    resolved_title = _front_matter_value(title or infer_title(document))
+    resolved_language = _front_matter_value(language)
+    resolved_priority = _front_matter_value(priority)
+    resolved_source_file = _front_matter_value(document.path.name)
+    tag_values = tuple(_front_matter_value(tag) for tag in tags)
     summary_items = extract_important_points(document.text, limit=max_summary_items)
     body = text_to_markdown(document.pages)
-    tag_lines = "\n".join(f"  - {tag}" for tag in tags)
+    tag_lines = "\n".join(f"  - {tag}" for tag in tag_values)
     if not tag_lines:
         tag_lines = "  - imported"
 
@@ -103,12 +107,12 @@ def document_to_markdown(
     return (
         "---\n"
         f"title: {resolved_title}\n"
-        f"language: {language}\n"
+        f"language: {resolved_language}\n"
         "tags:\n"
         f"{tag_lines}\n"
-        f"priority: {priority}\n"
+        f"priority: {resolved_priority}\n"
         "source_type: pdf\n"
-        f"source_file: {document.path.name}\n"
+        f"source_file: {resolved_source_file}\n"
         f"source_sha256: {document.source_sha256}\n"
         f"pages: {len(document.pages)}\n"
         "---\n\n"
@@ -117,6 +121,10 @@ def document_to_markdown(
         "## Extracted Text\n\n"
         f"{body}\n"
     )
+
+
+def _front_matter_value(value: str) -> str:
+    return WHITESPACE_RE.sub(" ", value.replace("\r", "\n").replace("\n", " ")).strip()
 
 
 def infer_title(document: PdfDocument) -> str:

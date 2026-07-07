@@ -85,6 +85,18 @@ class CliTests(unittest.TestCase):
                 with redirect_stderr(io.StringIO()):
                     cli.main(["--top-k", "0", "hello"])
 
+    def test_rejects_non_positive_import_summary_items(self) -> None:
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(io.StringIO()):
+                with redirect_stderr(io.StringIO()):
+                    cli.main(["--import-pdf", "guide.pdf", "--import-summary-items", "0"])
+
+    def test_rejects_non_positive_model_order(self) -> None:
+        with self.assertRaises(SystemExit):
+            with redirect_stdout(io.StringIO()):
+                with redirect_stderr(io.StringIO()):
+                    cli.main(["--build-model", "model.json", "--model-order", "0"])
+
     def test_query_json_output_is_machine_readable(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
             app = create.return_value
