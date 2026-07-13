@@ -12,11 +12,19 @@ The current retrieval benchmark uses 238 deterministic cases from `data/eval.jso
 
 Besides retrieval accuracy and MRR, the report measures answer precision, refusal recall, answerable recall, and results by category. Multi-intent cases require every expected topic to appear in the accepted top-k results; adversarial and out-of-domain cases are correct only when LastLight refuses to answer.
 
-Current lexical stress-suite results:
+Current stress-suite results, generated with the commands shown below:
 
-| Cases | Top-1 | Top-3 | MRR | Answer precision | Refusal recall |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 238 | 62.18% | 63.45% | 0.518 | 89.60% | 62.50% |
+| Strategy | Cases | Top-1 | Top-3 | MRR | Answer precision | Refusal recall | Answerable recall | Mean latency |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Lexical | 238 | 62.18% | 63.45% | 0.518 | 89.60% | 62.50% | 81.58% | 40.146 ms |
+| BM25 | 238 | 55.04% | 63.45% | 0.569 | 83.18% | 25.00% | 93.68% | 40.365 ms |
+
+```bash
+python src/main.py --eval --eval-output eval/results.json
+python src/main.py --strategy bm25 --eval --eval-output eval/results-bm25.json
+```
+
+BM25 accepts more answerable cases, but its lower answer precision and refusal recall mean that it also accepts substantially more adversarial and out-of-domain queries. The default lexical strategy remains the safer current tradeoff.
 
 The lower stress accuracy is intentional: it exposes concrete robustness gaps hidden by the original direct-query suite.
 
