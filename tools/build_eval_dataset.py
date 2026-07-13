@@ -111,7 +111,11 @@ def build_cases() -> list[dict[str, object]]:
     for query, category, language in REFUSAL_CASES:
         for suffix in ("", " please", " answer now"):
             cases.append({"query": query + suffix, "should_refuse": True, "difficulty": "stress", "expected_language": language, "category": category})
-    return cases
+    unique: dict[str, dict[str, object]] = {}
+    for case in cases:
+        key = json.dumps(case, ensure_ascii=False, sort_keys=True)
+        unique.setdefault(key, case)
+    return list(unique.values())
 
 
 def main() -> None:
