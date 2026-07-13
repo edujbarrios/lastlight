@@ -47,6 +47,15 @@ class SearchResult:
 @dataclass(frozen=True)
 class EvaluationCase:
     query: str
-    expected_tag: str
+    expected_tag: str | None = None
     difficulty: str = "standard"
     expected_language: str | None = None
+    expected_tags: tuple[str, ...] = field(default_factory=tuple)
+    category: str = "baseline"
+    should_refuse: bool = False
+
+    @property
+    def target_tags(self) -> tuple[str, ...]:
+        if self.expected_tags:
+            return self.expected_tags
+        return (self.expected_tag,) if self.expected_tag else ()

@@ -12,6 +12,7 @@ from lastlight.pdf_ingest import (
     infer_title,
     text_to_markdown,
 )
+from lastlight.markdown_loader import load_markdown_text
 
 
 class PdfIngestTests(unittest.TestCase):
@@ -63,6 +64,28 @@ class PdfIngestTests(unittest.TestCase):
         self.assertIn("source_sha256: abc123", markdown)
         self.assertIn("## Important Points", markdown)
         self.assertIn("- Do not run a generator indoors.", markdown)
+
+    def test_document_to_markdown_keeps_front_matter_values_single_line(self) -> None:
+        document = PdfDocument(
+            path=Path("guide.pdf"),
+            pages=(PdfPage(1, "Emergency Guide\nDo not run a generator indoors."),),
+            source_sha256="abc123",
+        )
+
+        markdown = document_to_markdown(
+            document,
+            title="Imported\nlanguage: es\n---\nInjected",
+            language="en\npriority: low",
+            tags=("generator\npriority: low",),
+            priority="high\nsource_type: text",
+        )
+        loaded = load_markdown_text(markdown, "imported.md")
+
+        self.assertEqual(loaded.language, "en priority: low")
+        self.assertEqual(loaded.priority, "high source_type: text")
+        self.assertEqual(loaded.tags, ("generator priority: low",))
+        self.assertIn("Imported language: es --- Injected", loaded.title)
+        self.assertNotIn("Injected", loaded.body)
 
     def test_infers_title_from_first_text_line(self) -> None:
         document = PdfDocument(

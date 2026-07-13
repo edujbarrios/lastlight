@@ -28,9 +28,12 @@ def load_evaluation_cases(path: Path | None = None) -> list[EvaluationCase]:
         cases.append(
             EvaluationCase(
                 query=raw["query"],
-                expected_tag=raw["expected_tag"],
+                expected_tag=raw.get("expected_tag"),
                 difficulty=raw.get("difficulty", "standard"),
                 expected_language=raw.get("expected_language"),
+                expected_tags=tuple(raw.get("expected_tags", ())),
+                category=raw.get("category", "baseline"),
+                should_refuse=bool(raw.get("should_refuse", False)),
             )
         )
     return cases
@@ -52,15 +55,27 @@ def build_evaluation_report(
     by_tag: dict[str, dict[str, object]] = {}
     by_difficulty: dict[str, dict[str, object]] = {}
     by_language: dict[str, dict[str, object]] = {}
+    by_category: dict[str, dict[str, object]] = {}
+    true_accept = false_accept = true_refusal = false_refusal = 0
 
     for case in cases:
         start = time.perf_counter()
         results = app.search(case.query, top_k=top_k)
         elapsed_ms = (time.perf_counter() - start) * 1000.0
         elapsed_samples_ms.append(elapsed_ms)
-        rank = _expected_rank(results, case)
-        top_1_match = rank == 1
-        top_k_match = rank is not None
+        accepted_results = [result for result in results if result.confidence in {"HIGH", "MEDIUM"}]
+        accepted = bool(accepted_results)
+        if case.should_refuse:
+            true_refusal += int(not accepted)
+            false_accept += int(accepted)
+        else:
+            true_accept += int(accepted)
+            false_refusal += int(not accepted)
+
+        rank = _expected_rank(accepted_results, case)
+        matched_tags = _matched_tags(accepted_results, case)
+        top_1_match = (not case.should_refuse and rank == 1) or (case.should_refuse and not accepted)
+        top_k_match = (not case.should_refuse and set(case.target_tags) <= matched_tags) or (case.should_refuse and not accepted)
         reciprocal_rank = 1.0 / rank if rank is not None else 0.0
         reciprocal_ranks.append(reciprocal_rank)
         if top_1_match:
@@ -68,10 +83,12 @@ def build_evaluation_report(
         if top_k_match:
             top_k_correct += 1
 
-        _record_bucket(by_tag, case.expected_tag, top_1_match, top_k_match, reciprocal_rank)
+        for tag in case.target_tags or ("expected-refusal",):
+            _record_bucket(by_tag, tag, top_1_match, top_k_match, reciprocal_rank)
         _record_bucket(
             by_difficulty, case.difficulty, top_1_match, top_k_match, reciprocal_rank
         )
+        _record_bucket(by_category, case.category, top_1_match, top_k_match, reciprocal_rank)
         _record_bucket(
             by_language,
             case.expected_language or "unspecified",
@@ -87,6 +104,10 @@ def build_evaluation_report(
                 {
                     "query": case.query,
                     "expected_tag": case.expected_tag,
+                    "expected_tags": list(case.target_tags),
+                    "category": case.category,
+                    "should_refuse": case.should_refuse,
+                    "accepted": False,
                     "expected_language": case.expected_language,
                     "difficulty": case.difficulty,
                     "top_1_correct": False,
@@ -107,6 +128,10 @@ def build_evaluation_report(
             {
                 "query": case.query,
                 "expected_tag": case.expected_tag,
+                "expected_tags": list(case.target_tags),
+                "category": case.category,
+                "should_refuse": case.should_refuse,
+                "accepted": accepted,
                 "expected_language": case.expected_language,
                 "difficulty": case.difficulty,
                 "top_1_correct": top_1_match,
@@ -156,7 +181,9 @@ def build_evaluation_report(
         "top_result_languages": dict(sorted(language_counts.items())),
         "by_expected_tag": _finalize_buckets(by_tag),
         "by_difficulty": _finalize_buckets(by_difficulty),
+        "by_category": _finalize_buckets(by_category),
         "by_expected_language": _finalize_buckets(by_language),
+        "decision_metrics": _decision_metrics(true_accept, false_accept, true_refusal, false_refusal),
         "cases": case_results,
     }
 
@@ -184,6 +211,8 @@ def format_evaluation_report(report: dict[str, object]) -> str:
         f"Top-{report['benchmark']['top_k']} accuracy: {report['top_k_accuracy']:.2%}",
         f"MRR: {report['mean_reciprocal_rank']:.3f}",
         f"Mean search latency: {report['latency_ms']['mean']:.3f} ms",
+        f"Answer precision: {report['decision_metrics']['answer_precision']:.2%}",
+        f"Refusal recall: {report['decision_metrics']['refusal_recall']:.2%}",
         "Confidence statistics:",
     ]
     for label in ("HIGH", "MEDIUM", "LOW", "NONE"):
@@ -211,7 +240,7 @@ def write_evaluation_report(
 
 def _expected_rank(results: list[SearchResult], case: EvaluationCase) -> int | None:
     for index, result in enumerate(results, start=1):
-        if case.expected_tag not in result.document.tags:
+        if not set(case.target_tags).intersection(result.document.tags):
             continue
         if (
             case.expected_language is not None
@@ -220,6 +249,31 @@ def _expected_rank(results: list[SearchResult], case: EvaluationCase) -> int | N
             continue
         return index
     return None
+
+
+def _matched_tags(results: list[SearchResult], case: EvaluationCase) -> set[str]:
+    matched: set[str] = set()
+    for result in results:
+        if case.expected_language is not None and result.document.language != case.expected_language:
+            continue
+        matched.update(set(case.target_tags).intersection(result.document.tags))
+    return matched
+
+
+def _decision_metrics(
+    true_accept: int, false_accept: int, true_refusal: int, false_refusal: int
+) -> dict[str, int | float]:
+    answer_total = true_accept + false_accept
+    refusal_total = true_refusal + false_accept
+    return {
+        "true_accept": true_accept,
+        "false_accept": false_accept,
+        "true_refusal": true_refusal,
+        "false_refusal": false_refusal,
+        "answer_precision": true_accept / answer_total if answer_total else 0.0,
+        "refusal_recall": true_refusal / refusal_total if refusal_total else 0.0,
+        "answerable_recall": true_accept / (true_accept + false_refusal) if true_accept + false_refusal else 0.0,
+    }
 
 
 def _serialize_result(result: SearchResult) -> dict[str, object]:

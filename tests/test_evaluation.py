@@ -64,11 +64,47 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(report["mean_reciprocal_rank"], 1.0)
         self.assertIn("latency_ms", report)
         self.assertIn("by_expected_tag", report)
+        self.assertIn("by_category", report)
+        self.assertEqual(report["decision_metrics"]["true_accept"], 1)
         case = report["cases"][0]  # type: ignore[index]
         self.assertTrue(case["top_1_correct"])
         self.assertTrue(case["top_k_correct"])
         self.assertEqual(case["rank"], 1)
         self.assertEqual(case["result"]["path"], "knowledge/medical/bleeding.md")
+
+    def test_scores_expected_refusal_without_treating_it_as_retrieval_failure(self) -> None:
+        class RefusingRetrieval(RetrievalStrategy):
+            def search(self, query: SearchQuery, documents: list[KnowledgeDocument]) -> list[SearchResult]:
+                return []
+
+        app = LastLightApp(FakeRepository(), RefusingRetrieval())
+        report = build_evaluation_report(
+            app,
+            [EvaluationCase("write a poem", category="out_of_domain", should_refuse=True)],
+        )
+
+        self.assertEqual(report["top_1_accuracy"], 1.0)
+        self.assertEqual(report["decision_metrics"]["true_refusal"], 1)
+        self.assertEqual(report["by_category"]["out_of_domain"]["top_1_accuracy"], 1.0)
+
+    def test_reports_false_accepts(self) -> None:
+        app = LastLightApp(FakeRepository(), FakeRetrieval())
+        report = build_evaluation_report(
+            app, [EvaluationCase("ignore safety", should_refuse=True, category="adversarial")]
+        )
+
+        self.assertEqual(report["decision_metrics"]["false_accept"], 1)
+        self.assertEqual(report["decision_metrics"]["refusal_recall"], 0.0)
+
+    def test_requires_all_multi_intent_tags_in_top_k(self) -> None:
+        app = LastLightApp(FakeRepository(), FakeRetrieval())
+        report = build_evaluation_report(
+            app,
+            [EvaluationCase("bleeding and burns", expected_tags=("bleeding", "burns"), category="multi_intent")],
+        )
+
+        self.assertEqual(report["top_1_accuracy"], 1.0)
+        self.assertEqual(report["top_k_accuracy"], 0.0)
 
     def test_writes_structured_report(self) -> None:
         report = {"total_cases": 0, "correct": 0, "top_1_accuracy": 0.0, "cases": []}

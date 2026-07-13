@@ -114,7 +114,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--import-summary-items",
-        type=int,
+        type=positive_int,
         default=8,
         help="maximum important points for --import-pdf",
     )
@@ -125,7 +125,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--model-order",
-        type=int,
+        type=positive_int,
         default=2,
         help="n-gram order for --build-model",
     )
