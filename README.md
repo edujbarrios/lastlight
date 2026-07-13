@@ -8,7 +8,19 @@ While much of current AI research focuses on general-purpose LLMs, disasters and
 
 ## Benchmark
 
-The current retrieval benchmark uses 40 direct, scenario-based, multi-intent, and Spanish disaster-response queries from `data/eval.jsonl`.
+The current retrieval benchmark uses 238 deterministic cases from `data/eval.jsonl`. It covers baseline and scenario queries plus misspellings, terse prompts, colloquial language, regional Spanish, multi-intent emergencies, contradictory claims, adversarial instructions, and out-of-domain requests. `data/eval_core.jsonl` preserves the 40 curated seed cases and `tools/build_eval_dataset.py` reproducibly builds the stress suite.
+
+Besides retrieval accuracy and MRR, the report measures answer precision, refusal recall, answerable recall, and results by category. Multi-intent cases require every expected topic to appear in the accepted top-k results; adversarial and out-of-domain cases are correct only when LastLight refuses to answer.
+
+Current lexical stress-suite results:
+
+| Cases | Top-1 | Top-3 | MRR | Answer precision | Refusal recall |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 238 | 62.18% | 63.45% | 0.518 | 89.60% | 62.50% |
+
+The lower stress accuracy is intentional: it exposes concrete robustness gaps hidden by the original direct-query suite.
+
+Historical results on the original 40 seed cases:
 
 | Strategy | Top-1 | Top-3 | MRR | Mean search latency |
 | --- | ---: | ---: | ---: | ---: |
@@ -83,6 +95,7 @@ The web session keeps short-lived context for follow-up questions.
 | Use another pack | `python src/main.py --knowledge path/to/pack.zip "save battery"` |
 | Filter language | `python src/main.py --language es "necesito ayuda"` |
 | Evaluate retrieval | `python src/main.py --eval` |
+| Rebuild stress dataset | `python tools/build_eval_dataset.py` |
 | Custom eval JSON | `python src/main.py --eval --eval-output eval/results.json` |
 | Choose retrieval | `python src/main.py --strategy bm25 "purify water"` |
 | Build C core | `python tools/build_c_core.py` |
