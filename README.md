@@ -66,6 +66,7 @@ python src/main.py "how do I purify water"
 python src/main.py --format json --top-k 5 "how do I purify water"
 python src/main.py --format sources "how do I purify water"
 python src/main.py --query-file field-questions.txt --query-output answers.jsonl
+python src/main.py --fail-on-refusal "how do I purify water"
 
 # Use --knowledge when adding an external knowledge pack beyond this repo's built-in knowledge.
 python src/main.py --knowledge path/to/pack.zip "find north without a compass"
@@ -106,6 +107,7 @@ The web session keeps short-lived context for follow-up questions.
 | JSON query output | `python src/main.py --format json --top-k 5 "stop bleeding"` |
 | Ranked source list | `python src/main.py --format sources "stop bleeding"` |
 | Batch queries to JSONL | `python src/main.py --query-file questions.txt --query-output answers.jsonl` |
+| Fail safely in scripts | `python src/main.py --fail-on-refusal "stop bleeding"` (exit 2 on refusal) |
 | Use another pack | `python src/main.py --knowledge path/to/pack.zip "save battery"` |
 | Filter language | `python src/main.py --language es "necesito ayuda"` |
 | Evaluate retrieval | `python src/main.py --eval` |

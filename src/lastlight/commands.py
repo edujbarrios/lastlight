@@ -66,6 +66,7 @@ class QueryCommand:
         synthesize: bool = False,
         output_format: str = "text",
         top_k: int = 3,
+        fail_on_refusal: bool = False,
     ) -> None:
         self.app = app
         self.query = query
@@ -73,14 +74,17 @@ class QueryCommand:
         self.synthesize = synthesize
         self.output_format = output_format
         self.top_k = max(top_k, 1)
+        self.fail_on_refusal = fail_on_refusal
 
     def execute(self) -> int:
         if self.output_format == "json":
-            print(self._json_output())
-            return 0
+            output, accepted = self._json_output()
+            print(output)
+            return 0 if accepted or not self.fail_on_refusal else 2
         if self.output_format == "sources":
-            print(self._sources_output())
-            return 0
+            output, accepted = self._sources_output()
+            print(output)
+            return 0 if accepted or not self.fail_on_refusal else 2
 
         print(STARTUP_WARNING)
         print()
@@ -94,9 +98,14 @@ class QueryCommand:
                 print(line, flush=True)
         else:
             print(answer)
+        if self.fail_on_refusal:
+            accepted = first_acceptable_result(
+                self.app.search(self.query, top_k=self.top_k)
+            )
+            return 0 if accepted else 2
         return 0
 
-    def _json_output(self) -> str:
+    def _json_output(self) -> tuple[str, bool]:
         results = self.app.search(self.query, top_k=self.top_k)
         accepted = first_acceptable_result(results)
         payload: dict[str, object] = {
@@ -111,12 +120,16 @@ class QueryCommand:
         }
         if accepted is None:
             payload["message"] = LOW_CONFIDENCE_RESPONSE
-        return json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True)
+        return (
+            json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True),
+            accepted is not None,
+        )
 
-    def _sources_output(self) -> str:
+    def _sources_output(self) -> tuple[str, bool]:
         results = self.app.search(self.query, top_k=self.top_k)
+        accepted = first_acceptable_result(results)
         if not results:
-            return LOW_CONFIDENCE_RESPONSE
+            return LOW_CONFIDENCE_RESPONSE, False
 
         lines = [f"Sources for: {self.query}"]
         for index, result in enumerate(results, start=1):
@@ -126,7 +139,7 @@ class QueryCommand:
                 f"{index}. [{result.confidence}] {document.title} | "
                 f"{document.path} | score={result.score:.3f} | tags={tags}"
             )
-        return "\n".join(lines)
+        return "\n".join(lines), accepted is not None
 
 
 class BatchQueryCommand:
