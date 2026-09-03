@@ -116,6 +116,7 @@ The web session keeps short-lived context for follow-up questions.
 | Export only if valid | `python src/main.py --export-pack dist/lastlight-core.zip --require-valid-pack` |
 | Import PDF | `python src/main.py --import-pdf guide.pdf --import-output knowledge/en/imported/guide.md --language en` |
 | Build audit index | `python src/main.py --build-index data/lastlight.index.json` |
+| Verify knowledge integrity | `python src/main.py --verify-index data/lastlight.index.json` |
 | Device self-check | `python src/main.py --self-check` |
 | Local web UI | `python src/main.py --serve` |
 | Run tests | `python -m unittest discover -s tests` |

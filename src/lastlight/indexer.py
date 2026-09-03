@@ -12,6 +12,47 @@ from .tokenizer import tokenize
 INDEX_VERSION = 1
 
 
+def verify_index(
+    repository: KnowledgeRepository, index_path: Path | str
+) -> dict[str, object]:
+    """Compare current knowledge sources with a previously generated audit index."""
+    path = Path(index_path)
+    try:
+        stored = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        return {"ok": False, "error": str(error), "missing": [], "modified": [], "unexpected": []}
+
+    if stored.get("index_version") != INDEX_VERSION or not isinstance(stored.get("documents"), list):
+        return {
+            "ok": False,
+            "error": "unsupported or malformed index",
+            "missing": [],
+            "modified": [],
+            "unexpected": [],
+        }
+
+    expected = {
+        item.get("path"): item.get("source_sha256")
+        for item in stored["documents"]
+        if isinstance(item, dict) and isinstance(item.get("path"), str)
+    }
+    current = {
+        document.path: document.source_sha256
+        for document in repository.list_documents()
+    }
+    missing = sorted(set(expected) - set(current))
+    unexpected = sorted(set(current) - set(expected))
+    modified = sorted(
+        item for item in set(expected) & set(current) if expected[item] != current[item]
+    )
+    return {
+        "ok": not (missing or modified or unexpected),
+        "missing": missing,
+        "modified": modified,
+        "unexpected": unexpected,
+    }
+
+
 def build_index(repository: KnowledgeRepository) -> dict[str, object]:
     documents = repository.list_documents()
     entries: list[dict[str, object]] = []
