@@ -129,6 +129,63 @@ class QueryCommand:
         return "\n".join(lines)
 
 
+class BatchQueryCommand:
+    """Answer a newline-delimited query file without requiring network access."""
+
+    def __init__(
+        self,
+        app: LastLightApp,
+        input_path: Path | str,
+        output_path: Path | str | None = None,
+        top_k: int = 3,
+    ) -> None:
+        self.app = app
+        self.input_path = Path(input_path)
+        self.output_path = Path(output_path) if output_path else None
+        self.top_k = max(top_k, 1)
+
+    def execute(self) -> int:
+        try:
+            queries = [
+                line.strip()
+                for line in self.input_path.read_text(encoding="utf-8").splitlines()
+                if line.strip() and not line.lstrip().startswith("#")
+            ]
+        except OSError as error:
+            print(f"Batch query failed: {error}")
+            return 1
+
+        records = [self._record(query) for query in queries]
+        rendered = "\n".join(
+            json.dumps(record, ensure_ascii=False, sort_keys=True)
+            for record in records
+        )
+        if rendered:
+            rendered += "\n"
+
+        if self.output_path:
+            try:
+                self.output_path.parent.mkdir(parents=True, exist_ok=True)
+                self.output_path.write_text(rendered, encoding="utf-8")
+            except OSError as error:
+                print(f"Batch query failed: {error}")
+                return 1
+            print(f"Wrote {len(records)} answers: {self.output_path}")
+        else:
+            print(rendered, end="")
+        return 0
+
+    def _record(self, query: str) -> dict[str, object]:
+        results = self.app.search(query, top_k=self.top_k)
+        accepted = first_acceptable_result(results)
+        return {
+            "query": query,
+            "accepted": accepted is not None,
+            "answer": safe_answer(results),
+            "results": [result_to_dict(result) for result in results],
+        }
+
+
 class EvaluationCommand:
     def __init__(
         self, app: LastLightApp, output_path: Path | str = DEFAULT_EVAL_OUTPUT
