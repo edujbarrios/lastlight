@@ -6,6 +6,10 @@ LastLight is a tiny local RAG-style knowledge capsule. It searches Markdown know
 
 While much of current AI research focuses on general-purpose LLMs, disasters and infrastructure collapse expose a narrower and practical AI systems problem: people often need accurate, auditable information from a solid local knowledge base when compute, battery, and network access are constrained. LastLight explores that gap through a low-power RAG-inspired design for austere environments, prioritizing robust retrieval, source traceability, and refusal over unconstrained generation.
 
+## Inspiration
+
+The repository's author was inspired by [*This War of Mine*](https://www.11bitstudios.com/games/this-war-of-mine/) when creating LastLight: a post-apocalyptic world where Internet and energy restrictions shape whether and how people can access knowledge. LastLight translates that premise into a practical offline system; it is an independent project and is not affiliated with the game or its creators.
+
 ## Benchmark
 
 The current retrieval benchmark uses 238 deterministic cases from `data/eval.jsonl`. It covers baseline and scenario queries plus misspellings, terse prompts, colloquial language, regional Spanish, multi-intent emergencies, contradictory claims, adversarial instructions, and out-of-domain requests. `data/eval_core.jsonl` preserves the 40 curated seed cases and `tools/build_eval_dataset.py` reproducibly builds the stress suite.
