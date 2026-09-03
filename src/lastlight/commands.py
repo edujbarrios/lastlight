@@ -199,6 +199,54 @@ class BatchQueryCommand:
         }
 
 
+class FieldGuideCommand:
+    """Build a deterministic, human-readable guide from planned questions."""
+
+    def __init__(
+        self,
+        app: LastLightApp,
+        input_path: Path | str,
+        output_path: Path | str,
+        top_k: int = 3,
+    ) -> None:
+        self.app = app
+        self.input_path = Path(input_path)
+        self.output_path = Path(output_path)
+        self.top_k = max(top_k, 1)
+
+    def execute(self) -> int:
+        try:
+            queries = [
+                line.strip()
+                for line in self.input_path.read_text(encoding="utf-8").splitlines()
+                if line.strip() and not line.lstrip().startswith("#")
+            ]
+        except OSError as error:
+            print(f"Field guide failed: {error}")
+            return 1
+
+        sections = ["# LastLight Offline Field Guide", ""]
+        accepted_count = 0
+        for query in queries:
+            results = self.app.search(query, top_k=self.top_k)
+            accepted = first_acceptable_result(results)
+            accepted_count += accepted is not None
+            sections.extend([f"## {query}", "", safe_answer(results), ""])
+
+        try:
+            self.output_path.parent.mkdir(parents=True, exist_ok=True)
+            self.output_path.write_text("\n".join(sections), encoding="utf-8")
+        except OSError as error:
+            print(f"Field guide failed: {error}")
+            return 1
+
+        print(
+            f"Wrote field guide: {self.output_path} "
+            f"({accepted_count}/{len(queries)} questions answered)"
+        )
+        return 0 if accepted_count == len(queries) else 2
+
+
 class EvaluationCommand:
     def __init__(
         self, app: LastLightApp, output_path: Path | str = DEFAULT_EVAL_OUTPUT
