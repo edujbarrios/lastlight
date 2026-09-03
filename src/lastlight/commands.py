@@ -13,7 +13,7 @@ from .evaluation import (
     format_evaluation_report,
     write_evaluation_report,
 )
-from .indexer import write_index
+from .indexer import verify_index, write_index
 from .interfaces import KnowledgeRepository
 from .local_model import summarize_local_model, write_local_model
 from .pack_export import export_pack, sha256_file
@@ -222,6 +222,25 @@ class BuildIndexCommand:
         output = write_index(self.repository, self.output_path)
         print(f"Wrote offline index: {output}")
         return 0
+
+
+class VerifyIndexCommand:
+    def __init__(self, repository: KnowledgeRepository, index_path: Path | str) -> None:
+        self.repository = repository
+        self.index_path = index_path
+
+    def execute(self) -> int:
+        report = verify_index(self.repository, self.index_path)
+        if report.get("error"):
+            print(f"Index verification failed: {report['error']}")
+            return 1
+        if report["ok"]:
+            print("Index verified: all knowledge sources match.")
+            return 0
+        for label in ("missing", "modified", "unexpected"):
+            for path in report[label]:
+                print(f"{label.capitalize()}: {path}")
+        return 1
 
 
 class PackInfoCommand:

@@ -21,6 +21,7 @@ from .commands import (
     ServeCommand,
     SelfCheckCommand,
     ValidatePackCommand,
+    VerifyIndexCommand,
 )
 from .factory import ApplicationFactory
 from .repository import MarkdownKnowledgeRepository
@@ -76,6 +77,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--build-index",
         metavar="PATH",
         help="write an optional offline JSON index and exit",
+    )
+    parser.add_argument(
+        "--verify-index",
+        metavar="PATH",
+        help="verify knowledge files against an offline audit index and exit",
     )
     parser.add_argument(
         "--pack-info",
@@ -234,6 +240,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.build_index:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return BuildIndexCommand(repository, Path(args.build_index)).execute()
+    if args.verify_index:
+        repository = MarkdownKnowledgeRepository(args.knowledge)
+        return VerifyIndexCommand(repository, Path(args.verify_index)).execute()
 
     app = ApplicationFactory.create(
         knowledge_dir=args.knowledge,

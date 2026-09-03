@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 import helpers  # noqa: F401
-from lastlight.indexer import build_index, write_index
+from lastlight.indexer import build_index, verify_index, write_index
 from lastlight.repository import MarkdownKnowledgeRepository
 
 
@@ -64,6 +64,36 @@ class IndexerTests(unittest.TestCase):
 
         self.assertEqual(data["document_count"], 1)
         self.assertEqual(data["documents"][0]["title"], "Doc")
+
+    def test_verifies_unchanged_index_and_detects_modified_source(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "knowledge"
+            root.mkdir()
+            document = root / "water.md"
+            document.write_text("Boil water.", encoding="utf-8")
+            repository = MarkdownKnowledgeRepository(root)
+            index_path = Path(tmp) / "index.json"
+            write_index(repository, index_path)
+
+            self.assertTrue(verify_index(repository, index_path)["ok"])
+            document.write_text("Changed guidance.", encoding="utf-8")
+            report = verify_index(MarkdownKnowledgeRepository(root), index_path)
+
+        self.assertFalse(report["ok"])
+        self.assertEqual(len(report["modified"]), 1)
+        self.assertTrue(report["modified"][0].endswith("water.md"))
+
+    def test_rejects_malformed_index(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "knowledge"
+            root.mkdir()
+            index_path = Path(tmp) / "index.json"
+            index_path.write_text("not json", encoding="utf-8")
+
+            report = verify_index(MarkdownKnowledgeRepository(root), index_path)
+
+        self.assertFalse(report["ok"])
+        self.assertIn("error", report)
 
 
 if __name__ == "__main__":
