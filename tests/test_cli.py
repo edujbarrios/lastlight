@@ -138,6 +138,29 @@ class CliTests(unittest.TestCase):
         self.assertIn("Sources for: water", output.getvalue())
         self.assertIn("knowledge/en/water/purification.md", output.getvalue())
 
+    def test_query_file_writes_one_json_record_per_query(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            input_path = Path(tmp) / "queries.txt"
+            output_path = Path(tmp) / "answers.jsonl"
+            input_path.write_text("water\n# field notes\n\nbleeding\n", encoding="utf-8")
+            with patch.object(cli.ApplicationFactory, "create") as create:
+                app = create.return_value
+                app.search.return_value = []
+                with redirect_stdout(io.StringIO()):
+                    exit_code = cli.main([
+                        "--query-file", str(input_path),
+                        "--query-output", str(output_path),
+                        "--top-k", "2",
+                    ])
+
+            records = [json.loads(line) for line in output_path.read_text(encoding="utf-8").splitlines()]
+
+        self.assertEqual(exit_code, 0)
+        self.assertEqual([record["query"] for record in records], ["water", "bleeding"])
+        self.assertTrue(all(not record["accepted"] for record in records))
+        self.assertEqual(app.search.call_count, 2)
+        app.search.assert_any_call("water", top_k=2)
+
     def test_serve_creates_application_and_runs_server_command(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
             with patch.object(cli.ServeCommand, "execute", return_value=0) as execute:

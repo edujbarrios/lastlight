@@ -7,6 +7,7 @@ import argparse
 from pathlib import Path
 
 from .commands import (
+    BatchQueryCommand,
     BuildIndexCommand,
     BuildModelCommand,
     EvaluationCommand,
@@ -38,6 +39,16 @@ def build_parser() -> argparse.ArgumentParser:
         description="Offline intelligence under extreme constraints.",
     )
     parser.add_argument("query", nargs="*", help="single query to answer")
+    parser.add_argument(
+        "--query-file",
+        metavar="PATH",
+        help="answer newline-delimited queries as JSONL",
+    )
+    parser.add_argument(
+        "--query-output",
+        metavar="PATH",
+        help="write --query-file JSONL results to this path",
+    )
     parser.add_argument("--eval", action="store_true", help="run evaluation suite")
     parser.add_argument(
         "--eval-output",
@@ -239,6 +250,13 @@ def main(argv: list[str] | None = None) -> int:
             else EvaluationCommand(app)
         )
         return command.execute()
+    if args.query_file:
+        return BatchQueryCommand(
+            app,
+            args.query_file,
+            output_path=args.query_output,
+            top_k=args.top_k,
+        ).execute()
     if args.query:
         return QueryCommand(
             app,
