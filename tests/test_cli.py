@@ -112,6 +112,28 @@ class CliTests(unittest.TestCase):
         self.assertFalse(data["accepted"])
         self.assertEqual(data["results"], [])
 
+    def test_fail_on_refusal_returns_status_two_for_json(self) -> None:
+        with patch.object(cli.ApplicationFactory, "create") as create:
+            create.return_value.search.return_value = []
+            with redirect_stdout(io.StringIO()):
+                exit_code = cli.main([
+                    "--format", "json", "--fail-on-refusal", "unknown"
+                ])
+
+        self.assertEqual(exit_code, 2)
+
+    def test_fail_on_refusal_keeps_success_for_accepted_text_answer(self) -> None:
+        document = KnowledgeDocument(title="Water", path="water.md", body="Boil it.")
+        result = SearchResult(document, 2.0, "HIGH", "Boil it.")
+        with patch.object(cli.ApplicationFactory, "create") as create:
+            app = create.return_value
+            app.answer.return_value = "answer"
+            app.search.return_value = [result]
+            with redirect_stdout(io.StringIO()):
+                exit_code = cli.main(["--fail-on-refusal", "water"])
+
+        self.assertEqual(exit_code, 0)
+
     def test_query_sources_output_lists_ranked_sources(self) -> None:
         document = KnowledgeDocument(
             title="Water",

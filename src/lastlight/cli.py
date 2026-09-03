@@ -169,6 +169,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="number of ranked results to consider for single-query mode",
     )
     parser.add_argument(
+        "--fail-on-refusal",
+        action="store_true",
+        help="exit with status 2 when a single query has no acceptable answer",
+    )
+    parser.add_argument(
         "--synthesize",
         action="store_true",
         help="experimental citation-aware n-gram synthesis from retrieved passage",
@@ -274,5 +279,6 @@ def main(argv: list[str] | None = None) -> int:
             synthesize=args.synthesize,
             output_format=args.format,
             top_k=args.top_k,
+            fail_on_refusal=args.fail_on_refusal,
         ).execute()
     return InteractiveCommand(app).execute()
