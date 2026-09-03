@@ -12,6 +12,7 @@ from .commands import (
     BuildModelCommand,
     EvaluationCommand,
     ExportPackCommand,
+    FieldGuideCommand,
     ImportPdfCommand,
     InteractiveCommand,
     ListKnowledgeCommand,
@@ -49,6 +50,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--query-output",
         metavar="PATH",
         help="write --query-file JSONL results to this path",
+    )
+    parser.add_argument(
+        "--field-guide",
+        metavar="PATH",
+        help="write --query-file answers as a human-readable Markdown guide",
     )
     parser.add_argument("--eval", action="store_true", help="run evaluation suite")
     parser.add_argument(
@@ -265,6 +271,13 @@ def main(argv: list[str] | None = None) -> int:
         )
         return command.execute()
     if args.query_file:
+        if args.field_guide:
+            return FieldGuideCommand(
+                app,
+                args.query_file,
+                args.field_guide,
+                top_k=args.top_k,
+            ).execute()
         return BatchQueryCommand(
             app,
             args.query_file,

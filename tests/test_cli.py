@@ -183,6 +183,45 @@ class CliTests(unittest.TestCase):
         self.assertEqual(app.search.call_count, 2)
         app.search.assert_any_call("water", top_k=2)
 
+    def test_field_guide_writes_readable_markdown(self) -> None:
+        document = KnowledgeDocument(
+            title="Safe Water", path="water.md", body="Boil water."
+        )
+        result = SearchResult(document, 2.0, "HIGH", "Boil water.")
+        with tempfile.TemporaryDirectory() as tmp:
+            input_path = Path(tmp) / "questions.txt"
+            guide_path = Path(tmp) / "field-guide.md"
+            input_path.write_text("safe water\n", encoding="utf-8")
+            with patch.object(cli.ApplicationFactory, "create") as create:
+                create.return_value.search.return_value = [result]
+                with redirect_stdout(io.StringIO()):
+                    exit_code = cli.main([
+                        "--query-file", str(input_path),
+                        "--field-guide", str(guide_path),
+                    ])
+            guide = guide_path.read_text(encoding="utf-8")
+
+        self.assertEqual(exit_code, 0)
+        self.assertIn("# LastLight Offline Field Guide", guide)
+        self.assertIn("## safe water", guide)
+        self.assertIn("Boil water.", guide)
+        self.assertIn("Source: water.md", guide)
+
+    def test_field_guide_returns_two_when_any_question_is_refused(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            input_path = Path(tmp) / "questions.txt"
+            guide_path = Path(tmp) / "field-guide.md"
+            input_path.write_text("unknown\n", encoding="utf-8")
+            with patch.object(cli.ApplicationFactory, "create") as create:
+                create.return_value.search.return_value = []
+                with redirect_stdout(io.StringIO()):
+                    exit_code = cli.main([
+                        "--query-file", str(input_path),
+                        "--field-guide", str(guide_path),
+                    ])
+
+        self.assertEqual(exit_code, 2)
+
     def test_serve_creates_application_and_runs_server_command(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
             with patch.object(cli.ServeCommand, "execute", return_value=0) as execute:
