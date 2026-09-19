@@ -224,7 +224,7 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
 
 
 def classify_query_risk(text: str) -> str:
-    normalized = " ".join(tokenize(text))
+    normalized = " ".join(tokenize(text, keep_stopwords=True))
     if any(term in normalized for term in CRITICAL_RISK_TERMS):
         return "critical"
     if any(term in normalized for term in HIGH_RISK_TERMS):
