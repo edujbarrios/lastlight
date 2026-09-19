@@ -29,9 +29,13 @@ def safe_answer(results: list[SearchResult]) -> str:
 def format_result(result: SearchResult) -> str:
     doc = result.document
     tags = ", ".join(doc.tags) if doc.tags else "none"
+    pack_line = ""
+    if doc.pack_path:
+        pack_line = f"Pack: {doc.pack_name} {doc.pack_version}\n"
     return (
         f"[{result.confidence} CONFIDENCE]\n\n"
         f"Title: {doc.title}\n"
+        f"{pack_line}"
         f"Source: {doc.path}\n"
         f"Language: {doc.language}\n"
         f"Tags: {tags}\n\n"
@@ -45,6 +49,12 @@ def result_to_dict(result: SearchResult) -> dict[str, object]:
     return {
         "title": doc.title,
         "source": doc.path,
+        "pack": {
+            "name": doc.pack_name,
+            "version": doc.pack_version,
+            "source": doc.pack_source,
+            "path": doc.pack_path,
+        },
         "language": doc.language,
         "tags": list(doc.tags),
         "priority": doc.priority,
