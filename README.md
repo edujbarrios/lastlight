@@ -4,7 +4,7 @@
 
 LastLight is a tiny local RAG-style knowledge capsule. It searches Markdown knowledge packs, returns sourced passages, and refuses to answer when confidence is too low. It uses only the Python standard library: no cloud API, embeddings, vector database, telemetry, package install, browser, or background service.
 
-While much of current AI research focuses on general-purpose LLMs, disasters and infrastructure collapse expose a narrower and practical AI systems problem: people often need accurate, auditable information from a solid local knowledge base when compute, battery, and network access are constrained. LastLight explores that gap through a low-power RAG-inspired design for austere environments, prioritizing robust retrieval, source traceability, and refusal over unconstrained generation.
+While much of current AI research focuses on general-purpose LLMs, disasters and infrastructure collapse expose a narrower and practical AI systems problem: people often need accurate, auditable information from a solid local knowledge base when compute, battery, and network access are constrained. LastLight explores that gap through a low-power RAG-inspired design for austere environments, prioritizing robust retrieval, source traceability, refusal, and resource-aware execution over unconstrained generation.
 
 ## Inspiration
 
@@ -49,7 +49,27 @@ Process-level timing on Windows 11 / Python 3.12.7 with 7 iterations and a 15 W 
 | BM25 evaluation | 1406.5 ms | 5.8606 mWh |
 | Unit tests | 743.1 ms | 3.0961 mWh |
 
-Full results are stored in [eval/results.json](eval/results.json), [eval/results-bm25.json](eval/results-bm25.json), and [eval/benchmark.md](eval/benchmark.md).
+Full retrieval results are stored in [eval/results.json](eval/results.json), [eval/results-bm25.json](eval/results-bm25.json), and [eval/benchmark.md](eval/benchmark.md).
+
+### Measured energy benchmarks
+
+`tools/benchmark.py` now distinguishes real hardware measurements from estimates. In `auto` mode it uses an explicit cumulative counter when supplied, otherwise top-level Linux RAPL package counters when available, and only then falls back to the wattage estimate.
+
+```bash
+# Auto-detect RAPL, otherwise use the labelled estimate fallback.
+python tools/benchmark.py --iterations 7
+
+# Require a real Linux RAPL package counter.
+python tools/benchmark.py --iterations 7 --energy-source rapl
+
+# Use an external/board-specific cumulative energy counter.
+python tools/benchmark.py --iterations 7 \
+  --energy-source counter \
+  --energy-counter /path/to/cumulative_energy \
+  --energy-unit mwh
+```
+
+RAPL is a real CPU/package energy measurement, not necessarily whole-device wall power. For end-to-end energy/query claims on Raspberry Pi-class hardware, prefer a whole-device meter whose cumulative reading can be exposed to the benchmark. See [Performance and Energy Measurement](docs/performance.md).
 
 ## Clone
 
@@ -69,9 +89,22 @@ python src/main.py --query-file field-questions.txt --query-output answers.jsonl
 python src/main.py --query-file field-questions.txt --field-guide field-guide.md
 python src/main.py --fail-on-refusal "how do I purify water"
 
+# Resource-adaptive retrieval remains opt-in.
+python src/main.py --strategy adaptive --mode balanced "how do I purify water"
+python src/main.py --strategy adaptive --mode survival --energy-budget-mwh 0.4 "how do I purify water"
+python src/main.py --strategy adaptive --mode survival --plan "how do I purify water"
+
 # Use --knowledge when adding an external knowledge pack beyond this repo's built-in knowledge.
 python src/main.py --knowledge path/to/pack.zip "find north without a compass"
 ```
+
+## Adaptive retrieval
+
+`--strategy adaptive` chooses between lexical, BM25, and the optional C-backed lexical path using a deterministic policy. The planner considers query risk, `survival` / `balanced` / `accuracy` mode, explicit energy and memory budgets, low-resource ARM/Termux detection, Linux battery percentage when available, and whether the native C core is loaded.
+
+Critical-risk queries keep a safety-first lexical policy even in `accuracy` mode. Tight resource budgets, low battery, or low-resource targets select the lower-cost path and cap `top-k`. Use `--plan` to print the complete strategy decision and reason as JSON. The existing default remains fixed `lexical` retrieval for backwards compatibility.
+
+See [Adaptive Retrieval](docs/adaptive_retrieval.md) for the decision order and thresholds.
 
 ## Frontend
 
@@ -91,11 +124,13 @@ The web session keeps short-lived context for follow-up questions.
 
 - Offline terminal search over mirrored English and Spanish knowledge packs, or custom packs
 - Sourced answers with confidence, language, tags, and source paths
-- Lexical, BM25, and optional C-backed lexical retrieval
+- Lexical, BM25, optional C-backed lexical, and resource-adaptive retrieval
+- Auditable survival/balanced/accuracy policies with explicit energy and memory budgets
 - Lightweight session memory for follow-up questions in interactive and web modes
 - Deterministic triage checks after accepted terminal answers
 - Directory and deterministic `.zip` knowledge packs
 - Pack validation, export, metadata, and SHA-256 audit indexes
+- Benchmark support for real Linux RAPL or external cumulative energy counters, with labelled estimate fallback
 - Optional minimal dark local web UI
 - Optional experimental n-gram synthesis and local model packs
 
@@ -115,7 +150,12 @@ The web session keeps short-lived context for follow-up questions.
 | Evaluate retrieval | `python src/main.py --eval` |
 | Rebuild stress dataset | `python tools/build_eval_dataset.py` |
 | Custom eval JSON | `python src/main.py --eval --eval-output eval/results.json` |
-| Choose retrieval | `python src/main.py --strategy bm25 "purify water"` |
+| Choose fixed retrieval | `python src/main.py --strategy bm25 "purify water"` |
+| Adaptive retrieval | `python src/main.py --strategy adaptive --mode balanced "purify water"` |
+| Survival budget | `python src/main.py --strategy adaptive --mode survival --energy-budget-mwh 0.4 "purify water"` |
+| Inspect retrieval plan | `python src/main.py --strategy adaptive --plan "purify water"` |
+| Benchmark energy | `python tools/benchmark.py --iterations 7` |
+| Require RAPL measurement | `python tools/benchmark.py --energy-source rapl` |
 | Build C core | `python tools/build_c_core.py` |
 | Inspect pack | `python src/main.py --pack-info` |
 | List knowledge | `python src/main.py --list-knowledge` |
@@ -151,8 +191,9 @@ Knowledge packs can include `lastlight-pack.json` for reproducible metadata. See
 ## Docs
 
 - [Architecture](docs/architecture.md)
+- [Adaptive Retrieval](docs/adaptive_retrieval.md)
 - [Roadmap](docs/roadmap.md)
-- [Performance](docs/performance.md)
+- [Performance and Energy Measurement](docs/performance.md)
 - [Platforms](docs/platforms.md)
 - [Native C core](docs/native_core.md)
 - [Local model packs](docs/local_models.md)
