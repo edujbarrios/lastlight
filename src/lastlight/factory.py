@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Sequence
 
 from .adaptive import AdaptiveRetrievalConfig, AdaptiveRetrievalStrategy
 from .app import LastLightApp
-from .repository import MarkdownKnowledgeRepository
+from .knowledge_sources import build_knowledge_repository
 from .retrieval import (
     BM25RetrievalStrategy,
     CBackedLexicalRetrievalStrategy,
@@ -17,14 +18,14 @@ from .retrieval import (
 class ApplicationFactory:
     @staticmethod
     def create(
-        knowledge_dir: Path | str | None = None,
+        knowledge_dir: Path | str | Sequence[Path | str] | None = None,
         strategy: str = "lexical",
         language: str | None = None,
         mode: str = "balanced",
         energy_budget_mwh: float | None = None,
         memory_budget_mb: int | None = None,
     ) -> LastLightApp:
-        repository = MarkdownKnowledgeRepository(knowledge_dir)
+        repository = build_knowledge_repository(knowledge_dir)
         if strategy == "bm25":
             retrieval = BM25RetrievalStrategy()
         elif strategy == "c-lexical":
