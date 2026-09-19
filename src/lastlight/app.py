@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from .domain import SearchQuery, SearchResult
 from .interfaces import KnowledgeRepository, RetrievalStrategy
+from .language import resolve_retrieval_language
 from .safety import safe_answer
 from .synthesis import synthesize_answer
 from .triage import append_follow_up_questions, first_acceptable_result
@@ -22,11 +23,16 @@ class LastLightApp:
 
     def search(self, text: str, top_k: int = 3) -> list[SearchResult]:
         documents = self.repository.list_documents()
-        if self.language:
+        effective_language = resolve_retrieval_language(
+            text,
+            documents,
+            explicit_language=self.language,
+        )
+        if effective_language:
             documents = [
                 document
                 for document in documents
-                if document.language.casefold() == self.language
+                if document.language.casefold() == effective_language
             ]
         return self.retrieval.search(SearchQuery(text=text, top_k=top_k), documents)
 
