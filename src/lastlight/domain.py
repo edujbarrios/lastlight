@@ -27,6 +27,10 @@ class KnowledgeDocument:
     tags: tuple[str, ...] = field(default_factory=tuple)
     priority: str = "normal"
     metadata: dict[str, object] = field(default_factory=dict)
+    pack_name: str = "knowledge"
+    pack_version: str = "unknown"
+    pack_source: str = "local"
+    pack_path: str = ""
 
 
 @dataclass(frozen=True)
