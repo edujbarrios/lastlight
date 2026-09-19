@@ -26,6 +26,7 @@ from .commands import (
     VerifyIndexCommand,
 )
 from .factory import ApplicationFactory
+from .knowledge_sources import build_knowledge_repository
 from .repository import MarkdownKnowledgeRepository
 from .system_commands import DeviceBenchmarkCommand, VerifyProvenanceCommand
 
@@ -42,6 +43,26 @@ def positive_float(value: str) -> float:
     if parsed <= 0:
         raise argparse.ArgumentTypeError("must be greater than 0")
     return parsed
+
+
+def _single_knowledge_source(
+    parser: argparse.ArgumentParser,
+    sources: list[str] | None,
+    operation: str,
+) -> str | None:
+    if not sources:
+        return None
+    if len(sources) > 1:
+        parser.error(f"{operation} accepts exactly one --knowledge source")
+    return sources[0]
+
+
+def _application_knowledge_arg(sources: list[str] | None) -> str | list[str] | None:
+    if not sources:
+        return None
+    if len(sources) == 1:
+        return sources[0]
+    return sources
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -146,8 +167,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--knowledge",
+        action="append",
         default=None,
-        help="knowledge directory or .zip knowledge pack",
+        metavar="PATH",
+        help="knowledge directory or .zip pack; repeat to mount multiple packs",
     )
     parser.add_argument(
         "--language",
@@ -305,8 +328,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.benchmark:
+        source = _single_knowledge_source(parser, args.knowledge, "--benchmark")
         return DeviceBenchmarkCommand(
-            args.knowledge,
+            source,
             energy_source=args.benchmark_energy_source,
             energy_counter=args.benchmark_energy_counter,
             energy_unit=args.benchmark_energy_unit,
@@ -315,26 +339,31 @@ def main(argv: list[str] | None = None) -> int:
             as_json=args.benchmark_json,
         ).execute()
     if args.self_check:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        source = _single_knowledge_source(parser, args.knowledge, "--self-check")
+        repository = MarkdownKnowledgeRepository(source)
         return SelfCheckCommand(repository).execute()
     if args.pack_info:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        source = _single_knowledge_source(parser, args.knowledge, "--pack-info")
+        repository = MarkdownKnowledgeRepository(source)
         return PackInfoCommand(repository).execute()
     if args.list_knowledge:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        repository = build_knowledge_repository(args.knowledge)
         return ListKnowledgeCommand(repository, language=args.language).execute()
     if args.validate_pack:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        source = _single_knowledge_source(parser, args.knowledge, "--validate-pack")
+        repository = MarkdownKnowledgeRepository(source)
         return ValidatePackCommand(repository).execute()
     if args.verify_provenance:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        source = _single_knowledge_source(parser, args.knowledge, "--verify-provenance")
+        repository = MarkdownKnowledgeRepository(source)
         return VerifyProvenanceCommand(
             repository,
             stale_after_days=args.stale_after_days,
             as_json=args.provenance_json,
         ).execute()
     if args.export_pack:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        source = _single_knowledge_source(parser, args.knowledge, "--export-pack")
+        repository = MarkdownKnowledgeRepository(source)
         return ExportPackCommand(
             repository,
             Path(args.export_pack),
@@ -354,19 +383,22 @@ def main(argv: list[str] | None = None) -> int:
     if args.model_info:
         return ModelInfoCommand(Path(args.model_info)).execute()
     if args.build_model:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        source = _single_knowledge_source(parser, args.knowledge, "--build-model")
+        repository = MarkdownKnowledgeRepository(source)
         return BuildModelCommand(
             repository, Path(args.build_model), order=args.model_order
         ).execute()
     if args.build_index:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        source = _single_knowledge_source(parser, args.knowledge, "--build-index")
+        repository = MarkdownKnowledgeRepository(source)
         return BuildIndexCommand(repository, Path(args.build_index)).execute()
     if args.verify_index:
-        repository = MarkdownKnowledgeRepository(args.knowledge)
+        source = _single_knowledge_source(parser, args.knowledge, "--verify-index")
+        repository = MarkdownKnowledgeRepository(source)
         return VerifyIndexCommand(repository, Path(args.verify_index)).execute()
 
     factory_kwargs: dict[str, object] = {
-        "knowledge_dir": args.knowledge,
+        "knowledge_dir": _application_knowledge_arg(args.knowledge),
         "strategy": args.strategy,
         "language": args.language,
     }
