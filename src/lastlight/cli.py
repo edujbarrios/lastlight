@@ -27,6 +27,7 @@ from .commands import (
 )
 from .factory import ApplicationFactory
 from .repository import MarkdownKnowledgeRepository
+from .system_commands import DeviceBenchmarkCommand, VerifyProvenanceCommand
 
 
 def positive_int(value: str) -> int:
@@ -70,6 +71,47 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         metavar="PATH",
         help="write evaluation JSON to this path",
+    )
+    parser.add_argument(
+        "--benchmark",
+        action="store_true",
+        help="run the integrated device/safety/energy benchmark and exit",
+    )
+    parser.add_argument(
+        "--benchmark-json",
+        action="store_true",
+        help="emit --benchmark output as machine-readable JSON",
+    )
+    parser.add_argument(
+        "--benchmark-max-cases",
+        type=positive_int,
+        default=None,
+        metavar="N",
+        help="limit benchmark evaluation cases for a quicker smoke run",
+    )
+    parser.add_argument(
+        "--benchmark-energy-source",
+        choices=("auto", "rapl", "counter", "estimate"),
+        default="auto",
+        help="energy source for --benchmark",
+    )
+    parser.add_argument(
+        "--benchmark-energy-counter",
+        metavar="PATH",
+        help="cumulative hardware energy counter file for --benchmark",
+    )
+    parser.add_argument(
+        "--benchmark-energy-unit",
+        choices=("uj", "mj", "j", "uwh", "mwh", "wh"),
+        default="mwh",
+        help="unit stored by --benchmark-energy-counter",
+    )
+    parser.add_argument(
+        "--benchmark-watts",
+        type=positive_float,
+        default=15.0,
+        metavar="WATTS",
+        help="power assumption used only when benchmark energy is estimated",
     )
     parser.add_argument(
         "--strategy",
@@ -136,6 +178,23 @@ def build_parser() -> argparse.ArgumentParser:
         "--validate-pack",
         action="store_true",
         help="validate a knowledge pack for community publishing and exit",
+    )
+    parser.add_argument(
+        "--verify-provenance",
+        action="store_true",
+        help="verify pack publisher, freshness, provenance, and fingerprint",
+    )
+    parser.add_argument(
+        "--provenance-json",
+        action="store_true",
+        help="emit --verify-provenance output as JSON",
+    )
+    parser.add_argument(
+        "--stale-after-days",
+        type=positive_int,
+        default=365,
+        metavar="DAYS",
+        help="age threshold that triggers a provenance freshness warning",
     )
     parser.add_argument(
         "--export-pack",
@@ -245,6 +304,16 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
+    if args.benchmark:
+        return DeviceBenchmarkCommand(
+            args.knowledge,
+            energy_source=args.benchmark_energy_source,
+            energy_counter=args.benchmark_energy_counter,
+            energy_unit=args.benchmark_energy_unit,
+            watts=args.benchmark_watts,
+            max_cases=args.benchmark_max_cases,
+            as_json=args.benchmark_json,
+        ).execute()
     if args.self_check:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return SelfCheckCommand(repository).execute()
@@ -257,6 +326,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.validate_pack:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return ValidatePackCommand(repository).execute()
+    if args.verify_provenance:
+        repository = MarkdownKnowledgeRepository(args.knowledge)
+        return VerifyProvenanceCommand(
+            repository,
+            stale_after_days=args.stale_after_days,
+            as_json=args.provenance_json,
+        ).execute()
     if args.export_pack:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return ExportPackCommand(
