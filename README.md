@@ -107,9 +107,18 @@ python src/main.py --knowledge path/to/pack.zip --validate-pack
 python src/main.py --knowledge path/to/pack.zip --verify-provenance
 python src/main.py --knowledge path/to/pack.zip --verify-provenance --provenance-json
 
-# Use an external knowledge pack after verification.
-python src/main.py --knowledge path/to/pack.zip "find north without a compass"
+# Mount one pack.
+python src/main.py --knowledge packs/water-es.zip "find safe water guidance"
+
+# Or mount several independent packs at the same time.
+python src/main.py \
+  --knowledge packs/water-es.zip \
+  --knowledge packs/first-aid-es.zip \
+  --knowledge packs/blackout-es.zip \
+  "necesito agua segura y primeros auxilios"
 ```
+
+`--knowledge` is repeatable. LastLight can use **one or multiple packs at once** without merging the ZIP files: their documents form one searchable corpus while each result keeps the pack name, version, source, and local pack path that produced it.
 
 ## Adaptive retrieval
 
@@ -129,21 +138,32 @@ This contract is intentionally registry-neutral: packs can be distributed by USB
 
 ## Frontend
 
-Start the optional local web UI. It uses a pure black, low-brightness theme, opens with a short calm-and-safety checklist, and shows only the answer passage:
+Start the optional local web UI. It uses a low-brightness dark theme, opens with a short calm-and-safety checklist, shows the currently mounted packs, and attributes accepted passages back to their pack, version, source document, and confidence.
 
 ```bash
+# Built-in knowledge.
 python src/main.py --serve
+
+# One downloaded pack.
+python src/main.py --knowledge packs/water-es.zip --serve
+
+# Several downloaded packs in the same local UI.
+python src/main.py \
+  --knowledge packs/water-es.zip \
+  --knowledge packs/first-aid-es.zip \
+  --knowledge packs/blackout-es.zip \
+  --serve
 ```
 
-Open `http://127.0.0.1:8765`.
+Open `http://127.0.0.1:8765`. The web session keeps short-lived context for follow-up questions, and the pack strip makes it explicit which offline knowledge set is currently mounted.
 
-The web session keeps short-lived context for follow-up questions.
-
-<img src="docs/screenshots/lastlight-web.png" alt="LastLight web UI" width="720">
+<img src="docs/screenshots/lastlight-web.webp" alt="LastLight local web UI with three mounted knowledge packs and pack-level answer provenance" width="720">
 
 ## Features
 
 - Offline terminal search over mirrored English and Spanish knowledge packs, or custom packs
+- Mount one or multiple independent directory/ZIP knowledge packs in the same query, interactive, evaluation, or web session
+- Per-result pack attribution with pack name, version, source, and local path
 - Sourced answers with confidence, language, tags, and source paths
 - Lexical, BM25, optional C-backed lexical, and resource-adaptive retrieval
 - Auditable survival/balanced/accuracy policies with explicit energy and memory budgets
@@ -154,7 +174,7 @@ The web session keeps short-lived context for follow-up questions.
 - Pack validation, export, metadata, SHA-256 audit indexes, provenance and freshness checks
 - Registry-neutral pack fingerprints suitable for offline distribution catalogs
 - Benchmark support for real Linux RAPL or external cumulative energy counters, with labelled estimate fallback
-- Optional minimal dark local web UI
+- Optional minimal dark local web UI with mounted-pack status and answer provenance
 - Optional experimental n-gram synthesis and local model packs
 
 ## Commands
@@ -168,7 +188,8 @@ The web session keeps short-lived context for follow-up questions.
 | Batch queries to JSONL | `python src/main.py --query-file questions.txt --query-output answers.jsonl` |
 | Build an offline field guide | `python src/main.py --query-file questions.txt --field-guide field-guide.md` |
 | Fail safely in scripts | `python src/main.py --fail-on-refusal "stop bleeding"` (exit 2 on refusal) |
-| Use another pack | `python src/main.py --knowledge path/to/pack.zip "save battery"` |
+| Use one pack | `python src/main.py --knowledge water.zip "save battery"` |
+| Use multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "safe water and first aid"` |
 | Filter language | `python src/main.py --language es "necesito ayuda"` |
 | Evaluate retrieval | `python src/main.py --eval` |
 | Integrated device benchmark | `python src/main.py --benchmark` |
@@ -194,6 +215,7 @@ The web session keeps short-lived context for follow-up questions.
 | Verify knowledge integrity | `python src/main.py --verify-index data/lastlight.index.json` |
 | Device self-check | `python src/main.py --self-check` |
 | Local web UI | `python src/main.py --serve` |
+| Multi-pack web UI | `python src/main.py --knowledge water.zip --knowledge first-aid.zip --serve` |
 | Run tests | `python -m unittest discover -s tests` |
 
 ## Knowledge
@@ -213,7 +235,7 @@ priority: high
 If water may be contaminated, boil it...
 ```
 
-Knowledge packs can include `lastlight-pack.json` for reproducible metadata and provenance. See [Knowledge Packs](docs/knowledge_packs.md) and [Knowledge Pack Provenance](docs/pack_provenance.md).
+Knowledge packs can include `lastlight-pack.json` for reproducible metadata and provenance. Packs remain independent artifacts: verify them one at a time, then repeat `--knowledge` to mount any combination in LastLight. See [Knowledge Packs](docs/knowledge_packs.md) and [Knowledge Pack Provenance](docs/pack_provenance.md).
 
 ## Docs
 
