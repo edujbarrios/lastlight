@@ -53,16 +53,11 @@ Full retrieval results are stored in [eval/results.json](eval/results.json), [ev
 
 ### Measured energy benchmarks
 
-`tools/benchmark.py` now distinguishes real hardware measurements from estimates. In `auto` mode it uses an explicit cumulative counter when supplied, otherwise top-level Linux RAPL package counters when available, and only then falls back to the wattage estimate.
+`tools/benchmark.py` distinguishes real hardware measurements from estimates. In `auto` mode it uses an explicit cumulative counter when supplied, otherwise top-level Linux RAPL package counters when available, and only then falls back to the wattage estimate.
 
 ```bash
-# Auto-detect RAPL, otherwise use the labelled estimate fallback.
 python tools/benchmark.py --iterations 7
-
-# Require a real Linux RAPL package counter.
 python tools/benchmark.py --iterations 7 --energy-source rapl
-
-# Use an external/board-specific cumulative energy counter.
 python tools/benchmark.py --iterations 7 \
   --energy-source counter \
   --energy-counter /path/to/cumulative_energy \
@@ -70,6 +65,19 @@ python tools/benchmark.py --iterations 7 \
 ```
 
 RAPL is a real CPU/package energy measurement, not necessarily whole-device wall power. For end-to-end energy/query claims on Raspberry Pi-class hardware, prefer a whole-device meter whose cumulative reading can be exposed to the benchmark. See [Performance and Energy Measurement](docs/performance.md).
+
+### Integrated device benchmark
+
+Run one safety-first system report across lexical, BM25, C-backed lexical, and adaptive retrieval:
+
+```bash
+python src/main.py --benchmark
+python src/main.py --benchmark --benchmark-json
+python src/main.py --benchmark --benchmark-energy-source rapl
+python src/main.py --benchmark --benchmark-max-cases 40
+```
+
+The report includes device/corpus information, Top-1 and Top-k accuracy, answer precision, refusal recall, p95 latency, peak Python-traced memory, measured or estimated energy/query, and an auditable strategy recommendation. See [Device Benchmark](docs/device_benchmark.md).
 
 ## Clone
 
@@ -94,7 +102,12 @@ python src/main.py --strategy adaptive --mode balanced "how do I purify water"
 python src/main.py --strategy adaptive --mode survival --energy-budget-mwh 0.4 "how do I purify water"
 python src/main.py --strategy adaptive --mode survival --plan "how do I purify water"
 
-# Use --knowledge when adding an external knowledge pack beyond this repo's built-in knowledge.
+# Verify a downloaded or locally built knowledge pack before using it.
+python src/main.py --knowledge path/to/pack.zip --validate-pack
+python src/main.py --knowledge path/to/pack.zip --verify-provenance
+python src/main.py --knowledge path/to/pack.zip --verify-provenance --provenance-json
+
+# Use an external knowledge pack after verification.
 python src/main.py --knowledge path/to/pack.zip "find north without a compass"
 ```
 
@@ -105,6 +118,14 @@ python src/main.py --knowledge path/to/pack.zip "find north without a compass"
 Critical-risk queries keep a safety-first lexical policy even in `accuracy` mode. Tight resource budgets, low battery, or low-resource targets select the lower-cost path and cap `top-k`. Use `--plan` to print the complete strategy decision and reason as JSON. The existing default remains fixed `lexical` retrieval for backwards compatibility.
 
 See [Adaptive Retrieval](docs/adaptive_retrieval.md) for the decision order and thresholds.
+
+## Auditable knowledge packs
+
+A `lastlight-pack.json` manifest can describe not only version, languages, license, and source, but also publisher, publication/expiry dates, a provenance chain, and an optional deterministic `fingerprint_sha256`.
+
+`--verify-provenance` independently calculates the pack fingerprint from the manifest and every Markdown document hash. It rejects expired packs, invalid dates, malformed provenance data, and declared fingerprints that no longer match the contents. Older-but-not-expired material can be flagged with a configurable freshness warning using `--stale-after-days`.
+
+This contract is intentionally registry-neutral: packs can be distributed by USB, SD card, GitHub Releases, a static catalog, or another service and still be verified locally without a network dependency. See [Knowledge Pack Provenance](docs/pack_provenance.md).
 
 ## Frontend
 
@@ -126,10 +147,12 @@ The web session keeps short-lived context for follow-up questions.
 - Sourced answers with confidence, language, tags, and source paths
 - Lexical, BM25, optional C-backed lexical, and resource-adaptive retrieval
 - Auditable survival/balanced/accuracy policies with explicit energy and memory budgets
+- Integrated safety/latency/memory/energy device benchmark with strategy recommendation
 - Lightweight session memory for follow-up questions in interactive and web modes
 - Deterministic triage checks after accepted terminal answers
 - Directory and deterministic `.zip` knowledge packs
-- Pack validation, export, metadata, and SHA-256 audit indexes
+- Pack validation, export, metadata, SHA-256 audit indexes, provenance and freshness checks
+- Registry-neutral pack fingerprints suitable for offline distribution catalogs
 - Benchmark support for real Linux RAPL or external cumulative energy counters, with labelled estimate fallback
 - Optional minimal dark local web UI
 - Optional experimental n-gram synthesis and local model packs
@@ -148,18 +171,22 @@ The web session keeps short-lived context for follow-up questions.
 | Use another pack | `python src/main.py --knowledge path/to/pack.zip "save battery"` |
 | Filter language | `python src/main.py --language es "necesito ayuda"` |
 | Evaluate retrieval | `python src/main.py --eval` |
+| Integrated device benchmark | `python src/main.py --benchmark` |
+| Benchmark JSON | `python src/main.py --benchmark --benchmark-json` |
+| Benchmark with RAPL | `python src/main.py --benchmark --benchmark-energy-source rapl` |
 | Rebuild stress dataset | `python tools/build_eval_dataset.py` |
 | Custom eval JSON | `python src/main.py --eval --eval-output eval/results.json` |
 | Choose fixed retrieval | `python src/main.py --strategy bm25 "purify water"` |
 | Adaptive retrieval | `python src/main.py --strategy adaptive --mode balanced "purify water"` |
 | Survival budget | `python src/main.py --strategy adaptive --mode survival --energy-budget-mwh 0.4 "purify water"` |
 | Inspect retrieval plan | `python src/main.py --strategy adaptive --plan "purify water"` |
-| Benchmark energy | `python tools/benchmark.py --iterations 7` |
-| Require RAPL measurement | `python tools/benchmark.py --energy-source rapl` |
+| Benchmark process energy | `python tools/benchmark.py --iterations 7` |
 | Build C core | `python tools/build_c_core.py` |
 | Inspect pack | `python src/main.py --pack-info` |
 | List knowledge | `python src/main.py --list-knowledge` |
 | Validate pack | `python src/main.py --validate-pack` |
+| Verify pack provenance | `python src/main.py --knowledge pack.zip --verify-provenance` |
+| Verify provenance as JSON | `python src/main.py --knowledge pack.zip --verify-provenance --provenance-json` |
 | Export pack | `python src/main.py --export-pack dist/lastlight-core.zip` |
 | Export only if valid | `python src/main.py --export-pack dist/lastlight-core.zip --require-valid-pack` |
 | Import PDF | `python src/main.py --import-pdf guide.pdf --import-output knowledge/en/imported/guide.md --language en` |
@@ -186,12 +213,14 @@ priority: high
 If water may be contaminated, boil it...
 ```
 
-Knowledge packs can include `lastlight-pack.json` for reproducible metadata. See [docs/knowledge_packs.md](docs/knowledge_packs.md).
+Knowledge packs can include `lastlight-pack.json` for reproducible metadata and provenance. See [Knowledge Packs](docs/knowledge_packs.md) and [Knowledge Pack Provenance](docs/pack_provenance.md).
 
 ## Docs
 
 - [Architecture](docs/architecture.md)
 - [Adaptive Retrieval](docs/adaptive_retrieval.md)
+- [Device Benchmark](docs/device_benchmark.md)
+- [Knowledge Pack Provenance](docs/pack_provenance.md)
 - [Roadmap](docs/roadmap.md)
 - [Performance and Energy Measurement](docs/performance.md)
 - [Platforms](docs/platforms.md)
