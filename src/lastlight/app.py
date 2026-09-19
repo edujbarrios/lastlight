@@ -38,3 +38,10 @@ class LastLightApp:
 
     def synthesize(self, text: str, top_k: int = 3) -> str:
         return synthesize_answer(text, self.search(text, top_k=top_k))
+
+    def retrieval_metadata(self) -> dict[str, object] | None:
+        getter = getattr(self.retrieval, "decision_metadata", None)
+        if not callable(getter):
+            return None
+        metadata = getter()
+        return metadata if isinstance(metadata, dict) else None

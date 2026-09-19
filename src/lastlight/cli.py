@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 
 from pathlib import Path
 
@@ -32,6 +33,13 @@ def positive_int(value: str) -> int:
     parsed = int(value)
     if parsed < 1:
         raise argparse.ArgumentTypeError("must be at least 1")
+    return parsed
+
+
+def positive_float(value: str) -> float:
+    parsed = float(value)
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("must be greater than 0")
     return parsed
 
 
@@ -65,9 +73,34 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--strategy",
-        choices=("lexical", "bm25", "c-lexical"),
+        choices=("lexical", "bm25", "c-lexical", "adaptive"),
         default="lexical",
         help="retrieval strategy to use",
+    )
+    parser.add_argument(
+        "--mode",
+        choices=("survival", "balanced", "accuracy"),
+        default="balanced",
+        help="resource policy used by --strategy adaptive",
+    )
+    parser.add_argument(
+        "--energy-budget-mwh",
+        type=positive_float,
+        default=None,
+        metavar="MWH",
+        help="per-query energy budget for adaptive retrieval",
+    )
+    parser.add_argument(
+        "--memory-budget-mb",
+        type=positive_int,
+        default=None,
+        metavar="MB",
+        help="memory budget for adaptive retrieval",
+    )
+    parser.add_argument(
+        "--plan",
+        action="store_true",
+        help="print the selected retrieval plan as JSON and exit",
     )
     parser.add_argument(
         "--knowledge",
@@ -209,7 +242,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    args = parser.parse_args(argv)
 
     if args.self_check:
         repository = MarkdownKnowledgeRepository(args.knowledge)
@@ -255,11 +289,32 @@ def main(argv: list[str] | None = None) -> int:
         repository = MarkdownKnowledgeRepository(args.knowledge)
         return VerifyIndexCommand(repository, Path(args.verify_index)).execute()
 
-    app = ApplicationFactory.create(
-        knowledge_dir=args.knowledge,
-        strategy=args.strategy,
-        language=args.language,
-    )
+    factory_kwargs: dict[str, object] = {
+        "knowledge_dir": args.knowledge,
+        "strategy": args.strategy,
+        "language": args.language,
+    }
+    if args.strategy == "adaptive":
+        factory_kwargs.update(
+            mode=args.mode,
+            energy_budget_mwh=args.energy_budget_mwh,
+            memory_budget_mb=args.memory_budget_mb,
+        )
+    app = ApplicationFactory.create(**factory_kwargs)
+
+    if args.plan:
+        if not args.query:
+            parser.error("--plan requires a query")
+        query = " ".join(args.query)
+        app.search(query, top_k=args.top_k)
+        metadata = app.retrieval_metadata() or {
+            "strategy": args.strategy,
+            "mode": "fixed",
+            "effective_top_k": args.top_k,
+        }
+        print(json.dumps(metadata, ensure_ascii=True, indent=2, sort_keys=True))
+        return 0
+
     if args.serve:
         return ServeCommand(app, host=args.host, port=args.port).execute()
     if args.eval:
