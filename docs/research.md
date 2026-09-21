@@ -1,27 +1,24 @@
 # Research Notes
 
-LastLight asks:
+LastLight Core asks:
 
-What is the smallest amount of software, computation, storage, and energy required to preserve useful **retrieval** under severe constraints?
+What is the smallest amount of software, computation and storage required to preserve useful **retrieval** under severe constraints?
 
 The core hypothesis is that a transparent retrieval system over human-readable, auditable knowledge packs can remain useful even when modern AI infrastructure is unavailable.
 
 Core research directions include:
 
-- measuring retrieval usefulness per kilobyte
-- comparing lexical ranking with BM25 under tiny corpora
+- comparing lexical ranking with BM25 on small local corpora
 - testing multilingual and multi-pack retrieval
 - improving refusal behavior under adversarial and out-of-domain queries
-- evaluating constrained hardware performance
-- measuring the cost of provenance and integrity checks
+- keeping provenance and integrity checks cheap and inspectable
+- preserving predictable behavior on constrained devices without hidden services
 
-Generative experiments, tiny local language models and citation-aware synthesis are intentionally outside the core and belong in the planned `lastlight-labs` companion repository.
+Generative experiments, native acceleration, large stress datasets, hardware profiles and energy/latency experiments are intentionally outside the core. They belong in companion repositories such as `lastlight-labs`, `lastlight-native` and `lastlight-bench`.
 
-## Stress evaluation
+## Core regression suite
 
-The evaluation suite separates retrieval quality from the decision to answer. Cases may declare one expected tag, several tags for a multi-intent query, or `should_refuse` for requests that the local corpus cannot safely support.
-
-The generated 238-case suite reports category-level results for spelling errors, short prompts, colloquial phrasing, regional Spanish, multi-intent scenarios, contradictory premises, adversarial instructions, and out-of-domain questions. Exact duplicate cases are removed. The 40 hand-curated seed cases remain separate so generated variants cannot be mistaken for independent human-authored scenarios.
+The core keeps `data/eval_core.jsonl`, the small hand-curated seed suite used to catch retrieval and refusal regressions. Cases may declare one expected tag, several tags for a multi-intent query, or `should_refuse` for requests that the mounted corpus cannot safely support.
 
 Decision metrics use `HIGH` and `MEDIUM` confidence as acceptance:
 
@@ -30,6 +27,8 @@ Decision metrics use `HIGH` and `MEDIUM` confidence as acceptance:
 - **Answer precision:** accepted answerable cases divided by all accepted cases.
 - **Refusal recall:** correctly refused cases divided by all expected-refusal cases.
 
-BM25 remains intentionally small: scores are computed in memory at query time, avoiding a persistent index until there is evidence that startup cost or corpus size requires one.
+The larger generated 238-case stress suite, category dashboards, reproducible hardware profiles and power measurements are benchmark/research artifacts rather than runtime requirements. They should live in `lastlight-bench`, which can depend on the core without making the core depend on them.
+
+BM25 remains intentionally small: scores are computed in memory at query time, avoiding a persistent vector or search service.
 
 See [`ECOSYSTEM.md`](../ECOSYSTEM.md) for the boundary between core research and companion projects.
