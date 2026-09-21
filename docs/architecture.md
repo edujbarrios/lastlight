@@ -24,7 +24,7 @@ The optional index builder writes a human-readable JSON summary of a selected kn
 
 ## Strategy Pattern
 
-`RetrievalStrategy` defines search behavior. `LexicalRetrievalStrategy` implements deterministic lexical ranking. `BM25RetrievalStrategy` provides an optional in-memory BM25 ranker, and adaptive retrieval can select among available strategies under explicit resource constraints.
+`RetrievalStrategy` defines search behavior. `LexicalRetrievalStrategy` implements deterministic lexical ranking. `BM25RetrievalStrategy` provides an optional in-memory BM25 ranker, and adaptive retrieval can select between core strategies under explicit resource constraints.
 
 ## Factory Pattern
 
@@ -42,8 +42,6 @@ The domain layer uses dataclasses for `KnowledgeDocument`, `KnowledgePack`, `Sea
 
 The application depends on interfaces. Markdown/ZIP storage and retrieval strategies are replaceable implementation details. The runtime depends only on local artifacts after download.
 
-The core repository deliberately excludes presentation and content-authoring concerns. Browser interfaces, pack catalogs, PDF/HTML ingestion, deterministic publishing workflows and experimental generation belong in companion repositories. See [`ECOSYSTEM.md`](../ECOSYSTEM.md).
+The core repository deliberately excludes presentation, content-authoring, optional native acceleration and generation experiments. Browser interfaces, pack catalogs, PDF/HTML ingestion, deterministic publishing workflows, native backends and experimental generation belong in companion repositories. See [`ECOSYSTEM.md`](../ECOSYSTEM.md).
 
-## Optional Native Core
-
-The optional C core is deliberately narrow. It counts token matches through a small `ctypes` bridge, while parsing, ranking, confidence scoring and safety formatting remain in Python. If the native library is absent, the strategy falls back to Python match counting.
+The pure-Python implementation is the compatibility baseline for the core runtime. Companion accelerators may depend on the core, but the core must not require them.
