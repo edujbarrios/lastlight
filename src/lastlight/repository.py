@@ -12,6 +12,7 @@ from .markdown_loader import load_markdown_document, load_markdown_text
 from .util import project_root
 
 PACK_MANIFEST = "lastlight-pack.json"
+PACK_README = "README.md"
 
 
 class MarkdownKnowledgeRepository(KnowledgeRepository):
@@ -40,7 +41,7 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
         documents = [
             load_markdown_document(path, root)
             for path in sorted(self.knowledge_dir.rglob("*.md"))
-            if path.is_file()
+            if path.is_file() and _is_directory_markdown_document(path, self.knowledge_dir)
         ]
         return documents
 
@@ -101,11 +102,22 @@ def _is_zip_pack(path: Path) -> bool:
     return path.is_file() and path.suffix.casefold() == ".zip"
 
 
+def _is_directory_markdown_document(path: Path, pack_root: Path) -> bool:
+    """Keep a root README as pack documentation instead of searchable knowledge."""
+    try:
+        relative = path.relative_to(pack_root)
+    except ValueError:
+        return True
+    return not (len(relative.parts) == 1 and relative.name.casefold() == PACK_README.casefold())
+
+
 def _is_zip_markdown_document(name: str) -> bool:
     normalized = name.replace("\\", "/")
     parts = tuple(part for part in normalized.split("/") if part)
     if not parts or normalized.endswith("/"):
         return False
     if any(part.startswith(".") or part == "__MACOSX" for part in parts):
+        return False
+    if len(parts) == 1 and parts[0].casefold() == PACK_README.casefold():
         return False
     return parts[-1].casefold().endswith(".md")
