@@ -1,94 +1,100 @@
 # Knowledge Packs
 
-LastLight knowledge packs are ordinary directories or `.zip` files containing Markdown.
-They can optionally include `lastlight-pack.json` at the pack root.
-The bundled pack keeps English documents under `en/` and Spanish documents under `es/`.
-Archive entries under hidden directories or `__MACOSX/` are ignored when loading `.zip` packs.
+LastLight knowledge packs are ordinary directories or `.zip` files containing Markdown documents plus optional metadata. The repository no longer ships a built-in emergency corpus: knowledge is expected to be distributed separately and mounted at runtime.
+
+The project-level [`knowledge/README.md`](../knowledge/README.md) is the short format reference. It is intentionally excluded from retrieval.
+
+## Recommended ZIP layout
+
+```text
+pack.zip
+├── lastlight-pack.json
+├── en/
+│   └── topic/
+│       └── guide.md
+├── es/
+│   └── topic/
+│       └── guide.md
+└── sources/
+    └── references.json
+```
+
+A root `README.md` is allowed for human-facing pack documentation and is ignored by retrieval. Archive entries under hidden directories or `__MACOSX/` are also ignored.
+
+Each Markdown document should include front matter when possible:
+
+```markdown
+---
+title: Water purification
+language: es
+tags:
+  - water
+  - purification
+priority: high
+---
+
+Contenido del documento...
+```
+
+## Manifest
+
+`lastlight-pack.json` lives at the pack root. A minimal example:
 
 ```json
 {
-  "name": "LastLight Core Emergency Knowledge Pack",
-  "version": "0.1.0",
-  "languages": ["en", "es"],
-  "description": "Core offline emergency knowledge included with LastLight.",
-  "license": "MPL-2.0",
-  "source": "https://github.com/edujbarrios/lastlight"
+  "name": "Emergency Water ES",
+  "version": "1.0.0",
+  "languages": ["es"],
+  "license": "CC-BY-4.0",
+  "source": "https://example.org/water",
+  "publisher": "Example Publisher",
+  "published_at": "2026-09-01",
+  "provenance": [
+    {"source": "https://example.org/reference"}
+  ]
 }
 ```
 
-The manifest is intentionally small. It helps people audit a pack before using it,
-record which languages it claims to cover, and reproduce an offline capsule later.
-If no manifest is present, LastLight still works and infers basic language coverage
-from document front matter.
+If no manifest is present, LastLight can still load the documents and infer basic language coverage from document front matter.
 
-Inspect a pack:
+## Validate and inspect
 
 ```bash
-python3 src/main.py --pack-info
-python3 src/main.py --knowledge path/to/pack.zip --pack-info
+python src/main.py --knowledge pack.zip --pack-info
+python src/main.py --knowledge pack.zip --validate-pack
+python src/main.py --knowledge pack.zip --verify-provenance
 ```
 
-Validate a pack before publishing it:
+Pack-specific validation, provenance and export operations are intentionally single-pack operations. Audit each artifact independently before mounting it with others.
+
+## Mounting multiple packs
+
+Query, interactive, local web and knowledge-list flows can mount more than one pack by repeating `--knowledge`:
 
 ```bash
-python3 src/main.py --validate-pack
-python3 src/main.py --knowledge path/to/pack.zip --validate-pack
-```
-
-Export a directory pack as a deterministic `.zip`:
-
-```bash
-python3 src/main.py --export-pack dist/lastlight-core.zip
-python3 src/main.py --export-pack dist/lastlight-core.zip --require-valid-pack
-```
-
-The export command prints a SHA-256 checksum so the copied pack can be verified
-on another machine. Use `--require-valid-pack` to stop the export when validation
-finds missing manifest fields or document-language mismatches.
-
-Build an audit index that includes pack metadata:
-
-```bash
-python3 src/main.py --build-index data/lastlight.index.json
-```
-
-The audit index includes pack metadata and per-document SHA-256 hashes.
-
-## Mounting Multiple Packs
-
-Query, interactive, evaluation, local web, and `--list-knowledge` flows can mount more than one pack by repeating `--knowledge`:
-
-```bash
-python3 src/main.py \
+python src/main.py \
   --knowledge packs/water-es.zip \
   --knowledge packs/first-aid-es.zip \
   --knowledge packs/blackout-es.zip \
-  "como puedo potabilizar agua"
+  "¿cómo consigo agua segura y trato una herida?"
 ```
 
-LastLight combines the mounted packs into one searchable corpus. Documents keep the pack name, version, source, and local pack path that produced them, so text and JSON answers can be traced back to the downloaded artifact.
+LastLight combines the documents into one searchable corpus while retaining the pack name, version, source and local artifact path that produced each document.
 
-This is intentionally compatible with a future web catalog: a user can download several independent `.zip` packs, verify each pack locally, then mount any combination without rebuilding LastLight or merging the archives together.
+## Distribution model
 
-Pack-specific maintenance commands remain intentionally single-pack operations. For example, provenance verification and export should be run against each downloaded pack independently before the packs are mounted together for retrieval.
+Packs are registry-neutral. They can arrive through GitHub Releases, USB/SD card, local storage, a static site or another distribution channel. After the files are local, LastLight does not require Internet access.
 
-A typical future catalog workflow can therefore be:
+A separate web platform is planned for browsing, reading and downloading versioned LastLight packs as ZIP files. The planned platform is a distribution layer, not a runtime dependency: users should be able to download only the packs relevant to their language, region or scenario and later mount any combination offline.
 
-```bash
-python3 src/main.py --knowledge downloads/water-es.zip --verify-provenance
-python3 src/main.py --knowledge downloads/first-aid-es.zip --verify-provenance
-python3 src/main.py \
-  --knowledge downloads/water-es.zip \
-  --knowledge downloads/first-aid-es.zip \
-  "necesito agua segura y primeros auxilios"
-```
+## Community pack checklist
 
-## Community Pack Checklist
+1. Keep packs topic-focused and reviewable.
+2. Put searchable guidance in Markdown below language/topic directories.
+3. Add `title`, `language`, `tags` and `priority` front matter where useful.
+4. Add `lastlight-pack.json` with version, license, source and publisher/provenance metadata.
+5. Keep source references auditable and date-sensitive guidance fresh.
+6. Run `--pack-info`, `--validate-pack` and `--verify-provenance` before distribution.
+7. Prefer a root `README.md` for human documentation; LastLight will not index it.
 
-1. Use Markdown files with clear source-grounded instructions.
-2. Add front matter with `title`, `language`, `tags`, and `priority` where useful.
-3. Place documents under language sections such as `en/` and `es/`.
-4. Include `lastlight-pack.json` at the pack root.
-5. Run `--pack-info`, `--validate-pack`, `--self-check`, and `--eval` before publishing.
-6. Export with `--export-pack` when distributing a `.zip` pack.
-7. Prefer small topic-focused packs over large unreviewable bundles.
+See [Knowledge Pack Provenance](pack_provenance.md) for the integrity and freshness model.

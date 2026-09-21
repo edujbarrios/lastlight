@@ -24,6 +24,30 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(len(docs), 1)
         self.assertEqual(docs[0].title, "A")
 
+    def test_ignores_root_readme_in_directory_pack(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "README.md").write_text("Pack documentation", encoding="utf-8")
+            nested = root / "es"
+            nested.mkdir()
+            (nested / "agua.md").write_text(
+                "---\nlanguage: es\n---\n\nAgua segura.", encoding="utf-8"
+            )
+
+            docs = MarkdownKnowledgeRepository(root).list_documents()
+
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0].title, "Agua")
+
+    def test_readme_only_directory_has_no_searchable_documents(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "README.md").write_text("Pack format specification", encoding="utf-8")
+
+            docs = MarkdownKnowledgeRepository(root).list_documents()
+
+        self.assertEqual(docs, [])
+
     def test_loads_markdown_from_zip_pack(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             pack = Path(tmp) / "pack.zip"
@@ -39,6 +63,18 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(len(docs), 1)
         self.assertEqual(docs[0].title, "Packed Water")
         self.assertEqual(docs[0].path, "pack.zip:water/purification.md")
+
+    def test_ignores_root_readme_in_zip_pack(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pack = Path(tmp) / "pack.zip"
+            with ZipFile(pack, "w") as archive:
+                archive.writestr("README.md", "Pack documentation")
+                archive.writestr("es/agua.md", "---\nlanguage: es\n---\n\nAgua segura.")
+
+            docs = MarkdownKnowledgeRepository(pack).list_documents()
+
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0].path, "pack.zip:es/agua.md")
 
     def test_loads_zip_pack_with_uppercase_extension(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
