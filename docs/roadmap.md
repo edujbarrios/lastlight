@@ -1,14 +1,13 @@
 # Core Roadmap
 
-This roadmap covers only `edujbarrios/lastlight`, the offline core runtime. UI, pack publishing, ingestion and generation experiments belong in companion repositories described in [`ECOSYSTEM.md`](../ECOSYSTEM.md).
+This roadmap covers only `edujbarrios/lastlight`, the offline core runtime. UI, pack publishing, ingestion, native acceleration and generation experiments belong in companion repositories described in [`ECOSYSTEM.md`](../ECOSYSTEM.md).
 
 ## Current core
 
 - Markdown directory and ZIP knowledge packs
 - repeated `--knowledge` for multi-pack retrieval
 - pack-level attribution
-- lexical and BM25 retrieval
-- optional C-backed lexical retrieval
+- pure-Python lexical and BM25 retrieval
 - resource-adaptive retrieval policies
 - confidence-aware refusal
 - deterministic ES/EN routing
@@ -28,7 +27,7 @@ This roadmap covers only `edujbarrios/lastlight`, the offline core runtime. UI, 
 ### Runtime boundaries
 
 - stable Python API for companion frontends and tools
-- documented extension points for retrieval backends
+- documented extension points for external retrieval accelerators
 - structured machine-readable runtime/status output
 - preserve zero-network and stdlib-only default behavior
 
@@ -53,6 +52,7 @@ The following are intentionally not core roadmap items:
 - curated knowledge content
 - PDF/HTML ingestion and pack publishing
 - digital-signing infrastructure
+- C/Rust/native acceleration implementations
 - experimental local generation/synthesis
 - large hardware benchmark datasets and dashboards
 
