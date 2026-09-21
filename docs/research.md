@@ -1,24 +1,24 @@
 # Research Notes
 
-LastLight asks:
+LastLight Core asks:
 
-What is the smallest amount of software, computation, storage, and energy required to preserve useful intelligence?
+What is the smallest amount of software, computation and storage required to preserve useful **retrieval** under severe constraints?
 
-The v0.1 hypothesis is that a transparent retrieval system over human-readable Markdown can remain useful even when modern AI infrastructure is unavailable.
+The core hypothesis is that a transparent retrieval system over human-readable, auditable knowledge packs can remain useful even when modern AI infrastructure is unavailable.
 
-Future research directions include:
+Core research directions include:
 
-- measuring retrieval usefulness per kilobyte
-- comparing lexical ranking with BM25 under tiny corpora
-- testing multilingual knowledge packs
-- evaluating constrained hardware performance
-- exploring citation-only local generation
+- comparing lexical ranking with BM25 on small local corpora
+- testing multilingual and multi-pack retrieval
+- improving refusal behavior under adversarial and out-of-domain queries
+- keeping provenance and integrity checks cheap and inspectable
+- preserving predictable behavior on constrained devices without hidden services
 
-## Stress evaluation
+Generative experiments, native acceleration, large stress datasets, hardware profiles and energy/latency experiments are intentionally outside the core. They belong in companion repositories such as `lastlight-labs`, `lastlight-native` and `lastlight-bench`.
 
-The evaluation suite separates retrieval quality from the decision to answer. Cases may declare one expected tag, several tags for a multi-intent query, or `should_refuse` for requests that the local corpus cannot safely support.
+## Core regression suite
 
-The generated 238-case suite reports category-level results for spelling errors, short prompts, colloquial phrasing, regional Spanish, multi-intent scenarios, contradictory premises, adversarial instructions, and out-of-domain questions. Exact duplicate cases are removed. The 40 hand-curated seed cases remain separate so generated variants cannot be mistaken for independent human-authored scenarios.
+The core keeps `data/eval_core.jsonl`, the small hand-curated seed suite used to catch retrieval and refusal regressions. Cases may declare one expected tag, several tags for a multi-intent query, or `should_refuse` for requests that the mounted corpus cannot safely support.
 
 Decision metrics use `HIGH` and `MEDIUM` confidence as acceptance:
 
@@ -27,8 +27,8 @@ Decision metrics use `HIGH` and `MEDIUM` confidence as acceptance:
 - **Answer precision:** accepted answerable cases divided by all accepted cases.
 - **Refusal recall:** correctly refused cases divided by all expected-refusal cases.
 
-The v0.2 line keeps BM25 intentionally small: scores are computed in memory at query time, avoiding a persistent index until there is evidence that startup cost or corpus size requires one.
+The larger generated 238-case stress suite, category dashboards, reproducible hardware profiles and power measurements are benchmark/research artifacts rather than runtime requirements. They should live in `lastlight-bench`, which can depend on the core without making the core depend on them.
 
-The v0.4 synthesis experiment is intentionally constrained. The n-gram model is trained only on the retrieved passage selected for the current query, and the original passage remains visible as the source of truth. This is a research step toward citation-aware generation, not a replacement for retrieval.
+BM25 remains intentionally small: scores are computed in memory at query time, avoiding a persistent vector or search service.
 
-The v0.7 local model pack experiment builds JSON n-gram artifacts from the Markdown corpus. The current goal is measurement and auditability: document count, token count, transition count, and deterministic transitions. The model is not used by the default answer path.
+See [`ECOSYSTEM.md`](../ECOSYSTEM.md) for the boundary between core research and companion projects.

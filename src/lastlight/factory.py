@@ -8,11 +8,7 @@ from typing import Sequence
 from .adaptive import AdaptiveRetrievalConfig, AdaptiveRetrievalStrategy
 from .app import LastLightApp
 from .knowledge_sources import build_knowledge_repository
-from .retrieval import (
-    BM25RetrievalStrategy,
-    CBackedLexicalRetrievalStrategy,
-    LexicalRetrievalStrategy,
-)
+from .retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy
 
 
 class ApplicationFactory:
@@ -28,8 +24,6 @@ class ApplicationFactory:
         repository = build_knowledge_repository(knowledge_dir)
         if strategy == "bm25":
             retrieval = BM25RetrievalStrategy()
-        elif strategy == "c-lexical":
-            retrieval = CBackedLexicalRetrievalStrategy()
         elif strategy == "adaptive":
             retrieval = AdaptiveRetrievalStrategy(
                 AdaptiveRetrievalConfig(

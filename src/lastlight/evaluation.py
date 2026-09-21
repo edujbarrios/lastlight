@@ -1,4 +1,4 @@
-"""Evaluation framework for deterministic retrieval."""
+"""Evaluation framework for deterministic core regression checks."""
 
 from __future__ import annotations
 
@@ -12,12 +12,13 @@ from .app import LastLightApp
 from .domain import EvaluationCase, SearchResult
 from .util import project_root
 
-DEFAULT_EVAL_OUTPUT = project_root() / "eval" / "results.json"
+DEFAULT_EVAL_DATA = project_root() / "data" / "eval_core.jsonl"
+DEFAULT_EVAL_OUTPUT = project_root() / "eval" / "core-results.json"
 DEFAULT_EVAL_TOP_K = 3
 
 
 def load_evaluation_cases(path: Path | None = None) -> list[EvaluationCase]:
-    path = path or project_root() / "data" / "eval.jsonl"
+    path = path or DEFAULT_EVAL_DATA
     cases: list[EvaluationCase] = []
     if not path.exists():
         return cases
@@ -63,7 +64,9 @@ def build_evaluation_report(
         results = app.search(case.query, top_k=top_k)
         elapsed_ms = (time.perf_counter() - start) * 1000.0
         elapsed_samples_ms.append(elapsed_ms)
-        accepted_results = [result for result in results if result.confidence in {"HIGH", "MEDIUM"}]
+        accepted_results = [
+            result for result in results if result.confidence in {"HIGH", "MEDIUM"}
+        ]
         accepted = bool(accepted_results)
         if case.should_refuse:
             true_refusal += int(not accepted)
@@ -74,8 +77,12 @@ def build_evaluation_report(
 
         rank = _expected_rank(accepted_results, case)
         matched_tags = _matched_tags(accepted_results, case)
-        top_1_match = (not case.should_refuse and rank == 1) or (case.should_refuse and not accepted)
-        top_k_match = (not case.should_refuse and set(case.target_tags) <= matched_tags) or (case.should_refuse and not accepted)
+        top_1_match = (not case.should_refuse and rank == 1) or (
+            case.should_refuse and not accepted
+        )
+        top_k_match = (
+            not case.should_refuse and set(case.target_tags) <= matched_tags
+        ) or (case.should_refuse and not accepted)
         reciprocal_rank = 1.0 / rank if rank is not None else 0.0
         reciprocal_ranks.append(reciprocal_rank)
         if top_1_match:
@@ -88,7 +95,9 @@ def build_evaluation_report(
         _record_bucket(
             by_difficulty, case.difficulty, top_1_match, top_k_match, reciprocal_rank
         )
-        _record_bucket(by_category, case.category, top_1_match, top_k_match, reciprocal_rank)
+        _record_bucket(
+            by_category, case.category, top_1_match, top_k_match, reciprocal_rank
+        )
         _record_bucket(
             by_language,
             case.expected_language or "unspecified",
@@ -160,10 +169,10 @@ def build_evaluation_report(
     return {
         "benchmark": {
             "top_k": top_k,
-            "case_source": "data/eval.jsonl",
+            "case_source": "data/eval_core.jsonl",
             "notes": (
-                "Deterministic retrieval benchmark over local Markdown knowledge. "
-                "A case is correct when any retrieved document contains the expected tag."
+                "Small deterministic core regression suite. Extended stress and hardware "
+                "benchmarking belong in the companion lastlight-bench project."
             ),
         },
         "total_cases": total,
@@ -183,7 +192,9 @@ def build_evaluation_report(
         "by_difficulty": _finalize_buckets(by_difficulty),
         "by_category": _finalize_buckets(by_category),
         "by_expected_language": _finalize_buckets(by_language),
-        "decision_metrics": _decision_metrics(true_accept, false_accept, true_refusal, false_refusal),
+        "decision_metrics": _decision_metrics(
+            true_accept, false_accept, true_refusal, false_refusal
+        ),
         "cases": case_results,
     }
 
@@ -205,7 +216,7 @@ def format_evaluation_report(report: dict[str, object]) -> str:
             )
 
     lines = [
-        "LastLight evaluation",
+        "LastLight core evaluation",
         f"Total cases: {report['total_cases']}",
         f"Top-1 accuracy: {report['top_1_accuracy']:.2%}",
         f"Top-{report['benchmark']['top_k']} accuracy: {report['top_k_accuracy']:.2%}",
@@ -254,7 +265,10 @@ def _expected_rank(results: list[SearchResult], case: EvaluationCase) -> int | N
 def _matched_tags(results: list[SearchResult], case: EvaluationCase) -> set[str]:
     matched: set[str] = set()
     for result in results:
-        if case.expected_language is not None and result.document.language != case.expected_language:
+        if (
+            case.expected_language is not None
+            and result.document.language != case.expected_language
+        ):
             continue
         matched.update(set(case.target_tags).intersection(result.document.tags))
     return matched
@@ -272,7 +286,11 @@ def _decision_metrics(
         "false_refusal": false_refusal,
         "answer_precision": true_accept / answer_total if answer_total else 0.0,
         "refusal_recall": true_refusal / refusal_total if refusal_total else 0.0,
-        "answerable_recall": true_accept / (true_accept + false_refusal) if true_accept + false_refusal else 0.0,
+        "answerable_recall": (
+            true_accept / (true_accept + false_refusal)
+            if true_accept + false_refusal
+            else 0.0
+        ),
     }
 
 

@@ -1,22 +1,22 @@
 # Low-Power Design
 
-LastLight is designed to feel like a tiny emergency utility.
+LastLight Core is designed to behave like a tiny emergency utility.
 
 It avoids:
 
 - polling
 - background work
 - animations
-- progress bars
 - telemetry
 - network calls
 - external databases
 - expensive startup indexing
+- required native extensions
 
-The v0.1 implementation loads Markdown files, ranks them deterministically, prints a sourced passage, and exits. This keeps behavior easy to inspect and reduces idle energy use.
+The core loads local Markdown packs, ranks them deterministically, returns sourced passages, and exits. This keeps behavior inspectable and reduces idle resource use.
 
-Newer experimental features keep that constraint. The offline index builder runs only when explicitly requested, and streaming output only flushes existing response lines to the terminal. Neither feature starts a service, watches files, or performs background work.
+The optional audit index is created only when explicitly requested. Streaming output only flushes existing terminal output; neither feature starts a service, watches files, or performs background work.
 
 The platform self-check is also explicit and one-shot. It reports Python version, platform, terminal availability, knowledge discovery, network independence, and dependency policy, then exits.
 
-The optional C core does not change the default runtime. It is loaded only when `--strategy c-lexical` is selected, and it falls back to Python if no native library is present.
+Pure Python is the compatibility baseline. Native acceleration, hardware benchmarking, browser interfaces, pack-authoring pipelines, and generation experiments are intentionally outside this repository and can evolve as companion projects without changing the offline core contract.

@@ -6,15 +6,10 @@ import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from .c_core import OptionalCCore
 from .compat import is_low_resource_target
 from .domain import KnowledgeDocument, SearchQuery, SearchResult
 from .interfaces import RetrievalStrategy
-from .retrieval import (
-    BM25RetrievalStrategy,
-    CBackedLexicalRetrievalStrategy,
-    LexicalRetrievalStrategy,
-)
+from .retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy
 from .tokenizer import tokenize
 
 CRITICAL_RISK_TERMS = frozenset(
@@ -68,15 +63,13 @@ class ResourceProfile:
     low_resource_target: bool
     memory_mb: int | None
     battery_percent: float | None
-    c_core_available: bool
 
     @classmethod
-    def detect(cls, c_core_available: bool = False) -> "ResourceProfile":
+    def detect(cls) -> "ResourceProfile":
         return cls(
             low_resource_target=is_low_resource_target(),
             memory_mb=_physical_memory_mb(),
             battery_percent=_battery_percent(),
-            c_core_available=c_core_available,
         )
 
 
@@ -113,20 +106,17 @@ class RetrievalDecision:
 
 
 class AdaptiveRetrievalStrategy(RetrievalStrategy):
-    """Select a retrieval strategy from query risk and resource constraints."""
+    """Select a core retrieval strategy from query risk and constraints."""
 
     def __init__(
         self,
         config: AdaptiveRetrievalConfig | None = None,
         profile: ResourceProfile | None = None,
-        c_core: OptionalCCore | None = None,
     ) -> None:
         self.config = config or AdaptiveRetrievalConfig()
-        self.c_core = c_core or OptionalCCore()
-        self.profile = profile or ResourceProfile.detect(self.c_core.available)
+        self.profile = profile or ResourceProfile.detect()
         self.lexical = LexicalRetrievalStrategy()
         self.bm25 = BM25RetrievalStrategy()
-        self.c_lexical = CBackedLexicalRetrievalStrategy(self.c_core)
         self.last_decision: RetrievalDecision | None = None
 
     def search(
@@ -138,7 +128,6 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
         strategy = {
             "lexical": self.lexical,
             "bm25": self.bm25,
-            "c-lexical": self.c_lexical,
         }[decision.strategy]
         return strategy.search(effective_query, documents)
 
@@ -147,9 +136,8 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
         constrained, constraint_reason = self._constraint_reason()
 
         if constrained:
-            strategy = "c-lexical" if self.profile.c_core_available else "lexical"
             return self._decision(
-                strategy,
+                "lexical",
                 risk,
                 min(max(query.top_k, 1), 2),
                 constraint_reason,

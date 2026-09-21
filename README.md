@@ -1,8 +1,8 @@
 # LastLight
 
-**Low-power, offline RAG for disaster and infrastructure-failure guidance.**
+**Low-power, offline retrieval for disaster and infrastructure-failure guidance.**
 
-LastLight is the **core runtime** of the LastLight ecosystem: a stdlib-only local retrieval engine for constrained environments. It searches downloaded Markdown knowledge packs, returns sourced passages, preserves pack provenance, and refuses when confidence is too low.
+`edujbarrios/lastlight` is **LastLight Core**: the small, auditable runtime that loads local knowledge packs, retrieves sourced passages, preserves provenance, and refuses when confidence is too low.
 
 No cloud API. No embeddings. No vector database. No telemetry. No package install required.
 
@@ -10,16 +10,16 @@ No cloud API. No embeddings. No vector database. No telemetry. No package instal
 
 ## Core scope
 
-This repository owns the offline engine and its stable contracts:
+This repository owns only the stable offline engine and contracts:
 
 - mount **one or multiple** directory/ZIP knowledge packs at once
-- lexical, BM25, optional C-backed and adaptive retrieval
+- lexical, BM25 and resource-adaptive retrieval
 - confidence-aware refusal and source traceability
 - ES/EN language routing
 - pack metadata, validation, SHA-256 integrity, provenance and freshness checks
-- CLI, evaluation and constrained-device diagnostics
+- a stdlib-only CLI and a small deterministic regression suite
 
-User interfaces, knowledge distribution, pack authoring and other product surfaces are intentionally developed as separate companion projects. See [ECOSYSTEM.md](ECOSYSTEM.md).
+Presentation, pack publishing, content, native acceleration, hardware benchmarking and experimental generation belong in companion repositories. See [ECOSYSTEM.md](ECOSYSTEM.md).
 
 ## Quick start
 
@@ -32,7 +32,7 @@ python src/main.py \
   "¿cómo potabilizo agua?"
 ```
 
-`--knowledge` is repeatable, so several packs can be searched as one corpus without merging their ZIP files:
+`--knowledge` is repeatable. Packs stay independent while LastLight searches them as one corpus:
 
 ```bash
 python src/main.py \
@@ -44,9 +44,7 @@ python src/main.py \
 
 ## Knowledge packs
 
-LastLight does not ship an embedded emergency corpus. The [`knowledge/`](knowledge/) directory documents the pack format; actual knowledge is expected to arrive as independently versioned packs.
-
-A typical ZIP looks like:
+LastLight Core does not ship an emergency corpus. [`knowledge/README.md`](knowledge/README.md) documents the pack format; real knowledge is expected to arrive as independently versioned packs.
 
 ```text
 water-es.zip
@@ -59,8 +57,6 @@ water-es.zip
     └── references.json
 ```
 
-See [`knowledge/README.md`](knowledge/README.md) for the expected ZIP structure and [`docs/knowledge_packs.md`](docs/knowledge_packs.md) for the full contract.
-
 Verify a downloaded pack before using it:
 
 ```bash
@@ -68,32 +64,18 @@ python src/main.py --knowledge pack.zip --validate-pack
 python src/main.py --knowledge pack.zip --verify-provenance
 ```
 
-Pack-specific maintenance commands intentionally operate on one pack at a time. Verify each artifact independently, then mount any combination for retrieval.
-
-### Planned knowledge platform
-
-A separate web platform is planned for browsing, reading and downloading versioned LastLight knowledge packs as `.zip` files. The intended flow is: discover knowledge online → download selected packs → transfer them if necessary by USB/SD → verify locally → mount one or more packs in LastLight.
-
-The platform is optional by design: once packs are downloaded, the core runtime remains fully offline.
+See [Knowledge Packs](docs/knowledge_packs.md) and [Knowledge Pack Provenance](docs/pack_provenance.md).
 
 ## Language behavior
 
-Explicit `--language es` / `--language en` always wins. Without it, LastLight automatically adopts a monolingual corpus language and conservatively routes clear ES/EN queries inside mixed corpora. Retrieved passages are returned in their original pack language; LastLight does not silently translate them.
+Explicit `--language es` / `--language en` always wins. Without it, LastLight adopts a monolingual corpus language automatically and conservatively routes clear ES/EN queries inside mixed corpora. Retrieved passages remain in the original pack language; the core does not silently translate them.
 
-## Benchmark
+## Core evaluation
 
-The stress suite contains **238 deterministic cases**, including misspellings, regional Spanish, multi-intent emergencies, adversarial instructions and out-of-domain requests.
-
-| Strategy | Top-1 | Top-3 | MRR | Answer precision | Refusal recall | Answerable recall |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Lexical | 62.18% | 63.45% | 0.518 | 89.60% | 62.50% | 81.58% |
-| BM25 | 55.04% | 63.45% | 0.569 | 83.18% | 25.00% | 93.68% |
-
-The default lexical strategy remains the safer current tradeoff because it gives up some answerable recall in exchange for stronger answer precision and refusal behavior.
+`--eval` is a lightweight regression check for retrieval/refusal behavior. The core keeps only the small seed suite; larger stress datasets, hardware profiles, latency/memory studies and energy measurements belong in the planned `lastlight-bench` repository.
 
 ```bash
-python src/main.py --benchmark
-python src/main.py --benchmark --benchmark-energy-source rapl
+python src/main.py --knowledge pack.zip --eval
 ```
 
 ## Useful commands
@@ -108,12 +90,13 @@ python src/main.py --benchmark --benchmark-energy-source rapl
 | Validate pack | `python src/main.py --knowledge pack.zip --validate-pack` |
 | Verify provenance | `python src/main.py --knowledge pack.zip --verify-provenance` |
 | Adaptive retrieval | `python src/main.py --knowledge pack.zip --strategy adaptive --mode balanced "agua"` |
-| Device benchmark | `python src/main.py --knowledge pack.zip --benchmark` |
+| Inspect adaptive plan | `python src/main.py --knowledge pack.zip --strategy adaptive --plan "agua"` |
+| Core evaluation | `python src/main.py --knowledge pack.zip --eval` |
 | Run tests | `python -m unittest discover -s tests` |
 
 ## Ecosystem
 
-This repository is intentionally the core, not a monorepo. Planned companion repositories and their boundaries are described in [ECOSYSTEM.md](ECOSYSTEM.md).
+This repository is intentionally the core, not a monorepo. Companion repository boundaries are described in [ECOSYSTEM.md](ECOSYSTEM.md).
 
 ## Docs
 
@@ -121,8 +104,6 @@ This repository is intentionally the core, not a monorepo. Planned companion rep
 - [Knowledge Packs](docs/knowledge_packs.md)
 - [Knowledge Pack Provenance](docs/pack_provenance.md)
 - [Adaptive Retrieval](docs/adaptive_retrieval.md)
-- [Device Benchmark](docs/device_benchmark.md)
-- [Performance and Energy Measurement](docs/performance.md)
 
 ## License
 

@@ -15,10 +15,7 @@ from .evaluation import (
 )
 from .indexer import verify_index, write_index
 from .interfaces import KnowledgeRepository
-from .local_model import summarize_local_model, write_local_model
-from .pack_export import export_pack, sha256_file
 from .pack_validation import format_validation_report, validate_pack
-from .pdf_ingest import document_to_markdown, load_pdf
 from .safety import (
     LOW_CONFIDENCE_RESPONSE,
     STARTUP_WARNING,
@@ -26,7 +23,6 @@ from .safety import (
     safe_answer,
 )
 from .session import LastLightSession
-from .synthesis import synthesize_answer
 from .triage import first_acceptable_result
 
 
@@ -62,7 +58,6 @@ class QueryCommand:
         app: LastLightApp,
         query: str,
         stream: bool = False,
-        synthesize: bool = False,
         output_format: str = "text",
         top_k: int = 3,
         fail_on_refusal: bool = False,
@@ -70,7 +65,6 @@ class QueryCommand:
         self.app = app
         self.query = query
         self.stream = stream
-        self.synthesize = synthesize
         self.output_format = output_format
         self.top_k = max(top_k, 1)
         self.fail_on_refusal = fail_on_refusal
@@ -87,11 +81,7 @@ class QueryCommand:
 
         print(STARTUP_WARNING)
         print()
-        answer = (
-            self.app.synthesize(self.query, top_k=self.top_k)
-            if self.synthesize
-            else self.app.answer(self.query, top_k=self.top_k)
-        )
+        answer = self.app.answer(self.query, top_k=self.top_k)
         if self.stream:
             for line in answer.splitlines():
                 print(line, flush=True)
@@ -110,11 +100,7 @@ class QueryCommand:
         payload: dict[str, object] = {
             "query": self.query,
             "accepted": accepted is not None,
-            "answer": (
-                synthesize_answer(self.query, results)
-                if self.synthesize
-                else safe_answer(results)
-            ),
+            "answer": safe_answer(results),
             "results": [result_to_dict(result) for result in results],
         }
         if accepted is None:
@@ -356,79 +342,6 @@ class ValidatePackCommand:
         return 0 if report.ok else 1
 
 
-class ExportPackCommand:
-    def __init__(
-        self,
-        repository: KnowledgeRepository,
-        output_path: Path | str,
-        require_valid: bool = False,
-    ) -> None:
-        self.repository = repository
-        self.output_path = output_path
-        self.require_valid = require_valid
-
-    def execute(self) -> int:
-        if self.require_valid:
-            report = validate_pack(self.repository)
-            if not report.ok:
-                print(format_validation_report(report))
-                return 1
-
-        source_dir = getattr(self.repository, "knowledge_dir", None)
-        if source_dir is None:
-            print("Export failed: repository does not expose a knowledge directory")
-            return 1
-
-        try:
-            output = export_pack(source_dir, self.output_path)
-        except ValueError as error:
-            print(f"Export failed: {error}")
-            return 1
-        print(f"Wrote knowledge pack: {output}")
-        print(f"SHA-256: {sha256_file(output)}")
-        return 0
-
-
-class ImportPdfCommand:
-    def __init__(
-        self,
-        pdf_path: Path | str,
-        output_path: Path | str | None = None,
-        title: str | None = None,
-        language: str = "unknown",
-        tags: tuple[str, ...] = ("imported", "pdf"),
-        priority: str = "normal",
-        summary_items: int = 8,
-    ) -> None:
-        self.pdf_path = Path(pdf_path)
-        self.output_path = Path(output_path) if output_path else self.pdf_path.with_suffix(".md")
-        self.title = title
-        self.language = language
-        self.tags = tags
-        self.priority = priority
-        self.summary_items = summary_items
-
-    def execute(self) -> int:
-        try:
-            document = load_pdf(self.pdf_path)
-            markdown = document_to_markdown(
-                document,
-                title=self.title,
-                language=self.language,
-                tags=self.tags,
-                priority=self.priority,
-                max_summary_items=self.summary_items,
-            )
-        except Exception as error:
-            print(f"PDF import failed: {error}")
-            return 1
-
-        self.output_path.parent.mkdir(parents=True, exist_ok=True)
-        self.output_path.write_text(markdown, encoding="utf-8")
-        print(f"Wrote Markdown: {self.output_path}")
-        return 0
-
-
 class SelfCheckCommand:
     def __init__(self, repository: KnowledgeRepository) -> None:
         self.repository = repository
@@ -437,29 +350,3 @@ class SelfCheckCommand:
         results = run_self_check(self.repository)
         print(format_self_check(results))
         return 0 if all(result.ok for result in results) else 1
-
-
-class BuildModelCommand:
-    def __init__(
-        self,
-        repository: KnowledgeRepository,
-        output_path: Path | str,
-        order: int = 2,
-    ) -> None:
-        self.repository = repository
-        self.output_path = output_path
-        self.order = order
-
-    def execute(self) -> int:
-        output = write_local_model(self.repository, self.output_path, order=self.order)
-        print(f"Wrote local n-gram model: {output}")
-        return 0
-
-
-class ModelInfoCommand:
-    def __init__(self, model_path: Path | str) -> None:
-        self.model_path = model_path
-
-    def execute(self) -> int:
-        print(summarize_local_model(self.model_path))
-        return 0
