@@ -37,7 +37,7 @@ python src/main.py --strategy adaptive --mode balanced "organize a field kit"
 
 ### Accuracy
 
-Normal and high-risk queries may use BM25 when resources are not constrained. Critical-risk queries still stay on lexical retrieval because the current stress benchmark gives lexical retrieval the stronger refusal profile.
+Normal and high-risk queries may use BM25 when resources are not constrained. Critical-risk queries stay on lexical retrieval because the current safety policy intentionally favors the more conservative refusal profile.
 
 ```bash
 python src/main.py --strategy adaptive --mode accuracy "radio communication plan"
@@ -45,7 +45,7 @@ python src/main.py --strategy adaptive --mode accuracy "radio communication plan
 
 ## Explicit budgets
 
-Budgets are policy inputs, not measurements. They let an operator impose a hard resource preference even when LastLight cannot read battery or memory telemetry from the platform.
+Budgets are policy inputs, not hardware measurements. They let an operator impose a resource preference even when LastLight cannot read battery or memory telemetry from the platform.
 
 ```bash
 python src/main.py --strategy adaptive \
@@ -54,7 +54,7 @@ python src/main.py --strategy adaptive \
   "how do I purify water"
 ```
 
-An energy budget at or below `0.5 mWh/query` or a memory budget at or below `64 MB` selects the low-cost lexical path. These thresholds are intentionally simple and auditable; they can be recalibrated from real-device benchmarks rather than hidden inside a learned model.
+An energy budget at or below `0.5 mWh/query` or a memory budget at or below `64 MB` selects the low-cost lexical path. These thresholds are intentionally simple and auditable. Hardware calibration and energy measurement belong in the companion `lastlight-bench` project rather than in the core runtime.
 
 ## Inspect the decision
 
