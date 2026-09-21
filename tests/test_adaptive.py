@@ -12,40 +12,28 @@ from lastlight.adaptive import (
 from lastlight.domain import SearchQuery
 
 
-class FakeCore:
-    def __init__(self, available: bool) -> None:
-        self.available = available
-
-    def count_matches(self, query_tokens: list[str], document_tokens: list[str]) -> int:
-        document_set = set(document_tokens)
-        return sum(1 for token in query_tokens if token in document_set)
-
-
 def profile(
     *,
     low_resource: bool = False,
     battery: float | None = 80.0,
-    c_core: bool = False,
 ) -> ResourceProfile:
     return ResourceProfile(
         low_resource_target=low_resource,
         memory_mb=4096,
         battery_percent=battery,
-        c_core_available=c_core,
     )
 
 
 class AdaptiveRetrievalTests(unittest.TestCase):
-    def test_survival_mode_prefers_native_core_and_caps_top_k(self) -> None:
+    def test_survival_mode_prefers_core_lexical_and_caps_top_k(self) -> None:
         strategy = AdaptiveRetrievalStrategy(
             AdaptiveRetrievalConfig(mode="survival"),
-            profile(c_core=True),
-            FakeCore(available=True),
+            profile(),
         )
 
         decision = strategy.plan(SearchQuery("find shelter", top_k=8))
 
-        self.assertEqual(decision.strategy, "c-lexical")
+        self.assertEqual(decision.strategy, "lexical")
         self.assertEqual(decision.effective_top_k, 2)
         self.assertIn("survival", decision.reason)
 
@@ -53,7 +41,6 @@ class AdaptiveRetrievalTests(unittest.TestCase):
         strategy = AdaptiveRetrievalStrategy(
             AdaptiveRetrievalConfig(mode="balanced"),
             profile(battery=12.0),
-            FakeCore(available=False),
         )
 
         decision = strategy.plan(SearchQuery("find shelter", top_k=5))
@@ -66,7 +53,6 @@ class AdaptiveRetrievalTests(unittest.TestCase):
         strategy = AdaptiveRetrievalStrategy(
             AdaptiveRetrievalConfig(mode="accuracy"),
             profile(),
-            FakeCore(available=False),
         )
 
         decision = strategy.plan(SearchQuery("person is not breathing", top_k=5))
@@ -79,7 +65,6 @@ class AdaptiveRetrievalTests(unittest.TestCase):
         strategy = AdaptiveRetrievalStrategy(
             AdaptiveRetrievalConfig(mode="accuracy"),
             profile(),
-            FakeCore(available=False),
         )
 
         decision = strategy.plan(SearchQuery("organize a field kit", top_k=4))
@@ -92,7 +77,6 @@ class AdaptiveRetrievalTests(unittest.TestCase):
         strategy = AdaptiveRetrievalStrategy(
             AdaptiveRetrievalConfig(mode="balanced", energy_budget_mwh=0.4),
             profile(),
-            FakeCore(available=False),
         )
 
         decision = strategy.plan(SearchQuery("organize a field kit", top_k=4))
