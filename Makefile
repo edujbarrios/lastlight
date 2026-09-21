@@ -1,13 +1,11 @@
 PYTHON ?= python3
+PACK ?=
 
-.PHONY: run test eval
-
-run:
-	$(PYTHON) src/main.py
+.PHONY: test eval
 
 test:
 	$(PYTHON) -m unittest discover -s tests
 
 eval:
-	$(PYTHON) src/main.py --eval
-
+	@test -n "$(PACK)" || (echo "Usage: make eval PACK=path/to/pack.zip"; exit 2)
+	$(PYTHON) src/main.py --knowledge "$(PACK)" --eval
