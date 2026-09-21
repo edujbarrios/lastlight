@@ -28,7 +28,6 @@ from .safety import (
 from .session import LastLightSession
 from .synthesis import synthesize_answer
 from .triage import first_acceptable_result
-from .web import serve
 
 
 class InteractiveCommand:
@@ -259,18 +258,6 @@ class EvaluationCommand:
         print(format_evaluation_report(report))
         output = write_evaluation_report(report, self.output_path)
         print(f"Wrote evaluation report: {output}")
-        return 0
-
-
-class ServeCommand:
-    def __init__(self, app: LastLightApp, host: str, port: int) -> None:
-        self.app = app
-        self.host = host
-        self.port = port
-
-    def execute(self) -> int:
-        print(STARTUP_WARNING)
-        serve(self.app, host=self.host, port=self.port)
         return 0
 
 
