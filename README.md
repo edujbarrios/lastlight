@@ -2,37 +2,28 @@
 
 **Low-power, offline RAG for disaster and infrastructure-failure guidance.**
 
-LastLight is a stdlib-only local retrieval system for constrained environments. It searches Markdown knowledge packs, returns sourced passages, keeps pack provenance visible, and refuses when confidence is too low.
+LastLight is a stdlib-only local retrieval system for constrained environments. It searches downloaded Markdown knowledge packs, returns sourced passages, preserves pack provenance, and refuses when confidence is too low.
 
 No cloud API. No embeddings. No vector database. No telemetry. No package install required.
 
 > Inspired by the resource-scarcity premise of *This War of Mine*. LastLight is an independent project and is not affiliated with the game or its creators.
 
-## Why it exists
+## What it does
 
-When Internet access, battery, compute, or infrastructure are unreliable, the useful question is not “how large is the model?” but “can I still retrieve trustworthy local guidance, know where it came from, and avoid answering when confidence is weak?”
-
-LastLight focuses on that problem with:
-
-- offline lexical, BM25, optional C-backed, and adaptive retrieval
-- confidence-aware refusal
-- one or multiple independent knowledge packs mounted at once
-- pack attribution, versioning, SHA-256 integrity and provenance checks
-- automatic ES/EN routing for multilingual corpora
-- device benchmarking for latency, memory and measured/estimated energy
-- a small local web UI with no runtime Internet dependency
+- mounts **one or multiple** independent directory/ZIP knowledge packs at once
+- keeps pack name, version, source and local path attached to retrieved documents
+- supports lexical, BM25, optional C-backed and adaptive retrieval
+- refuses low-confidence answers instead of fabricating guidance
+- routes Spanish/English queries to matching documents when possible
+- validates pack structure, SHA-256 integrity, provenance and freshness metadata
+- benchmarks latency, memory and measured/estimated energy
+- includes a tiny local web UI with no runtime Internet dependency
 
 ## Frontend
 
-The local web UI shows mounted packs and attributes accepted passages back to the pack, version, source document and confidence.
+The local web UI shows mounted packs and attributes accepted passages back to their pack, version, source document and confidence.
 
-<img src="docs/screenshots/lastlight-web.png" alt="LastLight local web UI with three Spanish knowledge packs mounted and a Spanish sourced answer" width="760">
-
-```bash
-python src/main.py --serve
-```
-
-Open `http://127.0.0.1:8765`.
+<img src="docs/screenshots/lastlight-web.png" alt="LastLight local web UI with multiple Spanish knowledge packs mounted" width="760">
 
 ## Quick start
 
@@ -40,24 +31,13 @@ Open `http://127.0.0.1:8765`.
 git clone https://github.com/edujbarrios/lastlight.git
 cd lastlight
 
-# Query the bundled knowledge.
-python src/main.py "how do I purify water"
-
-# Spanish queries are routed to Spanish knowledge when available.
-python src/main.py "¿cómo potabilizo agua?"
-```
-
-### Use one knowledge pack
-
-```bash
+# Query one downloaded pack.
 python src/main.py \
   --knowledge packs/water-es.zip \
-  "¿cómo almaceno agua de forma segura?"
+  "¿cómo potabilizo agua?"
 ```
 
-### Use several packs at the same time
-
-`--knowledge` is repeatable. Packs stay independent; LastLight combines their documents into one searchable corpus while preserving pack-level attribution.
+`--knowledge` is repeatable, so several packs can be searched as one corpus without merging their ZIP files:
 
 ```bash
 python src/main.py \
@@ -67,7 +47,7 @@ python src/main.py \
   "necesito agua segura y primeros auxilios"
 ```
 
-The same works in the local UI:
+Run the same mounted packs in the local web UI:
 
 ```bash
 python src/main.py \
@@ -76,39 +56,49 @@ python src/main.py \
   --serve
 ```
 
-### Verify a downloaded pack
+Then open `http://127.0.0.1:8765`.
+
+## Knowledge packs
+
+LastLight no longer ships an embedded emergency corpus in `knowledge/`. That directory now documents the pack format only; actual knowledge is expected to arrive as independently versioned packs.
+
+A typical ZIP looks like:
+
+```text
+water-es.zip
+├── lastlight-pack.json
+├── es/
+│   └── water/
+│       ├── purification.md
+│       └── storage.md
+└── sources/
+    └── references.json
+```
+
+See [`knowledge/README.md`](knowledge/README.md) for the expected ZIP structure and [`docs/knowledge_packs.md`](docs/knowledge_packs.md) for the full contract.
+
+Verify a downloaded pack before using it:
 
 ```bash
 python src/main.py --knowledge pack.zip --validate-pack
 python src/main.py --knowledge pack.zip --verify-provenance
 ```
 
-Pack-specific maintenance commands intentionally operate on one pack at a time; verify each artifact independently, then mount any combination for retrieval.
+Pack-specific maintenance commands intentionally operate on one pack at a time. Verify each artifact independently, then mount any combination for retrieval.
+
+### Planned knowledge platform
+
+A separate web platform is planned for browsing, reading and downloading versioned LastLight knowledge packs as `.zip` files. The intended flow is: discover knowledge online → download selected packs → transfer them if necessary by USB/SD → verify locally → mount one or more packs in LastLight.
+
+The platform will remain optional: once packs are downloaded, LastLight continues to work fully offline.
 
 ## Language behavior
 
-Explicit `--language es` / `--language en` always wins. Without it, LastLight:
-
-- automatically adopts the corpus language for monolingual packs
-- routes clearly Spanish queries to `es` documents in mixed ES/EN corpora
-- routes clearly English queries to `en`
-- leaves ambiguous multilingual queries unfiltered instead of guessing
-
-LastLight does not translate retrieved text: it returns the original sourced passage from the selected pack.
-
-## Safety and provenance
-
-Each accepted result can carry pack name, version, source and local path. `lastlight-pack.json` can also describe publisher, publication/expiry dates, provenance entries and an optional deterministic fingerprint.
-
-```bash
-python src/main.py --knowledge pack.zip --verify-provenance --provenance-json
-```
-
-This is registry-neutral: packs can arrive through USB, SD card, GitHub Releases, or a future static catalog and still be verified locally.
+Explicit `--language es` / `--language en` always wins. Without it, LastLight automatically adopts a monolingual corpus language and conservatively routes clear ES/EN queries inside mixed corpora. Retrieved passages are returned in their original pack language; LastLight does not silently translate them.
 
 ## Benchmark
 
-The stress suite contains **238 deterministic cases**, including misspellings, terse prompts, regional Spanish, multi-intent emergencies, adversarial instructions and out-of-domain requests.
+The stress suite contains **238 deterministic cases**, including misspellings, regional Spanish, multi-intent emergencies, adversarial instructions and out-of-domain requests.
 
 | Strategy | Top-1 | Top-3 | MRR | Answer precision | Refusal recall | Answerable recall |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -118,32 +108,24 @@ The stress suite contains **238 deterministic cases**, including misspellings, t
 The default lexical strategy remains the safer current tradeoff because it gives up some answerable recall in exchange for stronger answer precision and refusal behavior.
 
 ```bash
-python src/main.py --eval
 python src/main.py --benchmark
 python src/main.py --benchmark --benchmark-energy-source rapl
 ```
-
-RAPL measurements are CPU/package energy, not necessarily whole-device wall power. See [Performance and Energy Measurement](docs/performance.md).
 
 ## Useful commands
 
 | Task | Command |
 | --- | --- |
-| Interactive mode | `python src/main.py` |
-| Query | `python src/main.py "stop bleeding"` |
-| JSON output | `python src/main.py --format json "stop bleeding"` |
-| Source ranking | `python src/main.py --format sources "stop bleeding"` |
 | One pack | `python src/main.py --knowledge water.zip "safe water"` |
 | Multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "safe water and first aid"` |
-| Force Spanish | `python src/main.py --language es "necesito ayuda"` |
-| Adaptive retrieval | `python src/main.py --strategy adaptive --mode balanced "purify water"` |
-| Inspect adaptive plan | `python src/main.py --strategy adaptive --plan "purify water"` |
+| Web UI | `python src/main.py --knowledge water.zip --serve` |
+| JSON output | `python src/main.py --knowledge water.zip --format json "safe water"` |
+| Source ranking | `python src/main.py --knowledge water.zip --format sources "safe water"` |
+| Force Spanish | `python src/main.py --knowledge water.zip --language es "necesito ayuda"` |
 | Validate pack | `python src/main.py --knowledge pack.zip --validate-pack` |
 | Verify provenance | `python src/main.py --knowledge pack.zip --verify-provenance` |
-| List knowledge | `python src/main.py --list-knowledge` |
-| Local web UI | `python src/main.py --serve` |
-| Evaluate retrieval | `python src/main.py --eval` |
-| Device benchmark | `python src/main.py --benchmark` |
+| Adaptive retrieval | `python src/main.py --knowledge pack.zip --strategy adaptive --mode balanced "agua"` |
+| Device benchmark | `python src/main.py --knowledge pack.zip --benchmark` |
 | Run tests | `python -m unittest discover -s tests` |
 
 ## Docs
@@ -154,7 +136,6 @@ RAPL measurements are CPU/package energy, not necessarily whole-device wall powe
 - [Adaptive Retrieval](docs/adaptive_retrieval.md)
 - [Device Benchmark](docs/device_benchmark.md)
 - [Performance and Energy Measurement](docs/performance.md)
-- [Roadmap](docs/roadmap.md)
 
 ## License
 
