@@ -130,7 +130,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--strategy",
-        choices=("lexical", "bm25", "c-lexical", "adaptive"),
+        choices=("lexical", "bm25", "adaptive"),
         default="lexical",
         help="retrieval strategy to use",
     )
