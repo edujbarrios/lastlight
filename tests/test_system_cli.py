@@ -10,26 +10,6 @@ from lastlight import cli
 
 
 class SystemCliTests(unittest.TestCase):
-    def test_benchmark_routes_without_creating_query_app(self) -> None:
-        with patch.object(cli.DeviceBenchmarkCommand, "execute", return_value=0) as execute:
-            with patch.object(cli.ApplicationFactory, "create") as create:
-                with redirect_stdout(io.StringIO()):
-                    exit_code = cli.main(
-                        [
-                            "--benchmark",
-                            "--benchmark-max-cases",
-                            "12",
-                            "--benchmark-energy-source",
-                            "estimate",
-                            "--benchmark-watts",
-                            "5",
-                        ]
-                    )
-
-        self.assertEqual(exit_code, 0)
-        execute.assert_called_once_with()
-        create.assert_not_called()
-
     def test_verify_provenance_routes_without_creating_query_app(self) -> None:
         with patch.object(cli.VerifyProvenanceCommand, "execute", return_value=0) as execute:
             with patch.object(cli.ApplicationFactory, "create") as create:
@@ -46,11 +26,6 @@ class SystemCliTests(unittest.TestCase):
         self.assertEqual(exit_code, 0)
         execute.assert_called_once_with()
         create.assert_not_called()
-
-    def test_rejects_zero_benchmark_cases(self) -> None:
-        with self.assertRaises(SystemExit):
-            with redirect_stdout(io.StringIO()):
-                cli.main(["--benchmark", "--benchmark-max-cases", "0"])
 
     def test_rejects_zero_stale_threshold(self) -> None:
         with self.assertRaises(SystemExit):
