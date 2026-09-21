@@ -22,7 +22,7 @@ from .commands import (
 from .factory import ApplicationFactory
 from .knowledge_sources import build_knowledge_repository
 from .repository import MarkdownKnowledgeRepository
-from .system_commands import DeviceBenchmarkCommand, VerifyProvenanceCommand
+from .system_commands import VerifyProvenanceCommand
 
 
 def positive_int(value: str) -> int:
@@ -80,53 +80,12 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="PATH",
         help="write --query-file answers as a human-readable Markdown guide",
     )
-    parser.add_argument("--eval", action="store_true", help="run evaluation suite")
+    parser.add_argument("--eval", action="store_true", help="run core evaluation suite")
     parser.add_argument(
         "--eval-output",
         default=None,
         metavar="PATH",
         help="write evaluation JSON to this path",
-    )
-    parser.add_argument(
-        "--benchmark",
-        action="store_true",
-        help="run the integrated device/safety/energy benchmark and exit",
-    )
-    parser.add_argument(
-        "--benchmark-json",
-        action="store_true",
-        help="emit --benchmark output as machine-readable JSON",
-    )
-    parser.add_argument(
-        "--benchmark-max-cases",
-        type=positive_int,
-        default=None,
-        metavar="N",
-        help="limit benchmark evaluation cases for a quicker smoke run",
-    )
-    parser.add_argument(
-        "--benchmark-energy-source",
-        choices=("auto", "rapl", "counter", "estimate"),
-        default="auto",
-        help="energy source for --benchmark",
-    )
-    parser.add_argument(
-        "--benchmark-energy-counter",
-        metavar="PATH",
-        help="cumulative hardware energy counter file for --benchmark",
-    )
-    parser.add_argument(
-        "--benchmark-energy-unit",
-        choices=("uj", "mj", "j", "uwh", "mwh", "wh"),
-        default="mwh",
-        help="unit stored by --benchmark-energy-counter",
-    )
-    parser.add_argument(
-        "--benchmark-watts",
-        type=positive_float,
-        default=15.0,
-        metavar="WATTS",
-        help="power assumption used only when benchmark energy is estimated",
     )
     parser.add_argument(
         "--strategy",
@@ -145,7 +104,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=positive_float,
         default=None,
         metavar="MWH",
-        help="per-query energy budget for adaptive retrieval",
+        help="per-query energy budget for adaptive retrieval policy",
     )
     parser.add_argument(
         "--memory-budget-mb",
@@ -174,7 +133,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--build-index",
         metavar="PATH",
-        help="write an optional offline JSON index and exit",
+        help="write an optional offline JSON audit index and exit",
     )
     parser.add_argument(
         "--verify-index",
@@ -247,17 +206,6 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    if args.benchmark:
-        source = _single_knowledge_source(parser, args.knowledge, "--benchmark")
-        return DeviceBenchmarkCommand(
-            source,
-            energy_source=args.benchmark_energy_source,
-            energy_counter=args.benchmark_energy_counter,
-            energy_unit=args.benchmark_energy_unit,
-            watts=args.benchmark_watts,
-            max_cases=args.benchmark_max_cases,
-            as_json=args.benchmark_json,
-        ).execute()
     if args.self_check:
         source = _single_knowledge_source(parser, args.knowledge, "--self-check")
         repository = MarkdownKnowledgeRepository(source)
