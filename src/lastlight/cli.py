@@ -4,20 +4,15 @@ from __future__ import annotations
 
 import argparse
 import json
-
 from pathlib import Path
 
 from .commands import (
     BatchQueryCommand,
     BuildIndexCommand,
-    BuildModelCommand,
     EvaluationCommand,
-    ExportPackCommand,
     FieldGuideCommand,
-    ImportPdfCommand,
     InteractiveCommand,
     ListKnowledgeCommand,
-    ModelInfoCommand,
     PackInfoCommand,
     QueryCommand,
     SelfCheckCommand,
@@ -199,7 +194,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--validate-pack",
         action="store_true",
-        help="validate a knowledge pack for community publishing and exit",
+        help="validate a knowledge pack and exit",
     )
     parser.add_argument(
         "--verify-provenance",
@@ -217,59 +212,6 @@ def build_parser() -> argparse.ArgumentParser:
         default=365,
         metavar="DAYS",
         help="age threshold that triggers a provenance freshness warning",
-    )
-    parser.add_argument(
-        "--export-pack",
-        metavar="PATH",
-        help="write a deterministic .zip knowledge pack and exit",
-    )
-    parser.add_argument(
-        "--require-valid-pack",
-        action="store_true",
-        help="fail --export-pack when pack validation does not pass",
-    )
-    parser.add_argument(
-        "--import-pdf",
-        metavar="PATH",
-        help="convert a text-based PDF into LastLight Markdown and exit",
-    )
-    parser.add_argument(
-        "--import-output",
-        metavar="PATH",
-        help="output Markdown path for --import-pdf",
-    )
-    parser.add_argument("--import-title", help="title override for --import-pdf")
-    parser.add_argument(
-        "--import-tags",
-        default="imported,pdf",
-        help="comma-separated tags for --import-pdf",
-    )
-    parser.add_argument(
-        "--import-priority",
-        default="normal",
-        help="front matter priority for --import-pdf",
-    )
-    parser.add_argument(
-        "--import-summary-items",
-        type=positive_int,
-        default=8,
-        help="maximum important points for --import-pdf",
-    )
-    parser.add_argument(
-        "--build-model",
-        metavar="PATH",
-        help="write an experimental local n-gram model JSON and exit",
-    )
-    parser.add_argument(
-        "--model-order",
-        type=positive_int,
-        default=2,
-        help="n-gram order for --build-model",
-    )
-    parser.add_argument(
-        "--model-info",
-        metavar="PATH",
-        help="inspect a local n-gram model JSON and exit",
     )
     parser.add_argument(
         "--stream",
@@ -292,11 +234,6 @@ def build_parser() -> argparse.ArgumentParser:
         "--fail-on-refusal",
         action="store_true",
         help="exit with status 2 when a single query has no acceptable answer",
-    )
-    parser.add_argument(
-        "--synthesize",
-        action="store_true",
-        help="experimental citation-aware n-gram synthesis from retrieved passage",
     )
     parser.add_argument(
         "--self-check",
@@ -343,33 +280,6 @@ def main(argv: list[str] | None = None) -> int:
             repository,
             stale_after_days=args.stale_after_days,
             as_json=args.provenance_json,
-        ).execute()
-    if args.export_pack:
-        source = _single_knowledge_source(parser, args.knowledge, "--export-pack")
-        repository = MarkdownKnowledgeRepository(source)
-        return ExportPackCommand(
-            repository,
-            Path(args.export_pack),
-            require_valid=args.require_valid_pack,
-        ).execute()
-    if args.import_pdf:
-        tags = tuple(tag.strip() for tag in args.import_tags.split(",") if tag.strip())
-        return ImportPdfCommand(
-            args.import_pdf,
-            output_path=args.import_output,
-            title=args.import_title,
-            language=args.language or "unknown",
-            tags=tags,
-            priority=args.import_priority,
-            summary_items=args.import_summary_items,
-        ).execute()
-    if args.model_info:
-        return ModelInfoCommand(Path(args.model_info)).execute()
-    if args.build_model:
-        source = _single_knowledge_source(parser, args.knowledge, "--build-model")
-        repository = MarkdownKnowledgeRepository(source)
-        return BuildModelCommand(
-            repository, Path(args.build_model), order=args.model_order
         ).execute()
     if args.build_index:
         source = _single_knowledge_source(parser, args.knowledge, "--build-index")
@@ -433,7 +343,6 @@ def main(argv: list[str] | None = None) -> int:
             app,
             " ".join(args.query),
             stream=args.stream,
-            synthesize=args.synthesize,
             output_format=args.format,
             top_k=args.top_k,
             fail_on_refusal=args.fail_on_refusal,
