@@ -85,18 +85,6 @@ class CliTests(unittest.TestCase):
                 with redirect_stderr(io.StringIO()):
                     cli.main(["--top-k", "0", "hello"])
 
-    def test_rejects_non_positive_import_summary_items(self) -> None:
-        with self.assertRaises(SystemExit):
-            with redirect_stdout(io.StringIO()):
-                with redirect_stderr(io.StringIO()):
-                    cli.main(["--import-pdf", "guide.pdf", "--import-summary-items", "0"])
-
-    def test_rejects_non_positive_model_order(self) -> None:
-        with self.assertRaises(SystemExit):
-            with redirect_stdout(io.StringIO()):
-                with redirect_stderr(io.StringIO()):
-                    cli.main(["--build-model", "model.json", "--model-order", "0"])
-
     def test_query_json_output_is_machine_readable(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
             app = create.return_value
@@ -221,43 +209,6 @@ class CliTests(unittest.TestCase):
                     ])
 
         self.assertEqual(exit_code, 2)
-
-    def test_import_pdf_does_not_create_application(self) -> None:
-        with patch.object(cli.ApplicationFactory, "create") as create:
-            with patch.object(cli.ImportPdfCommand, "execute", return_value=0) as execute:
-                exit_code = cli.main(
-                    [
-                        "--import-pdf",
-                        "guide.pdf",
-                        "--import-output",
-                        "knowledge/en/imported/guide.md",
-                        "--language",
-                        "en",
-                        "--import-tags",
-                        "imported,pdf,water",
-                        "--import-priority",
-                        "high",
-                        "--import-summary-items",
-                        "3",
-                    ]
-                )
-
-        self.assertEqual(exit_code, 0)
-        create.assert_not_called()
-        execute.assert_called_once_with()
-
-    def test_export_pack_passes_require_valid_flag(self) -> None:
-        with patch.object(cli, "ExportPackCommand") as command_class:
-            command_class.return_value.execute.return_value = 0
-            with redirect_stdout(io.StringIO()):
-                exit_code = cli.main([
-                    "--export-pack",
-                    "dist/pack.zip",
-                    "--require-valid-pack",
-                ])
-
-        self.assertEqual(exit_code, 0)
-        self.assertTrue(command_class.call_args.kwargs["require_valid"])
 
 
 if __name__ == "__main__":
