@@ -1,48 +1,59 @@
-# Roadmap
+# Core Roadmap
 
-## v0.1
+This roadmap covers only `edujbarrios/lastlight`, the offline core runtime. UI, pack publishing, ingestion and generation experiments belong in companion repositories described in [`ECOSYSTEM.md`](../ECOSYSTEM.md).
 
-- Markdown knowledge base
-- Recursive discovery
-- Deterministic retrieval
-- CLI
-- Tests
-- Evaluation suite
+## Current core
 
-## v0.2
+- Markdown directory and ZIP knowledge packs
+- repeated `--knowledge` for multi-pack retrieval
+- pack-level attribution
+- lexical and BM25 retrieval
+- optional C-backed lexical retrieval
+- resource-adaptive retrieval policies
+- confidence-aware refusal
+- deterministic ES/EN routing
+- pack validation, integrity indexes and provenance/freshness checks
+- offline CLI, batch queries and field-guide output
+- deterministic evaluation and constrained-device diagnostics
 
-- BM25 strategy: implemented as optional in-memory retrieval
-- Better multilingual support: started with deterministic query expansion
-- Improved chunking: implemented for cleaner passage selection
+## Next core milestones
 
-## v0.3
+### Pack contract hardening
 
-- Compressed knowledge packs: basic `.zip` Markdown loading implemented
-- Offline index builder: optional JSON audit index implemented
-- Streaming retrieval: line-flushed terminal output implemented
+- canonical pack-relative fingerprint paths so directory and ZIP representations hash consistently
+- explicit pack-format version field
+- compatibility checks between core and pack format versions
+- clearer distinction between integrity and publisher authenticity
 
-## v0.4
+### Runtime boundaries
 
-- Tiny n-gram language model: experimental `--synthesize` mode implemented
-- Citation-aware generation based exclusively on retrieved passages: implemented with warning, citation, and original passage display
+- stable Python API for companion frontends and tools
+- documented extension points for retrieval backends
+- structured machine-readable runtime/status output
+- preserve zero-network and stdlib-only default behavior
 
-## v0.5
+### Safety and evaluation
 
-- Raspberry Pi support: documented with `--self-check`
-- Termux support: documented with `--self-check`
-- Old laptop support: documented with low-power usage notes
+- expand refusal regression coverage
+- improve multilingual routing without hidden translation
+- publish stable evaluation profiles for core retrieval behavior
+- keep safety policy changes auditable and deterministic
 
-## v0.6
+### Portability
 
-- Optional C retrieval core: implemented as `--strategy c-lexical` with Python fallback
+- continue validating ordinary Linux, Windows, macOS, Termux and low-resource ARM targets
+- keep the pure-Python path as the compatibility baseline
 
-## v0.7
+## Outside this repository
 
-- Tiny local language models: auditable JSON n-gram model packs implemented
-- Research into ultra-low-power AI systems: local model size and transition summaries available through `--model-info`
+The following are intentionally not core roadmap items:
 
-## v1.0
+- browser/desktop/mobile UI
+- public knowledge-pack catalog
+- curated knowledge content
+- PDF/HTML ingestion and pack publishing
+- digital-signing infrastructure
+- experimental local generation/synthesis
+- large hardware benchmark datasets and dashboards
 
-- Community-maintained emergency knowledge repository: started with pack manifest conventions, validation, and contribution checklist
-- Multilingual knowledge packs: optional `lastlight-pack.json` metadata implemented for directories and `.zip` packs
-- Reproducible offline intelligence system: deterministic pack export and audit indexes with pack metadata implemented
+Those belong in focused companion repositories rather than expanding the core into a monorepo.
