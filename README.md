@@ -2,24 +2,29 @@
 
 **Low-power, offline retrieval for disaster and infrastructure-failure guidance.**
 
-`edujbarrios/lastlight` is **LastLight Core**: the small, auditable runtime that loads local knowledge packs, retrieves sourced passages, preserves provenance, and refuses when confidence is too low.
+Most modern AI research moves in one direction: larger models, larger context windows, more accelerators, more memory, and increasingly capable cloud infrastructure. That direction is useful, but it leaves a different question relatively unexplored: **what happens when the infrastructure itself is the problem?**
+
+LastLight explores the reverse case. It asks how much useful machine-assisted reasoning can remain available when connectivity is unreliable or absent, power is scarce, hardware is modest, and a remote model cannot be assumed to exist.
+
+The goal is not to reproduce a general-purpose cloud LLM on a tiny device. LastLight is designed for a narrower and more auditable job: **retrieve practical knowledge locally, show where it came from, operate within strict resource constraints, and refuse when the available evidence is not strong enough to support an answer.**
+
+That makes it useful for scenarios such as prolonged outages, damaged communications infrastructure, remote field work, low-power devices, emergency preparation, or any environment where access to external services cannot be guaranteed.
+
+LastLight works entirely from local knowledge packs. A device can carry one or several independently versioned packs—for example water, first aid, blackout procedures, communications, or navigation—and search them together without requiring a network connection.
 
 No cloud API. No embeddings. No vector database. No telemetry. No package install required.
 
 > Inspired by the resource-scarcity premise of *This War of Mine*. LastLight is an independent project and is not affiliated with the game or its creators.
 
-## Core scope
-
-This repository owns only the stable offline engine and contracts:
+## What LastLight provides
 
 - mount **one or multiple** directory/ZIP knowledge packs at once
-- lexical, BM25 and resource-adaptive retrieval
-- confidence-aware refusal and source traceability
-- ES/EN language routing
+- deterministic lexical, BM25 and resource-adaptive retrieval
+- sourced passages with pack and document traceability
+- confidence-aware refusal instead of fabricating unsupported answers
+- ES/EN language routing without silently translating source material
 - pack metadata, validation, SHA-256 integrity, provenance and freshness checks
-- a stdlib-only CLI and a small deterministic regression suite
-
-Presentation, pack publishing, content, native acceleration, hardware benchmarking and experimental generation belong in companion repositories. See [ECOSYSTEM.md](ECOSYSTEM.md).
+- a stdlib-only CLI suitable for constrained and disconnected systems
 
 ## Quick start
 
@@ -32,7 +37,7 @@ python src/main.py \
   "¿cómo potabilizo agua?"
 ```
 
-`--knowledge` is repeatable. Packs stay independent while LastLight searches them as one corpus:
+`--knowledge` is repeatable. Packs remain independent while LastLight searches them as one local corpus:
 
 ```bash
 python src/main.py \
@@ -44,7 +49,7 @@ python src/main.py \
 
 ## Knowledge packs
 
-LastLight Core does not ship an emergency corpus. [`knowledge/README.md`](knowledge/README.md) documents the pack format; real knowledge is expected to arrive as independently versioned packs.
+LastLight does not ship a fixed emergency corpus. [`knowledge/README.md`](knowledge/README.md) documents the pack format; knowledge can be distributed and updated independently from the runtime.
 
 ```text
 water-es.zip
@@ -68,11 +73,11 @@ See [Knowledge Packs](docs/knowledge_packs.md) and [Knowledge Pack Provenance](d
 
 ## Language behavior
 
-Explicit `--language es` / `--language en` always wins. Without it, LastLight adopts a monolingual corpus language automatically and conservatively routes clear ES/EN queries inside mixed corpora. Retrieved passages remain in the original pack language; the core does not silently translate them.
+Explicit `--language es` / `--language en` always wins. Without it, LastLight adopts a monolingual corpus language automatically and conservatively routes clear ES/EN queries inside mixed corpora. Retrieved passages remain in the original pack language; LastLight does not silently translate them.
 
-## Core evaluation
+## Evaluation
 
-`--eval` is a lightweight regression check for retrieval/refusal behavior. The core keeps only the small seed suite; larger stress datasets, hardware profiles, latency/memory studies and energy measurements belong in the planned `lastlight-bench` repository.
+`--eval` runs a small deterministic regression suite for retrieval and refusal behavior.
 
 ```bash
 python src/main.py --knowledge pack.zip --eval
@@ -91,12 +96,14 @@ python src/main.py --knowledge pack.zip --eval
 | Verify provenance | `python src/main.py --knowledge pack.zip --verify-provenance` |
 | Adaptive retrieval | `python src/main.py --knowledge pack.zip --strategy adaptive --mode balanced "agua"` |
 | Inspect adaptive plan | `python src/main.py --knowledge pack.zip --strategy adaptive --plan "agua"` |
-| Core evaluation | `python src/main.py --knowledge pack.zip --eval` |
+| Evaluation | `python src/main.py --knowledge pack.zip --eval` |
 | Run tests | `python -m unittest discover -s tests` |
 
-## Ecosystem
+## Research direction
 
-This repository is intentionally the core, not a monorepo. Companion repository boundaries are described in [ECOSYSTEM.md](ECOSYSTEM.md).
+LastLight treats offline intelligence as a systems problem rather than a model-size competition: how much useful, trustworthy assistance can be preserved per unit of compute, memory, energy and stored knowledge when external infrastructure is unavailable?
+
+The project is intended to make that tradeoff measurable and auditable rather than hiding it behind a remote service.
 
 ## Docs
 
@@ -104,6 +111,7 @@ This repository is intentionally the core, not a monorepo. Companion repository 
 - [Knowledge Packs](docs/knowledge_packs.md)
 - [Knowledge Pack Provenance](docs/pack_provenance.md)
 - [Adaptive Retrieval](docs/adaptive_retrieval.md)
+- [Ecosystem](ECOSYSTEM.md)
 
 ## License
 
