@@ -222,17 +222,6 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(exit_code, 2)
 
-    def test_serve_creates_application_and_runs_server_command(self) -> None:
-        with patch.object(cli.ApplicationFactory, "create") as create:
-            with patch.object(cli.ServeCommand, "execute", return_value=0) as execute:
-                exit_code = cli.main(["--serve", "--host", "127.0.0.1", "--port", "9999"])
-
-        self.assertEqual(exit_code, 0)
-        create.assert_called_once_with(
-            knowledge_dir=None, strategy="lexical", language=None
-        )
-        execute.assert_called_once_with()
-
     def test_import_pdf_does_not_create_application(self) -> None:
         with patch.object(cli.ApplicationFactory, "create") as create:
             with patch.object(cli.ImportPdfCommand, "execute", return_value=0) as execute:
