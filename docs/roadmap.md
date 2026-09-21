@@ -1,6 +1,6 @@
 # Core Roadmap
 
-This roadmap covers only `edujbarrios/lastlight`, the offline core runtime. UI, pack publishing, ingestion, native acceleration and generation experiments belong in companion repositories described in [`ECOSYSTEM.md`](../ECOSYSTEM.md).
+This roadmap covers only `edujbarrios/lastlight`, the offline core runtime. UI, pack publishing, ingestion, native acceleration, hardware benchmarking and generation experiments belong in companion repositories described in [`ECOSYSTEM.md`](../ECOSYSTEM.md).
 
 ## Current core
 
@@ -13,7 +13,7 @@ This roadmap covers only `edujbarrios/lastlight`, the offline core runtime. UI, 
 - deterministic ES/EN routing
 - pack validation, integrity indexes and provenance/freshness checks
 - offline CLI, batch queries and field-guide output
-- deterministic evaluation and constrained-device diagnostics
+- small deterministic regression suite and one-shot platform self-check
 
 ## Next core milestones
 
@@ -33,9 +33,9 @@ This roadmap covers only `edujbarrios/lastlight`, the offline core runtime. UI, 
 
 ### Safety and evaluation
 
-- expand refusal regression coverage
+- expand the small refusal regression suite where core behavior changes
 - improve multilingual routing without hidden translation
-- publish stable evaluation profiles for core retrieval behavior
+- publish a stable core evaluation contract that companion benchmark projects can reuse
 - keep safety policy changes auditable and deterministic
 
 ### Portability
@@ -54,6 +54,6 @@ The following are intentionally not core roadmap items:
 - digital-signing infrastructure
 - C/Rust/native acceleration implementations
 - experimental local generation/synthesis
-- large hardware benchmark datasets and dashboards
+- generated stress suites, hardware benchmark datasets and dashboards
 
 Those belong in focused companion repositories rather than expanding the core into a monorepo.
