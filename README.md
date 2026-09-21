@@ -2,28 +2,24 @@
 
 **Low-power, offline RAG for disaster and infrastructure-failure guidance.**
 
-LastLight is a stdlib-only local retrieval system for constrained environments. It searches downloaded Markdown knowledge packs, returns sourced passages, preserves pack provenance, and refuses when confidence is too low.
+LastLight is the **core runtime** of the LastLight ecosystem: a stdlib-only local retrieval engine for constrained environments. It searches downloaded Markdown knowledge packs, returns sourced passages, preserves pack provenance, and refuses when confidence is too low.
 
 No cloud API. No embeddings. No vector database. No telemetry. No package install required.
 
 > Inspired by the resource-scarcity premise of *This War of Mine*. LastLight is an independent project and is not affiliated with the game or its creators.
 
-## What it does
+## Core scope
 
-- mounts **one or multiple** independent directory/ZIP knowledge packs at once
-- keeps pack name, version, source and local path attached to retrieved documents
-- supports lexical, BM25, optional C-backed and adaptive retrieval
-- refuses low-confidence answers instead of fabricating guidance
-- routes Spanish/English queries to matching documents when possible
-- validates pack structure, SHA-256 integrity, provenance and freshness metadata
-- benchmarks latency, memory and measured/estimated energy
-- includes a tiny local web UI with no runtime Internet dependency
+This repository owns the offline engine and its stable contracts:
 
-## Frontend
+- mount **one or multiple** directory/ZIP knowledge packs at once
+- lexical, BM25, optional C-backed and adaptive retrieval
+- confidence-aware refusal and source traceability
+- ES/EN language routing
+- pack metadata, validation, SHA-256 integrity, provenance and freshness checks
+- CLI, evaluation and constrained-device diagnostics
 
-The local web UI shows mounted packs and attributes accepted passages back to their pack, version, source document and confidence.
-
-<img src="docs/screenshots/lastlight-web.png" alt="LastLight local web UI with multiple Spanish knowledge packs mounted" width="760">
+User interfaces, knowledge distribution, pack authoring and other product surfaces are intentionally developed as separate companion projects. See [ECOSYSTEM.md](ECOSYSTEM.md).
 
 ## Quick start
 
@@ -31,7 +27,6 @@ The local web UI shows mounted packs and attributes accepted passages back to th
 git clone https://github.com/edujbarrios/lastlight.git
 cd lastlight
 
-# Query one downloaded pack.
 python src/main.py \
   --knowledge packs/water-es.zip \
   "¿cómo potabilizo agua?"
@@ -47,20 +42,9 @@ python src/main.py \
   "necesito agua segura y primeros auxilios"
 ```
 
-Run the same mounted packs in the local web UI:
-
-```bash
-python src/main.py \
-  --knowledge packs/water-es.zip \
-  --knowledge packs/first-aid-es.zip \
-  --serve
-```
-
-Then open `http://127.0.0.1:8765`.
-
 ## Knowledge packs
 
-LastLight no longer ships an embedded emergency corpus in `knowledge/`. That directory now documents the pack format only; actual knowledge is expected to arrive as independently versioned packs.
+LastLight does not ship an embedded emergency corpus. The [`knowledge/`](knowledge/) directory documents the pack format; actual knowledge is expected to arrive as independently versioned packs.
 
 A typical ZIP looks like:
 
@@ -90,7 +74,7 @@ Pack-specific maintenance commands intentionally operate on one pack at a time. 
 
 A separate web platform is planned for browsing, reading and downloading versioned LastLight knowledge packs as `.zip` files. The intended flow is: discover knowledge online → download selected packs → transfer them if necessary by USB/SD → verify locally → mount one or more packs in LastLight.
 
-The platform will remain optional: once packs are downloaded, LastLight continues to work fully offline.
+The platform is optional by design: once packs are downloaded, the core runtime remains fully offline.
 
 ## Language behavior
 
@@ -118,7 +102,6 @@ python src/main.py --benchmark --benchmark-energy-source rapl
 | --- | --- |
 | One pack | `python src/main.py --knowledge water.zip "safe water"` |
 | Multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "safe water and first aid"` |
-| Web UI | `python src/main.py --knowledge water.zip --serve` |
 | JSON output | `python src/main.py --knowledge water.zip --format json "safe water"` |
 | Source ranking | `python src/main.py --knowledge water.zip --format sources "safe water"` |
 | Force Spanish | `python src/main.py --knowledge water.zip --language es "necesito ayuda"` |
@@ -127,6 +110,10 @@ python src/main.py --benchmark --benchmark-energy-source rapl
 | Adaptive retrieval | `python src/main.py --knowledge pack.zip --strategy adaptive --mode balanced "agua"` |
 | Device benchmark | `python src/main.py --knowledge pack.zip --benchmark` |
 | Run tests | `python -m unittest discover -s tests` |
+
+## Ecosystem
+
+This repository is intentionally the core, not a monorepo. Planned companion repositories and their boundaries are described in [ECOSYSTEM.md](ECOSYSTEM.md).
 
 ## Docs
 
