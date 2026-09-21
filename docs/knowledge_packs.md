@@ -1,6 +1,6 @@
 # Knowledge Packs
 
-LastLight knowledge packs are ordinary directories or `.zip` files containing Markdown documents plus optional metadata. The repository no longer ships a built-in emergency corpus: knowledge is expected to be distributed separately and mounted at runtime.
+LastLight knowledge packs are ordinary directories or `.zip` files containing Markdown documents plus optional metadata. The core repository does not ship a built-in emergency corpus: knowledge is distributed separately and mounted at runtime.
 
 The project-level [`knowledge/README.md`](../knowledge/README.md) is the short format reference. It is intentionally excluded from retrieval.
 
@@ -59,17 +59,21 @@ If no manifest is present, LastLight can still load the documents and infer basi
 
 ## Validate and inspect
 
+The core validates artifacts it is asked to consume:
+
 ```bash
 python src/main.py --knowledge pack.zip --pack-info
 python src/main.py --knowledge pack.zip --validate-pack
 python src/main.py --knowledge pack.zip --verify-provenance
 ```
 
-Pack-specific validation, provenance and export operations are intentionally single-pack operations. Audit each artifact independently before mounting it with others.
+These operations are intentionally single-pack operations. Audit each artifact independently before mounting it with others.
+
+Pack creation, PDF/HTML ingestion, deterministic ZIP publishing and future signing workflows belong in the planned `lastlight-pack-tools` companion repository rather than the runtime core.
 
 ## Mounting multiple packs
 
-Query, interactive, local web and knowledge-list flows can mount more than one pack by repeating `--knowledge`:
+Query, interactive, evaluation and knowledge-list flows can mount more than one pack by repeating `--knowledge`:
 
 ```bash
 python src/main.py \
@@ -85,7 +89,7 @@ LastLight combines the documents into one searchable corpus while retaining the 
 
 Packs are registry-neutral. They can arrive through GitHub Releases, USB/SD card, local storage, a static site or another distribution channel. After the files are local, LastLight does not require Internet access.
 
-A separate web platform is planned for browsing, reading and downloading versioned LastLight packs as ZIP files. The planned platform is a distribution layer, not a runtime dependency: users should be able to download only the packs relevant to their language, region or scenario and later mount any combination offline.
+A separate `lastlight-hub` web platform is planned for browsing, reading and downloading versioned LastLight packs as ZIP files. The hub is a distribution layer, not a runtime dependency: users should be able to download only the packs relevant to their language, region or scenario and later mount any combination offline.
 
 ## Community pack checklist
 
@@ -97,4 +101,4 @@ A separate web platform is planned for browsing, reading and downloading version
 6. Run `--pack-info`, `--validate-pack` and `--verify-provenance` before distribution.
 7. Prefer a root `README.md` for human documentation; LastLight will not index it.
 
-See [Knowledge Pack Provenance](pack_provenance.md) for the integrity and freshness model.
+See [Knowledge Pack Provenance](pack_provenance.md) for the integrity and freshness model, and [`ECOSYSTEM.md`](../ECOSYSTEM.md) for repository boundaries.
