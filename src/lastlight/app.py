@@ -6,7 +6,6 @@ from .domain import SearchQuery, SearchResult
 from .interfaces import KnowledgeRepository, RetrievalStrategy
 from .language import resolve_retrieval_language
 from .safety import safe_answer
-from .synthesis import synthesize_answer
 from .triage import append_follow_up_questions, first_acceptable_result
 
 
@@ -41,9 +40,6 @@ class LastLightApp:
         return append_follow_up_questions(
             safe_answer(results), first_acceptable_result(results)
         )
-
-    def synthesize(self, text: str, top_k: int = 3) -> str:
-        return synthesize_answer(text, self.search(text, top_k=top_k))
 
     def retrieval_metadata(self) -> dict[str, object] | None:
         getter = getattr(self.retrieval, "decision_metadata", None)
