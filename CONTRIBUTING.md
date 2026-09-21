@@ -1,23 +1,36 @@
-# Contributing to LastLight
+# Contributing to LastLight Core
 
-LastLight welcomes small, auditable contributions that improve offline usefulness under constrained conditions.
+LastLight welcomes small, auditable contributions that improve offline retrieval under constrained conditions.
 
-## Knowledge Contributions
+## Core code contributions
 
-1. Create a Markdown file.
-2. Add optional metadata: `title`, `language`, `tags`, and `priority`.
-3. Place it under `knowledge/`.
-4. Run `make test`.
-5. Run `make eval`.
-6. Open a pull request.
+Changes in this repository should directly improve the runtime contract: loading/verifying packs, multi-pack composition, retrieval, language routing, refusal/safety behavior, provenance, or the dependency-free CLI/API.
 
-Knowledge should be practical, source-conscious, calm, and clear. Do not add unsupported claims or advice that depends on hidden context.
+Keep changes deterministic and standard-library only. Avoid network calls, telemetry, background workers, persistent daemons, GUI features, content catalogs, hardware benchmark suites, native-only dependencies, and experimental generation in the core.
 
-## Code Contributions
+Before opening a pull request:
 
-Keep changes small, deterministic, and dependency-free. Prefer readable standard-library code over cleverness. Avoid network calls, telemetry, background workers, persistent daemons, GUI features, and third-party packages.
+```bash
+python -m unittest discover -s tests
+```
 
-## Design Priorities
+For retrieval-policy changes, also run the small core regression suite against an appropriate local knowledge pack:
+
+```bash
+python src/main.py --knowledge path/to/pack.zip --eval
+```
+
+## Knowledge contributions
+
+The core repository does not contain curated emergency knowledge. `knowledge/README.md` documents the pack format only.
+
+Knowledge content should be developed as independently versioned packs (planned home: `lastlight-packs`). Pack-authoring and ingestion utilities belong in `lastlight-pack-tools`.
+
+## Companion projects
+
+Presentation, distribution, curated content, native acceleration, hardware benchmarking, and experimental generation are intentionally separate from the core. See [ECOSYSTEM.md](ECOSYSTEM.md) before adding a new subsystem.
+
+## Design priorities
 
 - Simplicity
 - Transparency
@@ -26,4 +39,3 @@ Keep changes small, deterministic, and dependency-free. Prefer readable standard
 - Extensibility
 - Low-power operation
 - Long-term maintainability
-
