@@ -14,7 +14,7 @@ from .evaluation import build_evaluation_report, load_evaluation_cases
 from .factory import ApplicationFactory
 from .repository import MarkdownKnowledgeRepository
 
-DEFAULT_STRATEGIES = ("lexical", "bm25", "c-lexical", "adaptive")
+DEFAULT_STRATEGIES = ("lexical", "bm25", "adaptive")
 
 
 @dataclass(frozen=True)
