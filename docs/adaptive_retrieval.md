@@ -8,12 +8,12 @@ Enable it with:
 python src/main.py --strategy adaptive "how do I purify water"
 ```
 
-The planner considers four inputs:
+The core planner considers:
 
 1. query risk (`critical`, `high`, or `normal`),
 2. operating mode (`survival`, `balanced`, or `accuracy`),
 3. explicit energy and memory budgets,
-4. a small local device profile: ARM/Termux detection, physical memory when available, battery percentage on Linux power-supply sysfs, and availability of the optional C core.
+4. a small local device profile: ARM/Termux detection, physical memory when available, and battery percentage on Linux power-supply sysfs.
 
 It never calls the network and adds no third-party dependency.
 
@@ -21,7 +21,7 @@ It never calls the network and adds no third-party dependency.
 
 ### Survival
 
-Caps retrieval to at most two results and prefers the optional C-backed lexical path when the native core is available. Otherwise it uses the deterministic Python lexical strategy.
+Caps retrieval to at most two results and uses the deterministic lexical path to keep cost and behavior predictable.
 
 ```bash
 python src/main.py --strategy adaptive --mode survival "find a safe water source"
@@ -54,7 +54,7 @@ python src/main.py --strategy adaptive \
   "how do I purify water"
 ```
 
-An energy budget at or below `0.5 mWh/query` or a memory budget at or below `64 MB` selects the low-cost path. These thresholds are intentionally simple and auditable; they can be recalibrated from real-device benchmarks rather than hidden inside a learned model.
+An energy budget at or below `0.5 mWh/query` or a memory budget at or below `64 MB` selects the low-cost lexical path. These thresholds are intentionally simple and auditable; they can be recalibrated from real-device benchmarks rather than hidden inside a learned model.
 
 ## Inspect the decision
 
@@ -77,11 +77,11 @@ Example shape:
   "mode": "survival",
   "reason": "survival mode caps retrieval cost",
   "risk": "high",
-  "strategy": "c-lexical"
+  "strategy": "lexical"
 }
 ```
 
-Values depend on the device and query. `c-lexical` still retains the existing Python fallback if the native library disappears after profiling.
+Values depend on the device and query.
 
 ## Decision priority
 
@@ -94,3 +94,5 @@ The planner applies constraints in this order:
 5. requested accuracy/balanced policy.
 
 This makes every strategy choice reproducible from the printed metadata.
+
+Optional accelerated retrieval backends are intentionally outside the core runtime and can evolve in a companion project such as `lastlight-native` without changing this policy contract.
