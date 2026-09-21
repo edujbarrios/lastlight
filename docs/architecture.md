@@ -1,6 +1,6 @@
 # Architecture
 
-LastLight uses clean architecture principles without heavy ceremony.
+LastLight Core uses clean architecture principles without heavy ceremony.
 
 ## Repository Pattern
 
@@ -42,6 +42,6 @@ The domain layer uses dataclasses for `KnowledgeDocument`, `KnowledgePack`, `Sea
 
 The application depends on interfaces. Markdown/ZIP storage and retrieval strategies are replaceable implementation details. The runtime depends only on local artifacts after download.
 
-The core repository deliberately excludes presentation, content-authoring, optional native acceleration and generation experiments. Browser interfaces, pack catalogs, PDF/HTML ingestion, deterministic publishing workflows, native backends and experimental generation belong in companion repositories. See [`ECOSYSTEM.md`](../ECOSYSTEM.md).
+The core repository deliberately excludes presentation, curated content, pack-authoring/ingestion pipelines, optional native acceleration, large benchmark/energy tooling and generation experiments. Browser interfaces, public catalogs, PDF/HTML ingestion, deterministic publishing workflows, native backends, hardware research and experimental generation belong in companion repositories. See [`ECOSYSTEM.md`](../ECOSYSTEM.md).
 
-The pure-Python implementation is the compatibility baseline for the core runtime. Companion accelerators may depend on the core, but the core must not require them.
+Pure Python is the compatibility baseline for the core runtime. Companion projects may depend on core contracts, but the core must not depend on those projects.
