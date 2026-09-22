@@ -28,14 +28,14 @@ No cloud API. No embeddings. No vector database. No telemetry. No package instal
 
 ## Try it in 30 seconds
 
-The repository includes one deliberately small demo archive at [`examplepack/lastlight-example-es.zip`](examplepack/lastlight-example-es.zip). It exists only so a new visitor can understand the system without downloading anything else.
+The repository includes one deliberately small English demo archive at [`examplepack/lastlight-example-en.zip`](examplepack/lastlight-example-en.zip). It exists only so a new visitor can understand the system without downloading anything else.
 
 ```bash
 git clone https://github.com/edujbarrios/lastlight.git
 cd lastlight
 
 python src/main.py \
-  --knowledge examplepack/lastlight-example-es.zip \
+  --knowledge examplepack/lastlight-example-en.zip \
   --validate-pack
 ```
 
@@ -47,42 +47,46 @@ Ask a natural-language question and inspect the ranked source:
 
 ```bash
 python src/main.py \
-  --knowledge examplepack/lastlight-example-es.zip \
+  --knowledge examplepack/lastlight-example-en.zip \
   --format sources \
-  "Se ha cortado el suministro de agua y no tengo agua embotellada. Si consigo agua que parece clara, ¿qué debo hacer antes de beberla?"
+  "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"
 ```
 
 Current default lexical result:
 
 ```text
-Sources for: Se ha cortado el suministro de agua y no tengo agua embotellada. Si consigo agua que parece clara, ¿qué debo hacer antes de beberla?
-1. [HIGH] Agua segura durante una emergencia | lastlight-example-es.zip:es/agua/potabilizacion.md | score=3.314 | tags=agua, potabilizacion, emergencia
+Sources for: The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?
+1. [HIGH] Safe water during an emergency | lastlight-example-en.zip:en/water/purification.md | score=2.574 | tags=water, purification, emergency
 ```
 
-The same question in normal text mode retrieves this passage:
+The same question in normal text mode retrieves this answer:
 
 ```text
+LastLight is experimental and retrieval-only. It shows sourced passages; it does not replace professional emergency guidance.
+
 [HIGH CONFIDENCE]
 
-Title: Agua segura durante una emergencia
-Source: lastlight-example-es.zip:es/agua/potabilizacion.md
-Language: es
-Tags: agua, potabilizacion, emergencia
+Title: Safe water during an emergency
+Source: lastlight-example-en.zip:en/water/purification.md
+Language: en
+Tags: water, purification, emergency
 
 Passage:
-Si no hay agua embotellada segura, el CDC recomienda hervir el agua clara a hervor fuerte durante 1 minuto; por encima de 6500 pies (aprox. 2000 m), durante 3 minutos. Deja que se enfríe y guárdala en recipientes limpios y desinfectados con tapa.
+If safe bottled water is not available, bring clear water to a rolling boil for 1 minute. At elevations above 6,500 feet (about 2,000 meters), boil water for 3 minutes. Let it cool and store it in clean, sanitized containers with tight covers.
 
-Comprobaciones de seguimiento:
-- ¿El agua huele a combustible, productos químicos, aguas residuales o disolventes?
-- ¿Puedes hervirla o solo tienes filtros, paños o desinfectante?
+Experimental offline research tool. Verify critical decisions with trusted human expertise whenever possible.
+
+Follow-up checks:
+- Does the water smell like fuel, chemicals, sewage, or solvents?
+- Can you boil it, or do you only have filters, cloth, or disinfectant?
 ```
 
 And when the pack does not contain evidence for the question, LastLight refuses instead of inventing an answer:
 
 ```bash
 python src/main.py \
-  --knowledge examplepack/lastlight-example-es.zip \
-  "¿cómo reparo un motor diésel?"
+  --knowledge examplepack/lastlight-example-en.zip \
+  "How do I repair a diesel engine that will not start?"
 ```
 
 ```text
@@ -99,26 +103,26 @@ One pack:
 
 ```bash
 python src/main.py \
-  --knowledge packs/water-es.zip \
-  "¿cómo potabilizo agua?"
+  --knowledge packs/water-en.zip \
+  "We have no running water after the outage. How can I make collected water safer to drink?"
 ```
 
 `--knowledge` is repeatable. Packs remain independent while LastLight searches them as one local corpus:
 
 ```bash
 python src/main.py \
-  --knowledge packs/water-es.zip \
-  --knowledge packs/first-aid-es.zip \
-  --knowledge packs/blackout-es.zip \
-  "necesito agua segura y primeros auxilios"
+  --knowledge packs/water-en.zip \
+  --knowledge packs/first-aid-en.zip \
+  --knowledge packs/blackout-en.zip \
+  "Someone is bleeding heavily and the power is out. What guidance is available?"
 ```
 
 A typical pack looks like:
 
 ```text
-water-es.zip
+water-en.zip
 ├── lastlight-pack.json
-├── es/
+├── en/
 │   └── water/
 │       ├── purification.md
 │       └── storage.md
@@ -144,7 +148,7 @@ Explicit `--language es` / `--language en` always wins. Without it, LastLight ad
 `--eval` runs a small deterministic regression suite for retrieval and refusal behavior.
 
 ```bash
-python src/main.py --knowledge examplepack/lastlight-example-es.zip --eval
+python src/main.py --knowledge examplepack/lastlight-example-en.zip --eval
 ```
 
 The committed example ZIP also has integration coverage for pack validation, HIGH-confidence water and bleeding retrieval, and an out-of-domain refusal case.
@@ -153,16 +157,16 @@ The committed example ZIP also has integration coverage for pack validation, HIG
 
 | Task | Command |
 | --- | --- |
-| Try the bundled demo | `python src/main.py --knowledge examplepack/lastlight-example-es.zip "Se ha cortado el suministro de agua y no tengo agua embotellada. Si consigo agua que parece clara, ¿qué debo hacer antes de beberla?"` |
-| One external pack | `python src/main.py --knowledge water.zip "safe water"` |
-| Multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "safe water and first aid"` |
-| JSON output | `python src/main.py --knowledge water.zip --format json "safe water"` |
-| Source ranking | `python src/main.py --knowledge water.zip --format sources "safe water"` |
+| Try the bundled demo | `python src/main.py --knowledge examplepack/lastlight-example-en.zip "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"` |
+| One external pack | `python src/main.py --knowledge water.zip "What should I do if the water supply is unsafe?"` |
+| Multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "What guidance do I have for safe water and a serious wound?"` |
+| JSON output | `python src/main.py --knowledge water.zip --format json "How can I make this water safer to drink?"` |
+| Source ranking | `python src/main.py --knowledge water.zip --format sources "How can I make this water safer to drink?"` |
 | Force Spanish | `python src/main.py --knowledge water.zip --language es "necesito ayuda"` |
 | Validate pack | `python src/main.py --knowledge pack.zip --validate-pack` |
 | Verify provenance | `python src/main.py --knowledge pack.zip --verify-provenance` |
-| Adaptive retrieval | `python src/main.py --knowledge pack.zip --strategy adaptive --mode balanced "agua"` |
-| Inspect adaptive plan | `python src/main.py --knowledge pack.zip --strategy adaptive --plan "agua"` |
+| Adaptive retrieval | `python src/main.py --knowledge pack.zip --strategy adaptive --mode balanced "How can I make collected water safe?"` |
+| Inspect adaptive plan | `python src/main.py --knowledge pack.zip --strategy adaptive --plan "How can I make collected water safe?"` |
 | Run tests | `python -m unittest discover -s tests` |
 
 ## Research direction
