@@ -1,6 +1,25 @@
 # Architecture
 
-LastLight Core uses clean architecture principles without heavy ceremony.
+LastLight uses a small package-oriented architecture with no runtime dependencies outside the Python standard library.
+
+## Source layout
+
+The implementation under `src/lastlight/` is grouped by responsibility:
+
+```text
+lastlight/
+├── application/   # app service, factory, sessions, language routing
+├── cli/           # argument parsing and command handlers
+├── evaluation/    # deterministic regression evaluation
+├── knowledge/     # repositories, Markdown/ZIP packs, validation, provenance, index
+├── retrieval/     # tokenization, chunking, ranking, lexical/BM25/adaptive search
+├── safety/        # confidence-aware answers and deterministic follow-up checks
+└── shared/        # domain models, protocols, compatibility and path utilities
+```
+
+A few thin top-level modules remain as compatibility facades for established imports such as `lastlight.factory` and `lastlight.repository`. New implementation code belongs in the responsibility packages above.
+
+`src/main.py` remains the stable executable entrypoint.
 
 ## Repository Pattern
 
@@ -38,10 +57,14 @@ Interactive mode, single-query mode, evaluation mode and system operations are c
 
 The domain layer uses dataclasses for `KnowledgeDocument`, `KnowledgePack`, `SearchQuery`, `SearchResult` and evaluation values.
 
+## Verification boundary
+
+The `core` GitHub Actions workflow runs the unit/integration suite on Python 3.10 and 3.12 and performs CLI smoke tests against the committed English example pack: pack validation, a natural-language retrieval query and an expected refusal.
+
 ## Dependency Boundaries
 
 The application depends on interfaces. Markdown/ZIP storage and retrieval strategies are replaceable implementation details. The runtime depends only on local artifacts after download.
 
-The core repository deliberately excludes presentation, curated content, pack-authoring/ingestion pipelines, optional native acceleration, large benchmark/energy tooling and generation experiments. Browser interfaces, public catalogs, PDF/HTML ingestion, deterministic publishing workflows, native backends, hardware research and experimental generation belong in companion repositories. See [`ECOSYSTEM.md`](../ECOSYSTEM.md).
+The repository deliberately excludes presentation, curated content, pack-authoring/ingestion pipelines, optional native acceleration, large benchmark/energy tooling and generation experiments. Browser interfaces, public catalogs, PDF/HTML ingestion, deterministic publishing workflows, native backends, hardware research and experimental generation belong in companion repositories. See [`ECOSYSTEM.md`](../ECOSYSTEM.md).
 
-Pure Python is the compatibility baseline for the core runtime. Companion projects may depend on core contracts, but the core must not depend on those projects.
+Pure Python is the compatibility baseline. Companion projects may depend on LastLight contracts, but LastLight must not depend on those projects.
