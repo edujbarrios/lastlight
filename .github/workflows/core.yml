@@ -16,24 +16,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Unit and integration tests
-        run: python -m unittest discover -s tests
-      - name: Validate bundled example pack
-        run: python src/main.py --knowledge examplepack/lastlight-example-en.zip --validate-pack
-      - name: Natural-language retrieval smoke test
-        run: >-
-          python src/main.py
-          --knowledge examplepack/lastlight-example-en.zip
-          --format sources
-          "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"
-      - name: Refusal smoke test
-        shell: bash
-        run: |
-          set +e
-          python src/main.py \
-            --knowledge examplepack/lastlight-example-en.zip \
-            --fail-on-refusal \
-            "How do I repair a diesel engine that will not start?"
-          status=$?
-          set -e
-          test "$status" -eq 2
+      - name: Full software health check
+        run: python tools/check_core.py
