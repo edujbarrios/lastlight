@@ -26,12 +26,78 @@ No cloud API. No embeddings. No vector database. No telemetry. No package instal
 - pack metadata, validation, SHA-256 integrity, provenance and freshness checks
 - a stdlib-only CLI suitable for constrained and disconnected systems
 
-## Quick start
+## Try it in 30 seconds
+
+The repository includes one deliberately small demo archive at [`examplepack/lastlight-example-es.zip`](examplepack/lastlight-example-es.zip). It exists only so a new visitor can understand the system without downloading anything else.
 
 ```bash
 git clone https://github.com/edujbarrios/lastlight.git
 cd lastlight
 
+python src/main.py \
+  --knowledge examplepack/lastlight-example-es.zip \
+  --validate-pack
+```
+
+```text
+Pack validation: PASS
+```
+
+Ask for a ranked source:
+
+```bash
+python src/main.py \
+  --knowledge examplepack/lastlight-example-es.zip \
+  --format sources \
+  "agua clara hervor 1 minuto"
+```
+
+Current default lexical result:
+
+```text
+Sources for: agua clara hervor 1 minuto
+1. [HIGH] Agua segura durante una emergencia | lastlight-example-es.zip:es/agua/potabilizacion.md | score=2.431 | tags=agua, potabilizacion, emergencia
+```
+
+A normal text query retrieves the passage itself. For the same example, the selected passage is:
+
+```text
+[HIGH CONFIDENCE]
+
+Title: Agua segura durante una emergencia
+Source: lastlight-example-es.zip:es/agua/potabilizacion.md
+Language: es
+Tags: agua, potabilizacion, emergencia
+
+Passage:
+Si no hay agua embotellada segura, el CDC recomienda hervir el agua clara a hervor fuerte durante 1 minuto; por encima de 6500 pies (aprox. 2000 m), durante 3 minutos. Deja que se enfríe y guárdala en recipientes limpios y desinfectados con tapa.
+
+Comprobaciones de seguimiento:
+- ¿El agua huele a combustible, productos químicos, aguas residuales o disolventes?
+- ¿Puedes hervirla o solo tienes filtros, paños o desinfectante?
+```
+
+And when the pack does not contain evidence for the question, LastLight refuses instead of inventing an answer:
+
+```bash
+python src/main.py \
+  --knowledge examplepack/lastlight-example-es.zip \
+  "¿cómo reparo un motor diésel?"
+```
+
+```text
+I do not have enough confidence to answer this question from the current knowledge base.
+```
+
+The example pack is **onboarding data, not the distribution model**. Maintained knowledge packs, the UI, pack-authoring tools and the future catalog are intended to evolve in separate companion repositories. See [Ecosystem](ECOSYSTEM.md).
+
+## Use your own knowledge packs
+
+LastLight does not ship a fixed emergency corpus. [`knowledge/README.md`](knowledge/README.md) documents the pack format; real knowledge can be distributed and updated independently from the runtime.
+
+One pack:
+
+```bash
 python src/main.py \
   --knowledge packs/water-es.zip \
   "¿cómo potabilizo agua?"
@@ -47,9 +113,7 @@ python src/main.py \
   "necesito agua segura y primeros auxilios"
 ```
 
-## Knowledge packs
-
-LastLight does not ship a fixed emergency corpus. [`knowledge/README.md`](knowledge/README.md) documents the pack format; knowledge can be distributed and updated independently from the runtime.
+A typical pack looks like:
 
 ```text
 water-es.zip
@@ -80,14 +144,17 @@ Explicit `--language es` / `--language en` always wins. Without it, LastLight ad
 `--eval` runs a small deterministic regression suite for retrieval and refusal behavior.
 
 ```bash
-python src/main.py --knowledge pack.zip --eval
+python src/main.py --knowledge examplepack/lastlight-example-es.zip --eval
 ```
+
+The committed example ZIP also has integration coverage for pack validation, HIGH-confidence water and bleeding retrieval, and an out-of-domain refusal case.
 
 ## Useful commands
 
 | Task | Command |
 | --- | --- |
-| One pack | `python src/main.py --knowledge water.zip "safe water"` |
+| Try the bundled demo | `python src/main.py --knowledge examplepack/lastlight-example-es.zip "agua clara hervor 1 minuto"` |
+| One external pack | `python src/main.py --knowledge water.zip "safe water"` |
 | Multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "safe water and first aid"` |
 | JSON output | `python src/main.py --knowledge water.zip --format json "safe water"` |
 | Source ranking | `python src/main.py --knowledge water.zip --format sources "safe water"` |
@@ -96,7 +163,6 @@ python src/main.py --knowledge pack.zip --eval
 | Verify provenance | `python src/main.py --knowledge pack.zip --verify-provenance` |
 | Adaptive retrieval | `python src/main.py --knowledge pack.zip --strategy adaptive --mode balanced "agua"` |
 | Inspect adaptive plan | `python src/main.py --knowledge pack.zip --strategy adaptive --plan "agua"` |
-| Evaluation | `python src/main.py --knowledge pack.zip --eval` |
 | Run tests | `python -m unittest discover -s tests` |
 
 ## Research direction
