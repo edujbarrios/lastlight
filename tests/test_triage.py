@@ -11,13 +11,15 @@ def result(
     body: str = "Boil water when it may be unsafe.",
     confidence: str = "HIGH",
     tags: tuple[str, ...] = ("water", "purification"),
+    language: str = "en",
 ) -> SearchResult:
     return SearchResult(
         document=KnowledgeDocument(
             title="Water Purification",
-            path="knowledge/en/water.md",
+            path=f"knowledge/{language}/water.md",
             body=body,
             tags=tags,
+            language=language,
         ),
         score=2.0,
         confidence=confidence,
@@ -41,6 +43,23 @@ class TriageTests(unittest.TestCase):
 
         self.assertIn("Boil water before drinking.", answer)
         self.assertIn("Follow-up checks:", answer)
+
+    def test_localizes_follow_up_checks_for_spanish_results(self) -> None:
+        spanish = result(
+            body="Hierve el agua antes de beberla.",
+            tags=("agua", "purification"),
+            language="es",
+        )
+
+        questions = suggest_follow_up_questions(spanish)
+        answer = append_follow_up_questions("Hierve el agua.", spanish)
+
+        self.assertIn(
+            "¿El agua huele a combustible, productos químicos, aguas residuales o disolventes?",
+            questions,
+        )
+        self.assertIn("Comprobaciones de seguimiento:", answer)
+        self.assertNotIn("Follow-up checks:", answer)
 
 
 if __name__ == "__main__":
