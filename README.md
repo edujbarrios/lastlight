@@ -43,23 +43,23 @@ python src/main.py \
 Pack validation: PASS
 ```
 
-Ask for a ranked source:
+Ask a natural-language question and inspect the ranked source:
 
 ```bash
 python src/main.py \
   --knowledge examplepack/lastlight-example-es.zip \
   --format sources \
-  "agua clara hervor 1 minuto"
+  "Se ha cortado el suministro de agua y no tengo agua embotellada. Si consigo agua que parece clara, ¿qué debo hacer antes de beberla?"
 ```
 
 Current default lexical result:
 
 ```text
-Sources for: agua clara hervor 1 minuto
-1. [HIGH] Agua segura durante una emergencia | lastlight-example-es.zip:es/agua/potabilizacion.md | score=2.431 | tags=agua, potabilizacion, emergencia
+Sources for: Se ha cortado el suministro de agua y no tengo agua embotellada. Si consigo agua que parece clara, ¿qué debo hacer antes de beberla?
+1. [HIGH] Agua segura durante una emergencia | lastlight-example-es.zip:es/agua/potabilizacion.md | score=3.314 | tags=agua, potabilizacion, emergencia
 ```
 
-A normal text query retrieves the passage itself. For the same example, the selected passage is:
+The same question in normal text mode retrieves this passage:
 
 ```text
 [HIGH CONFIDENCE]
@@ -153,7 +153,7 @@ The committed example ZIP also has integration coverage for pack validation, HIG
 
 | Task | Command |
 | --- | --- |
-| Try the bundled demo | `python src/main.py --knowledge examplepack/lastlight-example-es.zip "agua clara hervor 1 minuto"` |
+| Try the bundled demo | `python src/main.py --knowledge examplepack/lastlight-example-es.zip "Se ha cortado el suministro de agua y no tengo agua embotellada. Si consigo agua que parece clara, ¿qué debo hacer antes de beberla?"` |
 | One external pack | `python src/main.py --knowledge water.zip "safe water"` |
 | Multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "safe water and first aid"` |
 | JSON output | `python src/main.py --knowledge water.zip --format json "safe water"` |
