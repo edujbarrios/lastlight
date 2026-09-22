@@ -26,12 +26,16 @@ class ExamplePackIntegrationTests(unittest.TestCase):
     def test_water_query_retrieves_spanish_water_guidance(self) -> None:
         app = ApplicationFactory.create(EXAMPLE_PACK)
 
-        results = app.search("agua clara hervor 1 minuto")
+        results = app.search(
+            "Se ha cortado el suministro de agua y no tengo agua embotellada. "
+            "Si consigo agua que parece clara, ¿qué debo hacer antes de beberla?"
+        )
 
         self.assertTrue(results)
         self.assertEqual(results[0].document.title, "Agua segura durante una emergencia")
         self.assertEqual(results[0].document.language, "es")
         self.assertEqual(results[0].confidence, "HIGH")
+        self.assertAlmostEqual(results[0].score, 3.314, places=3)
         self.assertIn("1 minuto", results[0].passage)
 
     def test_bleeding_query_retrieves_direct_pressure_guidance(self) -> None:
