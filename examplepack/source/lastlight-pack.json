@@ -1,13 +1,13 @@
 {
   "description": "Small demonstration pack for showing LastLight offline retrieval. Not an official emergency knowledge release.",
   "languages": [
-    "es"
+    "en"
   ],
   "license": "CC0-1.0",
-  "name": "LastLight Example Pack ES",
+  "name": "LastLight Example Pack EN",
   "provenance": [
     {
-      "source": "https://www.cdc.gov/water-emergency/es/about/how-to-make-water-safe.html"
+      "source": "https://www.cdc.gov/water-emergency/about/how-to-make-water-safe.html"
     },
     {
       "source": "https://www.redcross.org/take-a-class/resources/learn-first-aid/bleeding-life-threatening-external"
@@ -19,5 +19,5 @@
   "published_at": "2026-09-22",
   "publisher": "LastLight example data",
   "source": "https://github.com/edujbarrios/lastlight/tree/main/examplepack",
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
