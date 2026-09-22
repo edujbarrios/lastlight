@@ -1,6 +1,6 @@
 # LastLight example pack
 
-This source tree builds the demo archive committed at `examplepack/lastlight-example-es.zip`.
+This source tree builds the English-first demo archive committed at `examplepack/lastlight-example-en.zip`.
 
 It is intentionally small and combines several topics only to demonstrate LastLight retrieval. Real knowledge packs are expected to live in separate repositories and release channels.
 
