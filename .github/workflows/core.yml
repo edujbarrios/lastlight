@@ -27,9 +27,13 @@ jobs:
           --format sources
           "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"
       - name: Refusal smoke test
-        run: >-
-          python src/main.py
-          --knowledge examplepack/lastlight-example-en.zip
-          --fail-on-refusal
-          "How do I repair a diesel engine that will not start?"
-        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          python src/main.py \
+            --knowledge examplepack/lastlight-example-en.zip \
+            --fail-on-refusal \
+            "How do I repair a diesel engine that will not start?"
+          status=$?
+          set -e
+          test "$status" -eq 2
