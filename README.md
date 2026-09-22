@@ -56,7 +56,7 @@ Current default lexical result:
 
 ```text
 Sources for: The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?
-1. [HIGH] Safe water during an emergency | lastlight-example-en.zip:en/water/purification.md | score=2.574 | tags=water, purification, emergency
+1. [HIGH] Safe water during an emergency | lastlight-example-en.zip:en/water/purification.md | score=2.539 | tags=water, purification, emergency
 ```
 
 The same question in normal text mode retrieves this answer:
