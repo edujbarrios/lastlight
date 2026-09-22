@@ -81,7 +81,7 @@ Follow-up checks:
 - Can you boil it, or do you only have filters, cloth, or disinfectant?
 ```
 
-And when the pack does not contain evidence for the question, LastLight refuses instead of inventing an answer:
+And when the pack does not contain enough evidence for the question, LastLight refuses instead of inventing an answer:
 
 ```bash
 python src/main.py \
@@ -92,6 +92,101 @@ python src/main.py \
 ```text
 I do not have enough confidence to answer this question from the current knowledge base.
 ```
+
+## Compare retrieval strategies
+
+LastLight exposes two fixed retrieval strategies and one adaptive policy. Adaptive retrieval is **strategy selection**, not a hidden model or a simultaneous blend of lexical and BM25 scores: it deterministically chooses the retrieval path for the current query and resource policy.
+
+Using the same natural-language water query, fixed lexical retrieval returns the source above with a lexical score of `2.539`:
+
+```bash
+python src/main.py \
+  --knowledge examplepack/lastlight-example-en.zip \
+  --strategy lexical \
+  --format sources \
+  "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"
+```
+
+Fixed BM25 ranks the same document first, using its own scoring scale:
+
+```bash
+python src/main.py \
+  --knowledge examplepack/lastlight-example-en.zip \
+  --strategy bm25 \
+  --format sources \
+  "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"
+```
+
+```text
+1. [HIGH] Safe water during an emergency | lastlight-example-en.zip:en/water/purification.md | score=7.159 | tags=water, purification, emergency
+```
+
+The numeric scores are **not comparable across lexical and BM25**; only ranking and confidence within each strategy are meaningful.
+
+Adaptive mode makes the choice explicit. For this water query, the planner classifies the query as `high` risk:
+
+| Mode | Selected strategy | Effective top-k | Why |
+| --- | --- | ---: | --- |
+| `survival` | lexical | 2 | caps retrieval cost |
+| `balanced` | lexical | 3 | keeps high-risk queries on the safety-first path |
+| `accuracy` | BM25 | 3 | uses BM25 when unconstrained and the query is not critical |
+
+Inspect the decision directly:
+
+```bash
+python src/main.py \
+  --knowledge examplepack/lastlight-example-en.zip \
+  --strategy adaptive \
+  --mode balanced \
+  --plan \
+  "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"
+```
+
+Stable fields from the plan are:
+
+```json
+{
+  "effective_top_k": 3,
+  "mode": "balanced",
+  "reason": "high-risk query in a safety-first mode",
+  "risk": "high",
+  "strategy": "lexical"
+}
+```
+
+For a normal-risk query, balanced mode can switch to BM25:
+
+```bash
+python src/main.py \
+  --knowledge examplepack/lastlight-example-en.zip \
+  --strategy adaptive \
+  --mode balanced \
+  --plan \
+  "The power has been out for several hours. How long will food stay safe in my refrigerator if I keep the door closed?"
+```
+
+```json
+{
+  "mode": "balanced",
+  "reason": "balanced mode with sufficient detected resources",
+  "risk": "normal",
+  "strategy": "bm25"
+}
+```
+
+Tight explicit budgets override the normal policy and force the lower-cost lexical path:
+
+```bash
+python src/main.py \
+  --knowledge examplepack/lastlight-example-en.zip \
+  --strategy adaptive \
+  --mode balanced \
+  --energy-budget-mwh 0.4 \
+  --plan \
+  "The power has been out for several hours. How long will food stay safe in my refrigerator if I keep the door closed?"
+```
+
+See [Adaptive Retrieval](docs/adaptive_retrieval.md) for the complete decision order and resource-policy thresholds.
 
 The example pack is **onboarding data, not the distribution model**. Maintained knowledge packs, the UI, pack-authoring tools and the future catalog are intended to evolve in separate companion repositories. See [Ecosystem](ECOSYSTEM.md).
 
@@ -160,13 +255,15 @@ The committed example ZIP also has integration coverage for pack validation, HIG
 | Try the bundled demo | `python src/main.py --knowledge examplepack/lastlight-example-en.zip "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"` |
 | One external pack | `python src/main.py --knowledge water.zip "What should I do if the water supply is unsafe?"` |
 | Multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "What guidance do I have for safe water and a serious wound?"` |
+| Fixed lexical | `python src/main.py --knowledge water.zip --strategy lexical "How can I make collected water safer?"` |
+| Fixed BM25 | `python src/main.py --knowledge water.zip --strategy bm25 "How can I make collected water safer?"` |
+| Adaptive balanced | `python src/main.py --knowledge water.zip --strategy adaptive --mode balanced "How can I make collected water safer?"` |
+| Inspect adaptive plan | `python src/main.py --knowledge water.zip --strategy adaptive --mode balanced --plan "How can I make collected water safer?"` |
 | JSON output | `python src/main.py --knowledge water.zip --format json "How can I make this water safer to drink?"` |
 | Source ranking | `python src/main.py --knowledge water.zip --format sources "How can I make this water safer to drink?"` |
 | Force Spanish | `python src/main.py --knowledge water.zip --language es "necesito ayuda"` |
 | Validate pack | `python src/main.py --knowledge pack.zip --validate-pack` |
 | Verify provenance | `python src/main.py --knowledge pack.zip --verify-provenance` |
-| Adaptive retrieval | `python src/main.py --knowledge pack.zip --strategy adaptive --mode balanced "How can I make collected water safe?"` |
-| Inspect adaptive plan | `python src/main.py --knowledge pack.zip --strategy adaptive --plan "How can I make collected water safe?"` |
 | Run tests | `python -m unittest discover -s tests` |
 
 ## Research direction
