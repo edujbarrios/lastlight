@@ -1,5 +1,8 @@
-"""Command-line interface and command handlers."""
+"""Command-line interface and command handlers.
 
-from .cli import build_parser, main, positive_float, positive_int
+The package re-exports the historical ``lastlight.cli`` module surface so tests,
+embedders and monkeypatch-based integrations keep working after the source tree
+was split into subpackages.
+"""
 
-__all__ = ["build_parser", "main", "positive_float", "positive_int"]
+from .cli import *  # noqa: F401,F403
