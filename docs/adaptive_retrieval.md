@@ -2,6 +2,8 @@
 
 LastLight can select a retrieval strategy at query time while keeping the decision deterministic and inspectable.
 
+Adaptive retrieval is **strategy selection**, not a simultaneous lexical/BM25 fusion step and not an LLM reranker. For each query, the planner selects one core retrieval path according to query risk and resource policy, then exposes that decision through `--plan`.
+
 Enable it with:
 
 ```bash
