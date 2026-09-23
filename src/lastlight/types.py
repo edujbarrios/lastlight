@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Literal
+
+RetrievalStrategyName = Literal["lexical", "bm25", "adaptive"]
+AdaptiveMode = Literal["survival", "balanced", "accuracy"]
+RefusalReason = Literal["no_matching_knowledge", "insufficient_confidence"]
 
 
 @dataclass(frozen=True)
@@ -134,4 +139,4 @@ class QueryResult:
     passage: str | None
     sources: tuple[SourceResult, ...]
     retrieval: RetrievalMetadata
-    refusal_reason: str | None = None
+    refusal_reason: RefusalReason | None = None
