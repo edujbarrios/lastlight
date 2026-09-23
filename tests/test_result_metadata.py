@@ -15,12 +15,13 @@ EXAMPLE_PACK = (
 
 
 class ResultMetadataTests(unittest.TestCase):
-    def test_low_confidence_refusal_has_machine_readable_reason(self) -> None:
+    def test_out_of_domain_refusal_has_no_match_reason(self) -> None:
         result = LastLight(EXAMPLE_PACK).query(
             "How do I repair a diesel engine that will not start?"
         )
         self.assertFalse(result.accepted)
-        self.assertEqual(result.refusal_reason, "insufficient_confidence")
+        self.assertEqual(result.sources, ())
+        self.assertEqual(result.refusal_reason, "no_matching_knowledge")
 
     def test_empty_retrieval_has_machine_readable_reason(self) -> None:
         result = LastLight(EXAMPLE_PACK).query("the and or")
