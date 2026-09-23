@@ -2,7 +2,15 @@
 
 from .api import LastLight
 from .errors import ConfigurationError, LastLightError, PackError, PackValidationError
-from .types import QueryResult, RetrievalMetadata, SourceDocument, SourceResult
+from .types import (
+    PackInfo,
+    PackProvenance,
+    PackValidation,
+    QueryResult,
+    RetrievalMetadata,
+    SourceDocument,
+    SourceResult,
+)
 
 __version__ = "0.1.1"
 
@@ -11,6 +19,9 @@ __all__ = [
     "LastLight",
     "LastLightError",
     "PackError",
+    "PackInfo",
+    "PackProvenance",
+    "PackValidation",
     "PackValidationError",
     "QueryResult",
     "RetrievalMetadata",
