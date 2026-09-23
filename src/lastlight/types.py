@@ -110,18 +110,28 @@ class PackProvenance:
 
 @dataclass(frozen=True)
 class RetrievalMetadata:
+    """Structured explanation of the retrieval strategy selected for a query."""
+
     strategy: str
     mode: str
     effective_top_k: int
     risk: str | None = None
     reason: str | None = None
+    low_resource_target: bool | None = None
+    memory_mb: int | None = None
+    battery_percent: float | None = None
+    energy_budget_mwh: float | None = None
+    memory_budget_mb: int | None = None
 
 
 @dataclass(frozen=True)
 class QueryResult:
+    """Stable result returned by :meth:`LastLight.query`."""
+
     query: str
     accepted: bool
     confidence: str | None
     passage: str | None
     sources: tuple[SourceResult, ...]
     retrieval: RetrievalMetadata
+    refusal_reason: str | None = None
