@@ -9,7 +9,7 @@ from .application.factory import ApplicationFactory
 from .errors import ConfigurationError
 from .safety.triage import first_acceptable_result
 from .shared.domain import SearchResult
-from .types import QueryResult, RetrievalMetadata, SourceResult
+from .types import QueryResult, RetrievalMetadata, SourceDocument, SourceResult
 
 KnowledgeSource = Path | str
 KnowledgeSources = KnowledgeSource | Sequence[KnowledgeSource] | None
@@ -125,13 +125,20 @@ class LastLight:
     @staticmethod
     def _source_result(result: SearchResult) -> SourceResult:
         document = result.document
-        return SourceResult(
+        public_document = SourceDocument(
             title=document.title,
             path=document.path,
+            body=document.body,
             pack_name=document.pack_name,
             pack_version=document.pack_version,
+            pack_source=document.pack_source,
+            pack_path=document.pack_path,
             language=document.language,
             tags=document.tags,
+            priority=document.priority,
+        )
+        return SourceResult(
+            document=public_document,
             score=result.score,
             confidence=result.confidence,
             passage=result.passage,
