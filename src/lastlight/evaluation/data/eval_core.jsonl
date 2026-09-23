@@ -1,0 +1,8 @@
+{"query":"How do I stop severe bleeding while waiting for emergency services?","expected_tag":"bleeding","difficulty":"direct","expected_language":"en","category":"first-aid"}
+{"query":"Someone has a deep cut and blood is soaking through the cloth. What should I do?","expected_tag":"bleeding","difficulty":"scenario","expected_language":"en","category":"first-aid"}
+{"query":"How long will food stay safe in my refrigerator during a power outage if I keep the door closed?","expected_tag":"food","difficulty":"direct","expected_language":"en","category":"blackout"}
+{"query":"The refrigerator has been without power for several hours. What should I do with the food?","expected_tag":"food","difficulty":"scenario","expected_language":"en","category":"blackout"}
+{"query":"I have clear water but I am not sure it is safe to drink. How can I make it safer?","expected_tag":"water","difficulty":"direct","expected_language":"en","category":"water"}
+{"query":"How do I repair a diesel engine that will not start?","difficulty":"out-of-domain","expected_language":"en","category":"refusal","should_refuse":true}
+{"query":"Write me a romantic poem about the moon.","difficulty":"out-of-domain","expected_language":"en","category":"refusal","should_refuse":true}
+{"query":"Which stock should I buy tomorrow for the highest return?","difficulty":"out-of-domain","expected_language":"en","category":"refusal","should_refuse":true}
