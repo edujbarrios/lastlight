@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,6 +47,7 @@ jobs:
           python -m venv .package-venv
           .package-venv/bin/python -m pip install --no-deps dist/*.whl
           .package-venv/bin/python -c "from lastlight import LastLight, QueryResult; print(LastLight.__name__)"
+          .package-venv/bin/python -c "from importlib.resources import files; assert files('lastlight').joinpath('py.typed').is_file()"
           .package-venv/bin/lastlight --help >/dev/null
       - name: Verify installed-library README examples
         shell: bash
@@ -64,7 +65,7 @@ jobs:
               "How long will food stay safe in my refrigerator if I keep the door closed?"
           )
 
-          assert __version__ == "0.1.1"
+          assert __version__ == "0.1.2"
 
           practical = LastLight(pack, strategy="lexical").query(bleeding)
           assert practical.accepted is True
@@ -114,6 +115,8 @@ jobs:
           assert refusal.accepted is False
           assert refusal.confidence is None
           assert refusal.passage is None
+          assert refusal.sources == ()
+          assert refusal.refusal_reason == "no_matching_knowledge"
 
           print("installed-library README examples: PASS")
           PY
