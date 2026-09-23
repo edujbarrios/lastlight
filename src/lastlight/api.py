@@ -146,6 +146,9 @@ class LastLight:
         results = self._search_internal(text, top_k=top_k)
         accepted = first_acceptable_result(results)
         metadata = self._metadata(top_k)
+        refusal_reason = None
+        if accepted is None:
+            refusal_reason = "no_matching_knowledge" if not results else "insufficient_confidence"
         return QueryResult(
             query=text,
             accepted=accepted is not None,
@@ -153,6 +156,7 @@ class LastLight:
             passage=accepted.passage if accepted else None,
             sources=tuple(self._source_result(result) for result in results),
             retrieval=metadata,
+            refusal_reason=refusal_reason,
         )
 
     def answer(self, text: str, *, top_k: int = 3) -> str:
@@ -216,6 +220,27 @@ class LastLight:
             effective_top_k=int(raw.get("effective_top_k", top_k)),
             risk=str(raw["risk"]) if raw.get("risk") is not None else None,
             reason=str(raw["reason"]) if raw.get("reason") is not None else None,
+            low_resource_target=(
+                bool(raw["low_resource_target"])
+                if raw.get("low_resource_target") is not None
+                else None
+            ),
+            memory_mb=int(raw["memory_mb"]) if raw.get("memory_mb") is not None else None,
+            battery_percent=(
+                float(raw["battery_percent"])
+                if raw.get("battery_percent") is not None
+                else None
+            ),
+            energy_budget_mwh=(
+                float(raw["energy_budget_mwh"])
+                if raw.get("energy_budget_mwh") is not None
+                else None
+            ),
+            memory_budget_mb=(
+                int(raw["memory_budget_mb"])
+                if raw.get("memory_budget_mb") is not None
+                else None
+            ),
         )
 
     @staticmethod
