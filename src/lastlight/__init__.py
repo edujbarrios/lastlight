@@ -3,18 +3,22 @@
 from .api import LastLight
 from .errors import ConfigurationError, LastLightError, PackError, PackValidationError
 from .types import (
+    AdaptiveMode,
     PackInfo,
     PackProvenance,
     PackValidation,
     QueryResult,
+    RefusalReason,
     RetrievalMetadata,
+    RetrievalStrategyName,
     SourceDocument,
     SourceResult,
 )
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 __all__ = [
+    "AdaptiveMode",
     "ConfigurationError",
     "LastLight",
     "LastLightError",
@@ -24,7 +28,9 @@ __all__ = [
     "PackValidation",
     "PackValidationError",
     "QueryResult",
+    "RefusalReason",
     "RetrievalMetadata",
+    "RetrievalStrategyName",
     "SourceDocument",
     "SourceResult",
     "__version__",
