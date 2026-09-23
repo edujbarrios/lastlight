@@ -26,6 +26,40 @@ No cloud API. No embeddings. No vector database. No telemetry. No package instal
 - pack metadata, validation, SHA-256 integrity, provenance and freshness checks
 - a stdlib-only CLI suitable for constrained and disconnected systems
 
+## Use LastLight as a Python library
+
+LastLight is library-first: the CLI is a first-party client of the same public Python API that can be used by `lastlight-ui`, `lastlight-bench`, or other integrations.
+
+Install it from a checkout:
+
+```bash
+python -m pip install .
+```
+
+Then query a local pack without parsing CLI output:
+
+```python
+from lastlight import LastLight
+
+engine = LastLight(
+    knowledge="examplepack/lastlight-example-en.zip",
+    strategy="adaptive",
+    mode="balanced",
+)
+
+result = engine.query(
+    "The water supply is down and I have no bottled water. "
+    "I found water that looks clear. What should I do before drinking it?"
+)
+
+if result.accepted:
+    print(result.confidence)
+    print(result.passage)
+    print(result.sources[0].path)
+```
+
+`QueryResult`, `SourceResult`, and `RetrievalMetadata` are stable public contracts intended for companion repositories. See [Python API](docs/python_api.md) for multi-pack and adaptive examples.
+
 ## Try it in 30 seconds
 
 The repository includes one deliberately small English demo archive at [`examplepack/lastlight-example-en.zip`](examplepack/lastlight-example-en.zip). It exists only so a new visitor can understand the system without downloading anything else.
@@ -275,6 +309,7 @@ The project is intended to make that tradeoff measurable and auditable rather th
 ## Docs
 
 - [Architecture](docs/architecture.md)
+- [Python API](docs/python_api.md)
 - [Knowledge Packs](docs/knowledge_packs.md)
 - [Knowledge Pack Provenance](docs/pack_provenance.md)
 - [Adaptive Retrieval](docs/adaptive_retrieval.md)
