@@ -7,7 +7,7 @@
 
 Most modern AI systems assume that connectivity, cloud compute, large models and abundant power are available. LastLight explores the reverse case: **how much useful, auditable assistance can remain available when the infrastructure itself is unreliable?**
 
-LastLight is intentionally narrow. It retrieves practical knowledge from local Markdown/ZIP packs, exposes the source passages and ranking metadata, adapts retrieval strategy to resource policy, and refuses when the available evidence is too weak to support an answer.
+LastLight retrieves practical knowledge from local Markdown/ZIP packs, exposes source passages and ranking metadata, adapts retrieval strategy to resource policy, and refuses when the available evidence is too weak to support an answer.
 
 No cloud API. No embeddings. No vector database. No telemetry. No runtime dependencies outside the Python standard library.
 
@@ -29,7 +29,7 @@ python -m pip install -e .
 
 ## Try it in 30 seconds
 
-Download the small demo knowledge pack used by the repository examples:
+Download the small demo knowledge pack used by the examples:
 
 ```bash
 curl -L \
@@ -43,8 +43,8 @@ Then use LastLight as a normal Python library:
 from lastlight import LastLight
 
 query = (
-    "The water supply is down and I have no bottled water. "
-    "I found water that looks clear. What should I do before drinking it?"
+    "Someone has a deep cut and is bleeding heavily. "
+    "What should I do while waiting for emergency services?"
 )
 
 engine = LastLight(
@@ -61,14 +61,14 @@ print(f"{result.sources[0].score:.3f}")
 print(result.passage)
 ```
 
-Observed with the published `lastlight 0.1.0` wheel:
+Observed output:
 
 ```text
 True
 HIGH
-Safe water during an emergency
-2.539
-If safe bottled water is not available, bring clear water to a rolling boil for 1 minute. At elevations above 6,500 feet (about 2,000 meters), boil water for 3 minutes. Let it cool and store it in clean, sanitized containers with tight covers.
+Severe external bleeding
+2.748
+For life-threatening external bleeding, call emergency services as soon as possible. Apply firm, continuous direct pressure to the wound with a dressing or clean material.
 ```
 
 The source object remains available for attribution and inspection:
@@ -83,10 +83,10 @@ print(source.matched_terms)
 ```
 
 ```text
-lastlight-example-en.zip:en/water/purification.md
+lastlight-example-en.zip:en/first-aid/severe-bleeding.md
 en
-('water', 'purification', 'emergency')
-('before', 'bottled', 'clear', 'that', 'water')
+('first-aid', 'bleeding', 'hemorrhage')
+('bleeding', 'emergency', 'services', 'waiting')
 ```
 
 Once the package and knowledge pack are local, querying does not require a network connection.
@@ -134,27 +134,31 @@ The main operations are:
 
 ```python
 engine.query(text)   # structured QueryResult
-engine.search(text)  # ranked SourceResult-compatible search results
+engine.search(text)  # ranked retrieval results
 engine.answer(text)  # formatted text response
-engine.plan(text)    # RetrievalMetadata for adaptive retrieval
+engine.plan(text)    # adaptive retrieval plan
 ```
 
 `QueryResult`, `SourceResult`, and `RetrievalMetadata` are the stable contracts intended for UIs, benchmarks and other companion repositories. See [Python API](docs/python_api.md).
 
 ## Compare retrieval strategies
 
-LastLight exposes two fixed retrieval strategies plus an adaptive planner. The examples below are executed against the installed wheel in CI so README behavior stays tied to the packaged library, not only to the source tree.
+LastLight exposes two fixed retrieval strategies plus an adaptive planner. The examples below are verified against the built wheel in CI so the README stays tied to the packaged library rather than only to the source tree.
 
-### Lexical vs BM25
+This query has an immediately useful answer and is also useful for comparing ranking behavior:
 
 ```python
 from lastlight import LastLight
 
 query = (
-    "The water supply is down and I have no bottled water. "
-    "I found water that looks clear. What should I do before drinking it?"
+    "The power has been out for several hours. "
+    "How long will food stay safe in my refrigerator if I keep the door closed?"
 )
+```
 
+### Lexical vs BM25
+
+```python
 for strategy in ("lexical", "bm25"):
     result = LastLight(
         "lastlight-example-en.zip",
@@ -168,29 +172,26 @@ for strategy in ("lexical", "bm25"):
         f"score={source.score:.3f}",
         source.confidence,
     )
+    print(result.passage)
 ```
 
 Observed output:
 
 ```text
-lexical Safe water during an emergency score=2.539 HIGH
-bm25 Safe water during an emergency score=7.159 HIGH
+lexical Food safety during a power outage score=4.918 HIGH
+Keep refrigerator and freezer doors closed as much as possible. As a reference, an unopened refrigerator keeps food cold for about 4 hours.
+
+bm25 Food safety during a power outage score=11.475 HIGH
+Keep refrigerator and freezer doors closed as much as possible. As a reference, an unopened refrigerator keeps food cold for about 4 hours.
 ```
 
-The numeric score scales are strategy-specific, so `2.539` and `7.159` should **not** be compared directly. What matters is ranking and confidence within each retrieval strategy.
+The numeric score scales are strategy-specific, so `4.918` and `11.475` should **not** be compared directly. What matters is ranking and confidence within each retrieval strategy.
 
 ### Adaptive strategy selection
 
-Adaptive mode does not blend lexical and BM25 scores. It deterministically chooses a retrieval strategy from the query risk, operating mode and resource policy.
+Adaptive mode does not blend lexical and BM25 scores. It deterministically chooses a retrieval strategy from query risk, operating mode and resource policy.
 
 ```python
-from lastlight import LastLight
-
-query = (
-    "The water supply is down and I have no bottled water. "
-    "I found water that looks clear. What should I do before drinking it?"
-)
-
 for mode in ("survival", "balanced", "accuracy"):
     plan = LastLight(
         "lastlight-example-en.zip",
@@ -207,38 +208,15 @@ for mode in ("survival", "balanced", "accuracy"):
     )
 ```
 
-Observed decisions for this high-risk water query:
+Observed decisions:
 
 ```text
-survival lexical 2 high survival mode caps retrieval cost
-balanced lexical 3 high high-risk query in a safety-first mode
-accuracy bm25 3 high accuracy mode with no active resource constraint
+survival lexical 2 normal survival mode caps retrieval cost
+balanced bm25 3 normal balanced mode with sufficient detected resources
+accuracy bm25 3 normal accuracy mode with no active resource constraint
 ```
 
-The same `balanced` mode can choose BM25 for a normal-risk query:
-
-```python
-food_query = (
-    "The power has been out for several hours. "
-    "How long will food stay safe in my refrigerator if I keep the door closed?"
-)
-
-plan = LastLight(
-    "lastlight-example-en.zip",
-    strategy="adaptive",
-    mode="balanced",
-).plan(food_query)
-
-print(plan.strategy)
-print(plan.risk)
-print(plan.reason)
-```
-
-```text
-bm25
-normal
-balanced mode with sufficient detected resources
-```
+The same query therefore demonstrates the trade-off clearly: `survival` caps retrieval cost with lexical search, while `balanced` and `accuracy` can choose BM25 when resources allow it.
 
 Explicit resource budgets can change the plan:
 
@@ -248,7 +226,7 @@ plan = LastLight(
     strategy="adaptive",
     mode="balanced",
     energy_budget_mwh=0.4,
-).plan(food_query)
+).plan(query)
 
 print(plan.strategy)
 print(plan.effective_top_k)
@@ -289,7 +267,7 @@ for source in result.sources:
     print(source.path, source.confidence, source.score)
 ```
 
-This is the intended integration point for projects such as a future `lastlight-ui` or `lastlight-bench`: they import the library rather than spawning and parsing the CLI.
+This is the intended integration point for projects such as `lastlight-ui` or `lastlight-bench`: they import the library instead of spawning and parsing the CLI.
 
 ## Knowledge packs
 
@@ -349,7 +327,7 @@ python -m pip install -e .
 python tools/check_core.py
 ```
 
-CI currently verifies Python 3.10 and 3.12, builds wheel and source distributions, installs the built wheel in an isolated environment, and executes the library examples for lexical retrieval, BM25 retrieval, adaptive planning and refusal behavior.
+CI verifies Python 3.10 and 3.12, builds wheel and source distributions, installs the built wheel in an isolated environment, and executes the library examples for lexical retrieval, BM25 retrieval, adaptive planning and refusal behavior.
 
 ## Research direction
 
@@ -357,11 +335,11 @@ LastLight treats offline intelligence as a systems problem rather than a model-s
 
 > How much useful, trustworthy assistance can be preserved per unit of compute, memory, energy and stored knowledge when external infrastructure is unavailable?
 
-The project is intended to make that tradeoff measurable and auditable rather than hiding it behind a remote service.
+The project is intended to make that trade-off measurable and auditable rather than hiding it behind a remote service.
 
 ## Ecosystem direction
 
-The runtime is now library-first so companion projects can depend on a stable Python API:
+The runtime is library-first so companion projects can depend on a stable Python API:
 
 ```text
 lastlight-ui ──────► lastlight
