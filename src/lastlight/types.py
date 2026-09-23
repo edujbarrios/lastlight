@@ -69,6 +69,46 @@ class SourceResult:
 
 
 @dataclass(frozen=True)
+class PackInfo:
+    """Public metadata for one mounted knowledge pack."""
+
+    name: str
+    version: str
+    languages: tuple[str, ...]
+    description: str
+    license: str
+    source: str
+    path: str
+    document_count: int
+
+
+@dataclass(frozen=True)
+class PackValidation:
+    """Validation result for one mounted knowledge pack."""
+
+    pack: PackInfo
+    ok: bool
+    errors: tuple[str, ...] = field(default_factory=tuple)
+    warnings: tuple[str, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True)
+class PackProvenance:
+    """Provenance and freshness result for one mounted knowledge pack."""
+
+    pack: PackInfo
+    ok: bool
+    fingerprint_sha256: str
+    publisher: str
+    published_at: str | None = None
+    expires_at: str | None = None
+    age_days: int | None = None
+    expired: bool = False
+    errors: tuple[str, ...] = field(default_factory=tuple)
+    warnings: tuple[str, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True)
 class RetrievalMetadata:
     strategy: str
     mode: str
