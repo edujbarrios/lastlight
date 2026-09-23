@@ -83,6 +83,11 @@ class LastLight:
         self._app.search(text, top_k=top_k)
         return self._metadata(top_k)
 
+    def retrieval_metadata(self) -> dict[str, object] | None:
+        """Compatibility hook for first-party adapters; prefer :meth:`plan`."""
+
+        return self._app.retrieval_metadata()
+
     def _metadata(self, top_k: int) -> RetrievalMetadata:
         raw = self._app.retrieval_metadata() or {
             "strategy": self.strategy,
