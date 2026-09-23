@@ -1,5 +1,8 @@
 # LastLight
 
+[![PyPI version](https://img.shields.io/pypi/v/lastlight.svg)](https://pypi.org/project/lastlight/)
+[![Python versions](https://img.shields.io/pypi/pyversions/lastlight.svg)](https://pypi.org/project/lastlight/)
+
 **Low-power, offline retrieval for disaster and infrastructure-failure guidance.**
 
 Most modern AI research moves in one direction: larger models, larger context windows, more accelerators, more memory, and increasingly capable cloud infrastructure. That direction is useful, but it leaves a different question relatively unexplored: **what happens when the infrastructure itself is the problem?**
@@ -12,7 +15,7 @@ That makes it useful for scenarios such as prolonged outages, damaged communicat
 
 LastLight works entirely from local knowledge packs. A device can carry one or several independently versioned packs—for example water, first aid, blackout procedures, communications, or navigation—and search them together without requiring a network connection.
 
-No cloud API. No embeddings. No vector database. No telemetry. No package install required.
+No cloud API. No embeddings. No vector database. No telemetry. No runtime dependencies.
 
 > Inspired by the resource-scarcity premise of *This War of Mine*. LastLight is an independent project and is not affiliated with the game or its creators.
 
@@ -30,10 +33,16 @@ No cloud API. No embeddings. No vector database. No telemetry. No package instal
 
 LastLight is library-first: the CLI is a first-party client of the same public Python API that can be used by `lastlight-ui`, `lastlight-bench`, or other integrations.
 
-Install it from a checkout:
+Install the published package from [PyPI](https://pypi.org/project/lastlight/):
 
 ```bash
-python -m pip install .
+python -m pip install lastlight
+```
+
+For development from a checkout, an editable install is also supported:
+
+```bash
+python -m pip install -e .
 ```
 
 Then query a local pack without parsing CLI output:
@@ -286,6 +295,7 @@ The committed example ZIP also has integration coverage for pack validation, HIG
 
 | Task | Command |
 | --- | --- |
+| Install from PyPI | `python -m pip install lastlight` |
 | Try the bundled demo | `python src/main.py --knowledge examplepack/lastlight-example-en.zip "The water supply is down and I have no bottled water. I found water that looks clear. What should I do before drinking it?"` |
 | One external pack | `python src/main.py --knowledge water.zip "What should I do if the water supply is unsafe?"` |
 | Multiple packs | `python src/main.py --knowledge water.zip --knowledge first-aid.zip "What guidance do I have for safe water and a serious wound?"` |
