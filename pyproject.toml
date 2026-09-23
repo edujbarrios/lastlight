@@ -6,11 +6,18 @@ build-backend = "setuptools.build_meta"
 name = "lastlight"
 version = "0.1.0"
 description = "Low-power, offline retrieval for disaster and infrastructure-failure guidance."
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 license = {file = "LICENSE"}
 authors = [
   {name = "Eduardo J. Barrios"}
+]
+keywords = [
+  "offline",
+  "retrieval",
+  "rag",
+  "emergency-preparedness",
+  "low-power",
 ]
 dependencies = []
 classifiers = [
@@ -27,6 +34,7 @@ classifiers = [
 
 [project.urls]
 Homepage = "https://github.com/edujbarrios/lastlight"
+Documentation = "https://github.com/edujbarrios/lastlight/blob/main/docs/python_api.md"
 Repository = "https://github.com/edujbarrios/lastlight"
 Issues = "https://github.com/edujbarrios/lastlight/issues"
 
