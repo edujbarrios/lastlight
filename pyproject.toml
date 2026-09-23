@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lastlight"
+version = "0.1.0"
+description = "Low-power, offline retrieval for disaster and infrastructure-failure guidance."
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [
+  {name = "Eduardo J. Barrios"}
+]
+dependencies = []
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+[project.urls]
+Homepage = "https://github.com/edujbarrios/lastlight"
+Repository = "https://github.com/edujbarrios/lastlight"
+Issues = "https://github.com/edujbarrios/lastlight/issues"
+
+[project.scripts]
+lastlight = "lastlight.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["lastlight*"]

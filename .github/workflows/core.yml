@@ -18,3 +18,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Full software health check
         run: python tools/check_core.py
+      - name: Install package from repository
+        run: python -m pip install --no-deps .
+      - name: Import installed library
+        run: python -c "from lastlight import LastLight, QueryResult, RetrievalMetadata, SourceResult; print(LastLight.__name__)"
+      - name: Installed CLI entrypoint
+        run: lastlight --help
