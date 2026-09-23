@@ -22,7 +22,7 @@ class PackPublicApiTests(unittest.TestCase):
         self.assertEqual(len(packs), 1)
         self.assertIsInstance(packs[0], PackInfo)
         self.assertEqual(packs[0].name, "LastLight Example Pack EN")
-        self.assertEqual(packs[0].version, "1.0.0")
+        self.assertEqual(packs[0].version, "1.1.0")
         self.assertEqual(packs[0].document_count, 3)
         self.assertIn("en", packs[0].languages)
 
