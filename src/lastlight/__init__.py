@@ -2,7 +2,7 @@
 
 from .api import LastLight
 from .errors import ConfigurationError, LastLightError, PackError, PackValidationError
-from .types import QueryResult, RetrievalMetadata, SourceResult
+from .types import QueryResult, RetrievalMetadata, SourceDocument, SourceResult
 
 __version__ = "0.1.1"
 
@@ -14,6 +14,7 @@ __all__ = [
     "PackValidationError",
     "QueryResult",
     "RetrievalMetadata",
+    "SourceDocument",
     "SourceResult",
     "__version__",
 ]
