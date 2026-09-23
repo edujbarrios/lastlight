@@ -4,7 +4,14 @@ import unittest
 from pathlib import Path
 
 import helpers  # noqa: F401
-from lastlight import LastLight, QueryResult, RetrievalMetadata, SourceResult
+from lastlight import (
+    ConfigurationError,
+    LastLight,
+    QueryResult,
+    RetrievalMetadata,
+    SourceDocument,
+    SourceResult,
+)
 
 
 EXAMPLE_PACK = (
@@ -15,15 +22,18 @@ EXAMPLE_PACK = (
 
 
 class PublicApiTests(unittest.TestCase):
-    def test_package_root_exposes_lastlight_facade(self) -> None:
+    def test_package_root_exposes_public_search_results(self) -> None:
         engine = LastLight(EXAMPLE_PACK)
         results = engine.search(
-            "The water supply is down and I have no bottled water. "
-            "I found water that looks clear. What should I do before drinking it?"
+            "Someone has a deep cut and is bleeding heavily. "
+            "What should I do while waiting for emergency services?"
         )
 
         self.assertTrue(results)
-        self.assertEqual(results[0].document.title, "Safe water during an emergency")
+        self.assertIsInstance(results[0], SourceResult)
+        self.assertIsInstance(results[0].document, SourceDocument)
+        self.assertEqual(results[0].title, "Severe external bleeding")
+        self.assertEqual(results[0].document.title, results[0].title)
 
     def test_query_returns_stable_public_contracts(self) -> None:
         engine = LastLight(EXAMPLE_PACK)
@@ -62,6 +72,14 @@ class PublicApiTests(unittest.TestCase):
         result = engine.query("How long will food stay cold during a power outage?")
 
         self.assertTrue(result.sources)
+
+    def test_unknown_strategy_is_rejected_instead_of_falling_back(self) -> None:
+        with self.assertRaisesRegex(ConfigurationError, "unsupported retrieval strategy"):
+            LastLight(EXAMPLE_PACK, strategy="bm225")
+
+    def test_unknown_adaptive_mode_is_rejected(self) -> None:
+        with self.assertRaisesRegex(ConfigurationError, "unsupported adaptive mode"):
+            LastLight(EXAMPLE_PACK, strategy="adaptive", mode="turbo")
 
 
 if __name__ == "__main__":
