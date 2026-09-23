@@ -6,7 +6,9 @@ from pathlib import Path
 from typing import Sequence
 
 from .application.factory import ApplicationFactory
+from .safety.triage import first_acceptable_result
 from .shared.domain import SearchResult
+from .types import QueryResult, RetrievalMetadata, SourceResult
 
 KnowledgeSource = Path | str
 KnowledgeSources = KnowledgeSource | Sequence[KnowledgeSource] | None
@@ -51,21 +53,62 @@ class LastLight:
         return cls(knowledge=packs, **kwargs)
 
     def search(self, text: str, *, top_k: int = 3) -> list[SearchResult]:
-        """Return ranked retrieval results."""
+        """Return ranked retrieval results for advanced callers."""
 
         return self._app.search(text, top_k=top_k)
+
+    def query(self, text: str, *, top_k: int = 3) -> QueryResult:
+        """Return a stable, structured result suitable for UIs and integrations."""
+
+        results = self._app.search(text, top_k=top_k)
+        accepted = first_acceptable_result(results)
+        metadata = self._metadata(top_k)
+        return QueryResult(
+            query=text,
+            accepted=accepted is not None,
+            confidence=accepted.confidence if accepted else None,
+            passage=accepted.passage if accepted else None,
+            sources=tuple(self._source_result(result) for result in results),
+            retrieval=metadata,
+        )
 
     def answer(self, text: str, *, top_k: int = 3) -> str:
         """Return the existing human-readable, safety-aware answer."""
 
         return self._app.answer(text, top_k=top_k)
 
-    def plan(self, text: str, *, top_k: int = 3) -> dict[str, object]:
+    def plan(self, text: str, *, top_k: int = 3) -> RetrievalMetadata:
         """Run retrieval and expose the selected retrieval-policy metadata."""
 
         self._app.search(text, top_k=top_k)
-        return self._app.retrieval_metadata() or {
+        return self._metadata(top_k)
+
+    def _metadata(self, top_k: int) -> RetrievalMetadata:
+        raw = self._app.retrieval_metadata() or {
             "strategy": self.strategy,
             "mode": "fixed",
             "effective_top_k": top_k,
         }
+        return RetrievalMetadata(
+            strategy=str(raw.get("strategy", self.strategy)),
+            mode=str(raw.get("mode", "fixed")),
+            effective_top_k=int(raw.get("effective_top_k", top_k)),
+            risk=str(raw["risk"]) if raw.get("risk") is not None else None,
+            reason=str(raw["reason"]) if raw.get("reason") is not None else None,
+        )
+
+    @staticmethod
+    def _source_result(result: SearchResult) -> SourceResult:
+        document = result.document
+        return SourceResult(
+            title=document.title,
+            path=document.path,
+            pack_name=document.pack_name,
+            pack_version=document.pack_version,
+            language=document.language,
+            tags=document.tags,
+            score=result.score,
+            confidence=result.confidence,
+            passage=result.passage,
+            matched_terms=result.matched_terms,
+        )
