@@ -9,106 +9,85 @@ from lastlight.pack_validation import format_validation_report, validate_pack
 from lastlight.repository import MarkdownKnowledgeRepository
 
 
+def _manifest(languages: str = '["en"]', format_version: object = 1) -> str:
+    return (
+        '{"format_version":' + str(format_version).lower() + ',"name":"Core",'
+        '"version":"1.0.0","languages":' + languages + ','
+        '"license":"MPL-2.0","source":"local","publisher":"tests"}'
+    )
+
+
 class PackValidationTests(unittest.TestCase):
     def test_valid_pack_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "lastlight-pack.json").write_text(
-                '{"name":"Core","version":"1.0","languages":["en"],'
-                '"license":"MPL-2.0","source":"local"}',
-                encoding="utf-8",
-            )
+            (root / "lastlight-pack.json").write_text(_manifest(), encoding="utf-8")
             (root / "water.md").write_text(
-                "---\ntitle: Water\nlanguage: en\ntags:\n  - water\n---\n\nBoil.",
-                encoding="utf-8",
+                "---\ntitle: Water\nlanguage: en\ntags:\n  - water\n---\n\nBoil.", encoding="utf-8"
             )
-
             report = validate_pack(MarkdownKnowledgeRepository(root))
-
         self.assertTrue(report.ok)
         self.assertEqual(report.errors, ())
 
     def test_missing_manifest_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "water.md").write_text(
-                "---\ntitle: Water\nlanguage: en\n---\n\nBoil.",
-                encoding="utf-8",
-            )
-
+            (root / "water.md").write_text("---\ntitle: Water\nlanguage: en\n---\n\nBoil.", encoding="utf-8")
             report = validate_pack(MarkdownKnowledgeRepository(root))
-
         self.assertFalse(report.ok)
         self.assertIn("missing lastlight-pack.json manifest", report.errors)
+
+    def test_unsupported_format_version_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "lastlight-pack.json").write_text(_manifest(format_version=2), encoding="utf-8")
+            (root / "water.md").write_text("---\ntitle: Water\nlanguage: en\ntags:\n  - water\n---\n\nBoil.", encoding="utf-8")
+            report = validate_pack(MarkdownKnowledgeRepository(root))
+        self.assertFalse(report.ok)
+        self.assertIn("unsupported pack format_version: 2; runtime supports 1", report.errors)
+
+    def test_missing_format_version_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "lastlight-pack.json").write_text(
+                '{"name":"Core","version":"1.0.0","languages":["en"],"license":"MPL-2.0","source":"local"}',
+                encoding="utf-8",
+            )
+            (root / "water.md").write_text("---\ntitle: Water\nlanguage: en\n---\n\nBoil.", encoding="utf-8")
+            report = validate_pack(MarkdownKnowledgeRepository(root))
+        self.assertFalse(report.ok)
+        self.assertIn("manifest missing required field: format_version", report.errors)
 
     def test_language_mismatch_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "lastlight-pack.json").write_text(
-                '{"name":"Core","version":"1.0","languages":["es"],'
-                '"license":"MPL-2.0","source":"local"}',
-                encoding="utf-8",
-            )
-            (root / "water.md").write_text(
-                "---\ntitle: Water\nlanguage: en\n---\n\nBoil.",
-                encoding="utf-8",
-            )
-
+            (root / "lastlight-pack.json").write_text(_manifest('["es"]'), encoding="utf-8")
+            (root / "water.md").write_text("---\ntitle: Water\nlanguage: en\n---\n\nBoil.", encoding="utf-8")
             report = validate_pack(MarkdownKnowledgeRepository(root))
-
         self.assertFalse(report.ok)
         self.assertIn("manifest languages missing document language: en", report.errors)
 
     def test_warns_when_document_is_outside_language_section(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            (root / "lastlight-pack.json").write_text(
-                '{"name":"Core","version":"1.0","languages":["en"],'
-                '"license":"MPL-2.0","source":"local"}',
-                encoding="utf-8",
-            )
-            (root / "water.md").write_text(
-                "---\ntitle: Water\nlanguage: en\ntags:\n  - water\n---\n\nBoil.",
-                encoding="utf-8",
-            )
-
+            (root / "lastlight-pack.json").write_text(_manifest(), encoding="utf-8")
+            (root / "water.md").write_text("---\ntitle: Water\nlanguage: en\ntags:\n  - water\n---\n\nBoil.", encoding="utf-8")
             report = validate_pack(MarkdownKnowledgeRepository(root))
-
         self.assertTrue(report.ok)
-        self.assertIn(
-            "1 document(s) are outside their language section",
-            report.warnings,
-        )
+        self.assertIn("1 document(s) are outside their language section", report.warnings)
 
     def test_accepts_document_inside_language_section(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            en = root / "en"
-            en.mkdir()
-            (root / "lastlight-pack.json").write_text(
-                '{"name":"Core","version":"1.0","languages":["en"],'
-                '"license":"MPL-2.0","source":"local"}',
-                encoding="utf-8",
-            )
-            (en / "water.md").write_text(
-                "---\ntitle: Water\nlanguage: en\ntags:\n  - water\n---\n\nBoil.",
-                encoding="utf-8",
-            )
-
+            root = Path(tmp); en = root / "en"; en.mkdir()
+            (root / "lastlight-pack.json").write_text(_manifest(), encoding="utf-8")
+            (en / "water.md").write_text("---\ntitle: Water\nlanguage: en\ntags:\n  - water\n---\n\nBoil.", encoding="utf-8")
             report = validate_pack(MarkdownKnowledgeRepository(root))
-
-        self.assertNotIn(
-            "1 document(s) are outside their language section",
-            report.warnings,
-        )
+        self.assertNotIn("1 document(s) are outside their language section", report.warnings)
 
     def test_format_validation_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            report = validate_pack(MarkdownKnowledgeRepository(root))
-
+            report = validate_pack(MarkdownKnowledgeRepository(Path(tmp)))
         output = format_validation_report(report)
-
         self.assertIn("Pack validation: FAIL", output)
         self.assertIn("ERROR: pack contains no Markdown documents", output)
 
