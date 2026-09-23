@@ -62,7 +62,7 @@ class RepositoryTests(unittest.TestCase):
 
         self.assertEqual(len(docs), 1)
         self.assertEqual(docs[0].title, "Packed Water")
-        self.assertEqual(docs[0].path, "pack.zip:water/purification.md")
+        self.assertEqual(docs[0].path, "water/purification.md")
 
     def test_ignores_root_readme_in_zip_pack(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -74,7 +74,7 @@ class RepositoryTests(unittest.TestCase):
             docs = MarkdownKnowledgeRepository(pack).list_documents()
 
         self.assertEqual(len(docs), 1)
-        self.assertEqual(docs[0].path, "pack.zip:es/agua.md")
+        self.assertEqual(docs[0].path, "es/agua.md")
 
     def test_loads_zip_pack_with_uppercase_extension(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -85,7 +85,7 @@ class RepositoryTests(unittest.TestCase):
             docs = MarkdownKnowledgeRepository(pack).list_documents()
 
         self.assertEqual(len(docs), 1)
-        self.assertEqual(docs[0].path, "pack.ZIP:water.md")
+        self.assertEqual(docs[0].path, "water.md")
 
     def test_ignores_zip_metadata_markdown(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -98,7 +98,7 @@ class RepositoryTests(unittest.TestCase):
             docs = MarkdownKnowledgeRepository(pack).list_documents()
 
         self.assertEqual(len(docs), 1)
-        self.assertEqual(docs[0].path, "pack.zip:water.md")
+        self.assertEqual(docs[0].path, "water.md")
 
     def test_reads_directory_pack_manifest(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
