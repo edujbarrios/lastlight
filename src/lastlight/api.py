@@ -6,10 +6,20 @@ from pathlib import Path
 from typing import Sequence
 
 from .application.factory import ApplicationFactory
-from .errors import ConfigurationError
+from .errors import ConfigurationError, PackValidationError
+from .knowledge.pack_validation import validate_pack
+from .knowledge.provenance import verify_pack_provenance
 from .safety.triage import first_acceptable_result
 from .shared.domain import SearchResult
-from .types import QueryResult, RetrievalMetadata, SourceDocument, SourceResult
+from .types import (
+    PackInfo,
+    PackProvenance,
+    PackValidation,
+    QueryResult,
+    RetrievalMetadata,
+    SourceDocument,
+    SourceResult,
+)
 
 KnowledgeSource = Path | str
 KnowledgeSources = KnowledgeSource | Sequence[KnowledgeSource] | None
@@ -67,6 +77,64 @@ class LastLight:
 
         return cls(knowledge=packs, **kwargs)
 
+    def packs(self) -> tuple[PackInfo, ...]:
+        """Return stable metadata for every mounted knowledge pack."""
+
+        return tuple(self._pack_info(repository) for repository in self._repositories())
+
+    def validate_packs(self, *, raise_on_error: bool = False) -> tuple[PackValidation, ...]:
+        """Validate all mounted packs without requiring CLI parsing.
+
+        Set ``raise_on_error=True`` when an integration should fail fast instead
+        of inspecting the returned validation reports.
+        """
+
+        reports: list[PackValidation] = []
+        for repository in self._repositories():
+            report = validate_pack(repository)
+            reports.append(
+                PackValidation(
+                    pack=self._pack_info(repository),
+                    ok=report.ok,
+                    errors=report.errors,
+                    warnings=report.warnings,
+                )
+            )
+        result = tuple(reports)
+        if raise_on_error:
+            failures = [report for report in result if not report.ok]
+            if failures:
+                summary = "; ".join(
+                    f"{report.pack.name}: {', '.join(report.errors)}" for report in failures
+                )
+                raise PackValidationError(summary)
+        return result
+
+    def verify_provenance(self, *, stale_after_days: int = 365) -> tuple[PackProvenance, ...]:
+        """Verify fingerprints, freshness and provenance for every mounted pack."""
+
+        reports: list[PackProvenance] = []
+        for repository in self._repositories():
+            report = verify_pack_provenance(
+                repository,
+                stale_after_days=stale_after_days,
+            )
+            reports.append(
+                PackProvenance(
+                    pack=self._pack_info(repository),
+                    ok=report.ok,
+                    fingerprint_sha256=report.fingerprint_sha256,
+                    publisher=report.publisher,
+                    published_at=report.published_at,
+                    expires_at=report.expires_at,
+                    age_days=report.age_days,
+                    expired=report.expired,
+                    errors=report.errors,
+                    warnings=report.warnings,
+                )
+            )
+        return tuple(reports)
+
     def search(self, text: str, *, top_k: int = 3) -> list[SourceResult]:
         """Return ranked public source results without leaking internal domain types."""
 
@@ -102,6 +170,34 @@ class LastLight:
         """Compatibility hook for first-party adapters; prefer :meth:`plan`."""
 
         return self._app.retrieval_metadata()
+
+    def _repositories(self) -> tuple[object, ...]:
+        repository = self._app.repository
+        repositories = getattr(repository, "repositories", None)
+        if isinstance(repositories, tuple):
+            return repositories
+        if isinstance(repositories, list):
+            return tuple(repositories)
+        return (repository,)
+
+    @staticmethod
+    def _pack_info(repository: object) -> PackInfo:
+        describe_pack = getattr(repository, "describe_pack", None)
+        list_documents = getattr(repository, "list_documents", None)
+        if not callable(list_documents):
+            raise TypeError("knowledge repository does not expose list_documents()")
+        documents = list_documents()
+        pack = describe_pack() if callable(describe_pack) else None
+        return PackInfo(
+            name=str(getattr(pack, "name", "knowledge")),
+            version=str(getattr(pack, "version", "unknown")),
+            languages=tuple(getattr(pack, "languages", ()) or ()),
+            description=str(getattr(pack, "description", "")),
+            license=str(getattr(pack, "license", "unknown")),
+            source=str(getattr(pack, "source", "local")),
+            path=str(getattr(pack, "path", "")),
+            document_count=len(documents),
+        )
 
     def _search_internal(self, text: str, *, top_k: int = 3) -> list[SearchResult]:
         """Internal bridge for first-party adapters that still need domain results."""
