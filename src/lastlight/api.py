@@ -6,12 +6,16 @@ from pathlib import Path
 from typing import Sequence
 
 from .application.factory import ApplicationFactory
+from .errors import ConfigurationError
 from .safety.triage import first_acceptable_result
 from .shared.domain import SearchResult
-from .types import QueryResult, RetrievalMetadata, SourceResult
+from .types import QueryResult, RetrievalMetadata, SourceDocument, SourceResult
 
 KnowledgeSource = Path | str
 KnowledgeSources = KnowledgeSource | Sequence[KnowledgeSource] | None
+
+SUPPORTED_STRATEGIES = frozenset({"lexical", "bm25", "adaptive"})
+SUPPORTED_MODES = frozenset({"survival", "balanced", "accuracy"})
 
 
 class LastLight:
@@ -31,6 +35,17 @@ class LastLight:
         energy_budget_mwh: float | None = None,
         memory_budget_mb: int | None = None,
     ) -> None:
+        if strategy not in SUPPORTED_STRATEGIES:
+            choices = ", ".join(sorted(SUPPORTED_STRATEGIES))
+            raise ConfigurationError(
+                f"unsupported retrieval strategy: {strategy!r}; choose one of: {choices}"
+            )
+        if mode not in SUPPORTED_MODES:
+            choices = ", ".join(sorted(SUPPORTED_MODES))
+            raise ConfigurationError(
+                f"unsupported adaptive mode: {mode!r}; choose one of: {choices}"
+            )
+
         self.strategy = strategy
         self.mode = mode
         self._app = ApplicationFactory.create(
@@ -52,15 +67,15 @@ class LastLight:
 
         return cls(knowledge=packs, **kwargs)
 
-    def search(self, text: str, *, top_k: int = 3) -> list[SearchResult]:
-        """Return ranked retrieval results for advanced callers."""
+    def search(self, text: str, *, top_k: int = 3) -> list[SourceResult]:
+        """Return ranked public source results without leaking internal domain types."""
 
-        return self._app.search(text, top_k=top_k)
+        return [self._source_result(result) for result in self._search_internal(text, top_k=top_k)]
 
     def query(self, text: str, *, top_k: int = 3) -> QueryResult:
         """Return a stable, structured result suitable for UIs and integrations."""
 
-        results = self._app.search(text, top_k=top_k)
+        results = self._search_internal(text, top_k=top_k)
         accepted = first_acceptable_result(results)
         metadata = self._metadata(top_k)
         return QueryResult(
@@ -80,13 +95,18 @@ class LastLight:
     def plan(self, text: str, *, top_k: int = 3) -> RetrievalMetadata:
         """Run retrieval and expose the selected retrieval-policy metadata."""
 
-        self._app.search(text, top_k=top_k)
+        self._search_internal(text, top_k=top_k)
         return self._metadata(top_k)
 
     def retrieval_metadata(self) -> dict[str, object] | None:
         """Compatibility hook for first-party adapters; prefer :meth:`plan`."""
 
         return self._app.retrieval_metadata()
+
+    def _search_internal(self, text: str, *, top_k: int = 3) -> list[SearchResult]:
+        """Internal bridge for first-party adapters that still need domain results."""
+
+        return self._app.search(text, top_k=top_k)
 
     def _metadata(self, top_k: int) -> RetrievalMetadata:
         raw = self._app.retrieval_metadata() or {
@@ -105,13 +125,20 @@ class LastLight:
     @staticmethod
     def _source_result(result: SearchResult) -> SourceResult:
         document = result.document
-        return SourceResult(
+        public_document = SourceDocument(
             title=document.title,
             path=document.path,
+            body=document.body,
             pack_name=document.pack_name,
             pack_version=document.pack_version,
+            pack_source=document.pack_source,
+            pack_path=document.pack_path,
             language=document.language,
             tags=document.tags,
+            priority=document.priority,
+        )
+        return SourceResult(
+            document=public_document,
             score=result.score,
             confidence=result.confidence,
             passage=result.passage,
