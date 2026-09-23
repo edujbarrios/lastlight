@@ -48,3 +48,56 @@ jobs:
           .package-venv/bin/python -m pip install --no-deps dist/*.whl
           .package-venv/bin/python -c "from lastlight import LastLight, QueryResult; print(LastLight.__name__)"
           .package-venv/bin/lastlight --help >/dev/null
+      - name: Verify installed-library README examples
+        shell: bash
+        run: |
+          .package-venv/bin/python - <<'PY'
+          from lastlight import LastLight
+
+          pack = "examplepack/lastlight-example-en.zip"
+          water = (
+              "The water supply is down and I have no bottled water. "
+              "I found water that looks clear. What should I do before drinking it?"
+          )
+          food = (
+              "The power has been out for several hours. "
+              "How long will food stay safe in my refrigerator if I keep the door closed?"
+          )
+
+          lexical = LastLight(pack, strategy="lexical").query(water)
+          assert lexical.accepted is True
+          assert lexical.confidence == "HIGH"
+          assert lexical.sources[0].title == "Safe water during an emergency"
+          assert round(lexical.sources[0].score, 3) == 2.539
+
+          bm25 = LastLight(pack, strategy="bm25").query(water)
+          assert bm25.accepted is True
+          assert bm25.confidence == "HIGH"
+          assert bm25.sources[0].title == "Safe water during an emergency"
+          assert round(bm25.sources[0].score, 3) == 7.159
+
+          balanced = LastLight(pack, strategy="adaptive", mode="balanced").plan(water)
+          assert balanced.strategy == "lexical"
+          assert balanced.risk == "high"
+          assert balanced.effective_top_k == 3
+
+          normal = LastLight(pack, strategy="adaptive", mode="balanced").plan(food)
+          assert normal.strategy == "bm25"
+          assert normal.risk == "normal"
+
+          constrained = LastLight(
+              pack,
+              strategy="adaptive",
+              mode="balanced",
+              energy_budget_mwh=0.4,
+          ).plan(food)
+          assert constrained.strategy == "lexical"
+          assert constrained.effective_top_k == 2
+
+          refusal = LastLight(pack).query("How do I repair a diesel engine that will not start?")
+          assert refusal.accepted is False
+          assert refusal.confidence is None
+          assert refusal.passage is None
+
+          print("installed-library README examples: PASS")
+          PY
