@@ -13,6 +13,13 @@ from .ranking import (
 )
 from .tokenizer import expand_query_tokens, tokenize
 
+# Generic glue words that should never be the only evidence for a LOW result.
+# Keeping this filter at the result boundary preserves established score scales
+# for meaningful matches while removing obvious out-of-domain noise.
+WEAK_LOW_CONFIDENCE_TERMS = frozenset(
+    {"about", "does", "had", "has", "have", "that", "will"}
+)
+
 
 class LexicalRetrievalStrategy(RetrievalStrategy):
     def search(
@@ -23,11 +30,14 @@ class LexicalRetrievalStrategy(RetrievalStrategy):
             score, matched_terms = lexical_score(query.text, document, len(documents))
             if score <= 0:
                 continue
+            confidence = confidence_for_score(score)
+            if _weak_low_confidence_match(confidence, matched_terms):
+                continue
             results.append(
                 SearchResult(
                     document=document,
                     score=score,
-                    confidence=confidence_for_score(score),
+                    confidence=confidence,
                     passage=select_passage(document.body, query.text),
                     matched_terms=matched_terms,
                 )
@@ -76,14 +86,23 @@ class BM25RetrievalStrategy(RetrievalStrategy):
         ):
             if score <= 0:
                 continue
+            confidence = confidence_for_bm25_score(score)
+            if _weak_low_confidence_match(confidence, matched_terms):
+                continue
             results.append(
                 SearchResult(
                     document=document,
                     score=score,
-                    confidence=confidence_for_bm25_score(score),
+                    confidence=confidence,
                     passage=select_passage(document.body, query.text),
                     matched_terms=matched_terms,
                 )
             )
         results.sort(key=lambda result: (-result.score, result.document.path))
         return results[: max(query.top_k, 1)]
+
+
+def _weak_low_confidence_match(confidence: str, matched_terms: tuple[str, ...]) -> bool:
+    if confidence != "LOW" or not matched_terms:
+        return False
+    return set(matched_terms).issubset(WEAK_LOW_CONFIDENCE_TERMS)
