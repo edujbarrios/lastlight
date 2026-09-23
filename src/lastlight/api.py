@@ -12,11 +12,14 @@ from .knowledge.provenance import verify_pack_provenance
 from .safety.triage import first_acceptable_result
 from .shared.domain import SearchResult
 from .types import (
+    AdaptiveMode,
     PackInfo,
     PackProvenance,
     PackValidation,
     QueryResult,
+    RefusalReason,
     RetrievalMetadata,
+    RetrievalStrategyName,
     SourceDocument,
     SourceResult,
 )
@@ -39,9 +42,9 @@ class LastLight:
         self,
         knowledge: KnowledgeSources = None,
         *,
-        strategy: str = "lexical",
+        strategy: RetrievalStrategyName = "lexical",
         language: str | None = None,
-        mode: str = "balanced",
+        mode: AdaptiveMode = "balanced",
         energy_budget_mwh: float | None = None,
         memory_budget_mb: int | None = None,
     ) -> None:
@@ -146,7 +149,7 @@ class LastLight:
         results = self._search_internal(text, top_k=top_k)
         accepted = first_acceptable_result(results)
         metadata = self._metadata(top_k)
-        refusal_reason = None
+        refusal_reason: RefusalReason | None = None
         if accepted is None:
             refusal_reason = "no_matching_knowledge" if not results else "insufficient_confidence"
         return QueryResult(
