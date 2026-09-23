@@ -83,13 +83,13 @@ print(source.matched_terms)
 ```
 
 ```text
-lastlight-example-en.zip:en/first-aid/severe-bleeding.md
+en/first-aid/severe-bleeding.md
 en
 ('first-aid', 'bleeding', 'hemorrhage')
 ('bleeding', 'emergency', 'services', 'waiting')
 ```
 
-Once the package and knowledge pack are local, querying does not require a network connection.
+Source paths are **pack-relative and stable**: the same document keeps the same logical path whether the pack is a directory, a ZIP file, or the ZIP is renamed. Once the package and knowledge pack are local, querying does not require a network connection.
 
 ## Confidence-aware refusal
 
@@ -99,23 +99,22 @@ LastLight does not turn every weak match into an answer. The public result makes
 from lastlight import LastLight
 
 engine = LastLight("lastlight-example-en.zip")
-
-result = engine.query(
-    "How do I repair a diesel engine that will not start?"
-)
+result = engine.query("How do I repair a diesel engine that will not start?")
 
 print(result.accepted)
 print(result.confidence)
 print(result.passage)
+print(result.refusal_reason)
 ```
 
 ```text
 False
 None
 None
+no_matching_knowledge
 ```
 
-A refused query may still contain LOW-confidence retrieval candidates in `result.sources`; callers should use `result.accepted` as the answer boundary.
+Callers should use `result.accepted` as the answer boundary rather than treating every retrieval candidate as an answer.
 
 ## Public Python API
 
@@ -127,25 +126,29 @@ from lastlight import (
     QueryResult,
     RetrievalMetadata,
     SourceResult,
+    PackInfo,
+    PackValidation,
+    PackProvenance,
 )
 ```
 
 The main operations are:
 
 ```python
-engine.query(text)   # structured QueryResult
-engine.search(text)  # ranked retrieval results
-engine.answer(text)  # formatted text response
-engine.plan(text)    # adaptive retrieval plan
+engine.query(text)            # structured QueryResult
+engine.search(text)           # ranked SourceResult values
+engine.answer(text)           # formatted text response
+engine.plan(text)             # adaptive retrieval metadata
+engine.packs()                # mounted pack metadata
+engine.validate_packs()       # structured validation reports
+engine.verify_provenance()    # integrity/freshness reports
 ```
 
-`QueryResult`, `SourceResult`, and `RetrievalMetadata` are the stable contracts intended for UIs, benchmarks and other companion repositories. See [Python API](docs/python_api.md).
+These package-root contracts are the intended integration boundary for UIs, benchmarks and other companion repositories. See [Python API](docs/python_api.md).
 
 ## Compare retrieval strategies
 
-LastLight exposes two fixed retrieval strategies plus an adaptive planner. The examples below are verified against the built wheel in CI so the README stays tied to the packaged library rather than only to the source tree.
-
-This query has an immediately useful answer and is also useful for comparing ranking behavior:
+LastLight exposes two fixed retrieval strategies plus an adaptive planner. The examples below are checked against the built wheel in CI.
 
 ```python
 from lastlight import LastLight
@@ -154,11 +157,7 @@ query = (
     "The power has been out for several hours. "
     "How long will food stay safe in my refrigerator if I keep the door closed?"
 )
-```
 
-### Lexical vs BM25
-
-```python
 for strategy in ("lexical", "bm25"):
     result = LastLight(
         "lastlight-example-en.zip",
@@ -166,12 +165,7 @@ for strategy in ("lexical", "bm25"):
     ).query(query)
 
     source = result.sources[0]
-    print(
-        strategy,
-        source.title,
-        f"score={source.score:.3f}",
-        source.confidence,
-    )
+    print(strategy, source.title, f"score={source.score:.3f}", source.confidence)
     print(result.passage)
 ```
 
@@ -185,7 +179,7 @@ bm25 Food safety during a power outage score=11.475 HIGH
 Keep refrigerator and freezer doors closed as much as possible. As a reference, an unopened refrigerator keeps food cold for about 4 hours.
 ```
 
-The numeric score scales are strategy-specific, so `4.918` and `11.475` should **not** be compared directly. What matters is ranking and confidence within each retrieval strategy.
+Score scales are strategy-specific, so lexical and BM25 numeric scores should **not** be compared directly.
 
 ### Adaptive strategy selection
 
@@ -199,13 +193,7 @@ for mode in ("survival", "balanced", "accuracy"):
         mode=mode,
     ).plan(query)
 
-    print(
-        mode,
-        plan.strategy,
-        plan.effective_top_k,
-        plan.risk,
-        plan.reason,
-    )
+    print(mode, plan.strategy, plan.effective_top_k, plan.risk, plan.reason)
 ```
 
 Observed decisions:
@@ -215,8 +203,6 @@ survival lexical 2 normal survival mode caps retrieval cost
 balanced bm25 3 normal balanced mode with sufficient detected resources
 accuracy bm25 3 normal accuracy mode with no active resource constraint
 ```
-
-The same query therefore demonstrates the trade-off clearly: `survival` caps retrieval cost with lexical search, while `balanced` and `accuracy` can choose BM25 when resources allow it.
 
 Explicit resource budgets can change the plan:
 
@@ -239,11 +225,9 @@ lexical
 energy budget is at or below 0.5 mWh/query
 ```
 
-See [Adaptive Retrieval](docs/adaptive_retrieval.md) for the complete decision order and policy thresholds.
+See [Adaptive Retrieval](docs/adaptive_retrieval.md) for the decision order and policy thresholds.
 
 ## Use multiple knowledge packs
-
-Packs remain independently versioned and distributable, while the library can search several as one local corpus:
 
 ```python
 from lastlight import LastLight
@@ -258,39 +242,59 @@ engine = LastLight.from_packs(
     mode="balanced",
 )
 
-result = engine.query(
-    "Someone is bleeding heavily and the power is out. "
-    "What guidance is available?"
-)
+result = engine.query("Someone is bleeding heavily. What guidance is available?")
 
 for source in result.sources:
-    print(source.path, source.confidence, source.score)
+    print(source.pack_name, source.path, source.confidence, source.score)
 ```
 
-This is the intended integration point for projects such as `lastlight-ui` or `lastlight-bench`: they import the library instead of spawning and parsing the CLI.
+This is the intended integration point for projects such as `lastlight-ui` and `lastlight-bench`: import the library instead of spawning and parsing the CLI.
 
-## Knowledge packs
+## Knowledge Pack Format v1
 
-LastLight does not ship a fixed emergency corpus. Runtime knowledge is external and can be distributed separately from the Python package.
-
-A typical pack looks like:
+Distributable LastLight packs use an explicit versioned manifest contract. A typical pack looks like:
 
 ```text
 water-en.zip
 ├── lastlight-pack.json
-├── en/
-│   └── water/
-│       ├── purification.md
-│       └── storage.md
-└── sources/
-    └── references.json
+└── en/
+    └── water/
+        ├── purification.md
+        └── storage.md
 ```
 
-[`knowledge/README.md`](knowledge/README.md) documents the pack format. See also [Knowledge Packs](docs/knowledge_packs.md) and [Knowledge Pack Provenance](docs/pack_provenance.md).
+A minimal manifest starts with:
+
+```json
+{
+  "format_version": 1,
+  "name": "Emergency Water EN",
+  "version": "1.0.0",
+  "languages": ["en"],
+  "license": "CC-BY-4.0",
+  "source": "https://example.org/water"
+}
+```
+
+`format_version` identifies the LastLight pack schema; `version` identifies the knowledge content release. Validation checks the schema version, required field types, semantic content version, language codes, provenance entries and optional SHA-256 fingerprints.
+
+Pack loading also rejects unsafe ZIP paths and duplicate normalized archive members, limits uncompressed Markdown sizes/counts, prevents directory symlinks from escaping the pack root, and reports malformed pack data through the public `PackError` hierarchy.
+
+See [Knowledge Packs](docs/knowledge_packs.md) and [Knowledge Pack Provenance](docs/pack_provenance.md).
+
+## Core evaluation gate
+
+LastLight ships a small deterministic evaluation suite **inside the installed package**. It covers answerable queries and expected refusals against the example corpus. CI runs the same suite on Python 3.10, 3.11 and 3.12 and blocks regressions below the core thresholds for top-1 accuracy, answer precision, refusal recall and answerable recall.
+
+The larger stress, hardware and energy benchmark suites belong in `lastlight-bench`; the core suite is deliberately small and release-oriented.
+
+From a checkout you can also run:
+
+```bash
+lastlight --knowledge examplepack/lastlight-example-en.zip --eval
+```
 
 ## Language behavior
-
-Language selection is also available from the library:
 
 ```python
 engine = LastLight(
@@ -303,9 +307,7 @@ An explicit language always wins. Without one, LastLight adopts a monolingual co
 
 ## CLI utilities
 
-The CLI remains a first-party interface, but it is secondary to the Python API. Installing from PyPI also installs the `lastlight` command.
-
-Useful operational commands include:
+The CLI is a first-party interface but remains secondary to the Python API. Installing from PyPI also installs the `lastlight` command.
 
 ```bash
 lastlight --help
@@ -314,11 +316,7 @@ lastlight --knowledge pack.zip --verify-provenance
 lastlight --knowledge pack.zip --format sources "How can I make this water safer?"
 ```
 
-The CLI and the Python API use the same runtime implementation.
-
 ## Development and verification
-
-From a checkout:
 
 ```bash
 git clone https://github.com/edujbarrios/lastlight.git
@@ -327,7 +325,7 @@ python -m pip install -e .
 python tools/check_core.py
 ```
 
-CI verifies Python 3.10 and 3.12, builds wheel and source distributions, installs the built wheel in an isolated environment, and executes the library examples for lexical retrieval, BM25 retrieval, adaptive planning and refusal behavior.
+CI tests Python 3.10, 3.11 and 3.12, runs the core evaluation gate, builds wheel and source distributions, validates package metadata, installs the built wheel in isolation, verifies packaged resources and executes the documented library behavior.
 
 ## Research direction
 
@@ -339,15 +337,13 @@ The project is intended to make that trade-off measurable and auditable rather t
 
 ## Ecosystem direction
 
-The runtime is library-first so companion projects can depend on a stable Python API:
-
 ```text
 lastlight-ui ──────► lastlight
 lastlight-bench ───► lastlight
 other integrations ► lastlight
 ```
 
-Knowledge packs, pack-authoring tools and a future catalog can evolve independently around the same pack contract. See [Ecosystem](ECOSYSTEM.md).
+Knowledge packs, pack-authoring tools and a future catalog can evolve independently around the Pack Format v1 contract. See [Ecosystem](ECOSYSTEM.md).
 
 ## Docs
 

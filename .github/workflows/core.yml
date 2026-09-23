@@ -86,10 +86,11 @@ jobs:
           pack = "examplepack/lastlight-example-en.zip"
           bleeding = "Someone has a deep cut and is bleeding heavily. What should I do while waiting for emergency services?"
           food = "The power has been out for several hours. How long will food stay safe in my refrigerator if I keep the door closed?"
-          assert __version__ == "0.1.2"
+          assert __version__ == "0.1.3"
           practical = LastLight(pack, strategy="lexical").query(bleeding)
           assert practical.accepted and practical.confidence == "HIGH"
           assert practical.sources[0].title == "Severe external bleeding"
+          assert practical.sources[0].path == "en/first-aid/severe-bleeding.md"
           lexical = LastLight(pack, strategy="lexical").query(food)
           assert lexical.accepted and lexical.sources[0].title == "Food safety during a power outage"
           bm25 = LastLight(pack, strategy="bm25").query(food)
