@@ -47,4 +47,4 @@ where = ["src"]
 include = ["lastlight*"]
 
 [tool.setuptools.package-data]
-lastlight = ["py.typed"]
+lastlight = ["py.typed", "evaluation/data/*.jsonl"]
