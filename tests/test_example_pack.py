@@ -50,14 +50,14 @@ class ExamplePackIntegrationTests(unittest.TestCase):
         self.assertEqual(results[0].confidence, "HIGH")
         self.assertIn("Keep pressure on the wound", results[0].passage)
 
-    def test_out_of_domain_query_has_no_acceptable_result(self) -> None:
+    def test_out_of_domain_query_is_pruned_and_refused(self) -> None:
         app = ApplicationFactory.create(EXAMPLE_PACK)
         query = "How do I repair a diesel engine that will not start?"
 
         results = app.search(query)
         answer = app.answer(query)
 
-        self.assertTrue(all(result.confidence == "LOW" for result in results))
+        self.assertEqual(results, [])
         self.assertIn("I do not have enough confidence", answer)
 
 
