@@ -3,6 +3,8 @@ name: publish-to-pypi
 on:
   release:
     types: [published]
+  push:
+    branches: [main]
 
 permissions:
   contents: read
@@ -10,6 +12,7 @@ permissions:
 jobs:
   build:
     name: Build release distributions
+    if: github.event_name == 'release' || contains(github.event.head_commit.message, '[bootstrap-pypi-v0.1.1]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -20,7 +23,7 @@ jobs:
           python-version: "3.12"
       - name: Verify release metadata and tag
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || 'v0.1.1' }}
         run: python tools/check_release.py --tag "$RELEASE_TAG"
       - name: Install release tooling
         run: python -m pip install --upgrade build twine
@@ -33,7 +36,7 @@ jobs:
         run: |
           python -m venv .release-venv
           .release-venv/bin/python -m pip install --no-deps dist/*.whl
-          .release-venv/bin/python -c "from lastlight import LastLight, QueryResult; print(LastLight.__name__)"
+          .release-venv/bin/python -c "from lastlight import LastLight, QueryResult, __version__; assert __version__ == '0.1.1'; print(LastLight.__name__, __version__)"
           .release-venv/bin/lastlight --help >/dev/null
       - name: Store release distributions
         uses: actions/upload-artifact@v5
@@ -42,9 +45,38 @@ jobs:
           path: dist/
           if-no-files-found: error
 
+  bootstrap-release:
+    name: Create GitHub v0.1.1 release
+    if: github.event_name == 'push' && contains(github.event.head_commit.message, '[bootstrap-pypi-v0.1.1]')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Create v0.1.1 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh release create v0.1.1 \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "LastLight v0.1.1" \
+            --notes-file - <<'EOF'
+          Patch release focused on the library-first public experience.
+
+          Highlights:
+          - clearer practical Python-library examples in the README
+          - first demo now shows actionable severe-bleeding retrieval
+          - retrieval comparison now uses a useful power-outage food-safety question
+          - packaged-wheel CI verifies the documented lexical, BM25, adaptive and refusal behavior
+          - no runtime dependency changes
+          EOF
+
   publish:
     name: Publish release to PyPI
-    needs: build
+    needs: [build, bootstrap-release]
+    if: always() && needs.build.result == 'success' && (github.event_name == 'release' || needs.bootstrap-release.result == 'success')
     runs-on: ubuntu-latest
     environment:
       name: pypi

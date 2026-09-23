@@ -52,38 +52,54 @@ jobs:
         shell: bash
         run: |
           .package-venv/bin/python - <<'PY'
-          from lastlight import LastLight
+          from lastlight import LastLight, __version__
 
           pack = "examplepack/lastlight-example-en.zip"
-          water = (
-              "The water supply is down and I have no bottled water. "
-              "I found water that looks clear. What should I do before drinking it?"
+          bleeding = (
+              "Someone has a deep cut and is bleeding heavily. "
+              "What should I do while waiting for emergency services?"
           )
           food = (
               "The power has been out for several hours. "
               "How long will food stay safe in my refrigerator if I keep the door closed?"
           )
 
-          lexical = LastLight(pack, strategy="lexical").query(water)
+          assert __version__ == "0.1.1"
+
+          practical = LastLight(pack, strategy="lexical").query(bleeding)
+          assert practical.accepted is True
+          assert practical.confidence == "HIGH"
+          assert practical.sources[0].title == "Severe external bleeding"
+          assert round(practical.sources[0].score, 3) == 2.748
+          assert "direct pressure" in practical.passage
+
+          lexical = LastLight(pack, strategy="lexical").query(food)
           assert lexical.accepted is True
           assert lexical.confidence == "HIGH"
-          assert lexical.sources[0].title == "Safe water during an emergency"
-          assert round(lexical.sources[0].score, 3) == 2.539
+          assert lexical.sources[0].title == "Food safety during a power outage"
+          assert round(lexical.sources[0].score, 3) == 4.918
+          assert "about 4 hours" in lexical.passage
 
-          bm25 = LastLight(pack, strategy="bm25").query(water)
+          bm25 = LastLight(pack, strategy="bm25").query(food)
           assert bm25.accepted is True
           assert bm25.confidence == "HIGH"
-          assert bm25.sources[0].title == "Safe water during an emergency"
-          assert round(bm25.sources[0].score, 3) == 7.159
+          assert bm25.sources[0].title == "Food safety during a power outage"
+          assert round(bm25.sources[0].score, 3) == 11.475
 
-          balanced = LastLight(pack, strategy="adaptive", mode="balanced").plan(water)
-          assert balanced.strategy == "lexical"
-          assert balanced.risk == "high"
+          survival = LastLight(pack, strategy="adaptive", mode="survival").plan(food)
+          assert survival.strategy == "lexical"
+          assert survival.risk == "normal"
+          assert survival.effective_top_k == 2
+
+          balanced = LastLight(pack, strategy="adaptive", mode="balanced").plan(food)
+          assert balanced.strategy == "bm25"
+          assert balanced.risk == "normal"
           assert balanced.effective_top_k == 3
 
-          normal = LastLight(pack, strategy="adaptive", mode="balanced").plan(food)
-          assert normal.strategy == "bm25"
-          assert normal.risk == "normal"
+          accuracy = LastLight(pack, strategy="adaptive", mode="accuracy").plan(food)
+          assert accuracy.strategy == "bm25"
+          assert accuracy.risk == "normal"
+          assert accuracy.effective_top_k == 3
 
           constrained = LastLight(
               pack,

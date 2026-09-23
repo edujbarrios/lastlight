@@ -3,7 +3,7 @@
 from .api import LastLight
 from .types import QueryResult, RetrievalMetadata, SourceResult
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "LastLight",
