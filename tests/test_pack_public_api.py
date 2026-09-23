@@ -21,7 +21,7 @@ class PackPublicApiTests(unittest.TestCase):
 
         self.assertEqual(len(packs), 1)
         self.assertIsInstance(packs[0], PackInfo)
-        self.assertEqual(packs[0].name, "lastlight-example-en")
+        self.assertEqual(packs[0].name, "LastLight Example Pack EN")
         self.assertEqual(packs[0].version, "1.0.0")
         self.assertEqual(packs[0].document_count, 3)
         self.assertIn("en", packs[0].languages)
@@ -41,7 +41,7 @@ class PackPublicApiTests(unittest.TestCase):
 
         self.assertEqual(len(reports), 1)
         self.assertIsInstance(reports[0], PackProvenance)
-        self.assertEqual(reports[0].pack.name, "lastlight-example-en")
+        self.assertEqual(reports[0].pack.name, "LastLight Example Pack EN")
         self.assertEqual(len(reports[0].fingerprint_sha256), 64)
 
     def test_multi_pack_metadata_is_returned_per_mount(self) -> None:
