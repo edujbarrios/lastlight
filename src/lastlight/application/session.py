@@ -73,6 +73,8 @@ class LastLightSession:
         self.memory = SessionMemory()
 
     def search(self, query: str, top_k: int = 3) -> list[SearchResult]:
+        if self.memory.has_context and not _looks_like_follow_up(query):
+            self.clear()
         search_text = self._contextual_query(query)
         results = self.app.search(search_text, top_k=top_k)
         self._remember(query, results)
