@@ -73,6 +73,19 @@ class PublicApiTests(unittest.TestCase):
 
         self.assertTrue(result.sources)
 
+    def test_invalid_top_k_is_rejected_at_the_public_boundary(self) -> None:
+        engine = LastLight(EXAMPLE_PACK)
+        query = "How can I make collected water safer to drink?"
+
+        with self.assertRaisesRegex(ConfigurationError, "top_k"):
+            engine.search(query, top_k=0)
+        with self.assertRaisesRegex(ConfigurationError, "top_k"):
+            engine.query(query, top_k=-1)
+        with self.assertRaisesRegex(ConfigurationError, "top_k"):
+            engine.answer(query, top_k=True)
+        with self.assertRaisesRegex(ConfigurationError, "top_k"):
+            engine.plan(query, top_k=1.5)  # type: ignore[arg-type]
+
     def test_unknown_strategy_is_rejected_instead_of_falling_back(self) -> None:
         with self.assertRaisesRegex(ConfigurationError, "unsupported retrieval strategy"):
             LastLight(EXAMPLE_PACK, strategy="bm225")
