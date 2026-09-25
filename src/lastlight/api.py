@@ -31,6 +31,12 @@ SUPPORTED_STRATEGIES = frozenset({"lexical", "bm25", "adaptive"})
 SUPPORTED_MODES = frozenset({"survival", "balanced", "accuracy"})
 
 
+def _validate_top_k(top_k: int) -> int:
+    if isinstance(top_k, bool) or not isinstance(top_k, int) or top_k < 1:
+        raise ConfigurationError("top_k must be an integer greater than or equal to 1")
+    return top_k
+
+
 class LastLight:
     """Small public facade over the offline LastLight application runtime.
 
@@ -165,7 +171,7 @@ class LastLight:
     def answer(self, text: str, *, top_k: int = 3) -> str:
         """Return the existing human-readable, safety-aware answer."""
 
-        return self._app.answer(text, top_k=top_k)
+        return self._app.answer(text, top_k=_validate_top_k(top_k))
 
     def plan(self, text: str, *, top_k: int = 3) -> RetrievalMetadata:
         """Run retrieval and expose the selected retrieval-policy metadata."""
@@ -209,7 +215,7 @@ class LastLight:
     def _search_internal(self, text: str, *, top_k: int = 3) -> list[SearchResult]:
         """Internal bridge for first-party adapters that still need domain results."""
 
-        return self._app.search(text, top_k=top_k)
+        return self._app.search(text, top_k=_validate_top_k(top_k))
 
     def _metadata(self, top_k: int) -> RetrievalMetadata:
         raw = self._app.retrieval_metadata() or {
