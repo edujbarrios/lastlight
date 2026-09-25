@@ -9,6 +9,7 @@ from zipfile import ZIP_DEFLATED, ZipFile
 import helpers  # noqa: F401
 from lastlight.errors import PackError
 from lastlight.knowledge.provenance import pack_fingerprint
+from lastlight.knowledge.repository import MAX_MANIFEST_BYTES
 from lastlight.repository import MarkdownKnowledgeRepository
 
 
@@ -56,6 +57,33 @@ class PackLoadingHardeningTests(unittest.TestCase):
                 pack_fingerprint(directory_docs, MANIFEST),
                 pack_fingerprint(zip_docs, MANIFEST),
             )
+
+    def test_rejects_directory_manifest_symlink_outside_pack_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "pack"
+            root.mkdir()
+            outside_manifest = Path(tmp) / "outside.json"
+            outside_manifest.write_text(json.dumps(MANIFEST), encoding="utf-8")
+            manifest = root / "lastlight-pack.json"
+            try:
+                manifest.symlink_to(outside_manifest)
+            except OSError as error:
+                self.skipTest(f"symlinks are unavailable: {error}")
+
+            with self.assertRaisesRegex(PackError, "manifest escapes pack root"):
+                MarkdownKnowledgeRepository(root).describe_pack()
+
+    def test_rejects_oversized_directory_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "pack"
+            root.mkdir()
+            (root / "lastlight-pack.json").write_text(
+                " " * (MAX_MANIFEST_BYTES + 1),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(PackError, "manifest exceeds maximum allowed size"):
+                MarkdownKnowledgeRepository(root).describe_pack()
 
     def test_rejects_zip_path_traversal(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

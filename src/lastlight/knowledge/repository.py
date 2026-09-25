@@ -31,7 +31,15 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
         manifest_path = self.knowledge_dir / PACK_MANIFEST
         if manifest_path.exists():
             try:
+                pack_root = self.knowledge_dir.resolve()
+                resolved_manifest = manifest_path.resolve()
+                if not resolved_manifest.is_relative_to(pack_root):
+                    raise PackError(f"pack manifest escapes pack root: {manifest_path}")
+                if manifest_path.stat().st_size > MAX_MANIFEST_BYTES:
+                    raise PackError("pack manifest exceeds maximum allowed size")
                 metadata = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except PackError:
+                raise
             except (OSError, UnicodeDecodeError, json.JSONDecodeError) as error:
                 raise PackError(f"cannot read pack manifest: {error}") from error
             if not isinstance(metadata, dict):
