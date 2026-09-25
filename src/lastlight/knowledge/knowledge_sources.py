@@ -27,6 +27,7 @@ def build_knowledge_repository(sources: KnowledgeSources = None) -> KnowledgeRep
         return MarkdownKnowledgeRepository()
 
     repositories = tuple(MarkdownKnowledgeRepository(source) for source in normalized)
-    if len(repositories) == 1:
-        return repositories[0]
+    # Route every explicit pack through the composite layer, even when there is
+    # only one source. Besides composing corpora, that layer is responsible for
+    # attaching pack identity to each document returned to the application.
     return CompositeKnowledgeRepository(repositories)
