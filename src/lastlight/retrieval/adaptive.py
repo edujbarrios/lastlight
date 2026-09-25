@@ -139,11 +139,16 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
 
 def classify_query_risk(text: str) -> str:
     normalized = " ".join(tokenize(text, keep_stopwords=True))
-    if any(term in normalized for term in CRITICAL_RISK_TERMS):
+    if _contains_risk_term(normalized, CRITICAL_RISK_TERMS):
         return "critical"
-    if any(term in normalized for term in HIGH_RISK_TERMS):
+    if _contains_risk_term(normalized, HIGH_RISK_TERMS):
         return "high"
     return "normal"
+
+
+def _contains_risk_term(normalized: str, terms: frozenset[str]) -> bool:
+    padded = f" {normalized} "
+    return any(f" {term} " in padded for term in terms)
 
 
 def _physical_memory_mb() -> int | None:
