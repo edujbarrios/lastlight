@@ -61,6 +61,29 @@ class TriageTests(unittest.TestCase):
         self.assertIn("Comprobaciones de seguimiento:", answer)
         self.assertNotIn("Follow-up checks:", answer)
 
+    def test_triage_terms_do_not_match_inside_unrelated_words(self) -> None:
+        navigation = SearchResult(
+            document=KnowledgeDocument(
+                title="Navigation near Las Vegas",
+                path="knowledge/en/navigation.md",
+                body="Use a compass near Las Vegas and confirm direction before moving.",
+                tags=("navigation", "compass"),
+                language="en",
+            ),
+            score=2.0,
+            confidence="HIGH",
+            passage="Use a compass and confirm direction before moving.",
+            matched_terms=("navigation", "compass"),
+        )
+
+        questions = suggest_follow_up_questions(navigation)
+
+        self.assertIn("Are you safer staying put than moving right now?", questions)
+        self.assertNotIn(
+            "Do you smell gas or fuel, or does anyone feel dizzy, weak, nauseated, or confused?",
+            questions,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
