@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from contextvars import ContextVar
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -84,7 +85,18 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
         self.profile = profile or ResourceProfile.detect()
         self.lexical = LexicalRetrievalStrategy()
         self.bm25 = BM25RetrievalStrategy()
-        self.last_decision: RetrievalDecision | None = None
+        self._last_decision: ContextVar[RetrievalDecision | None] = ContextVar(
+            "lastlight_adaptive_last_decision",
+            default=None,
+        )
+
+    @property
+    def last_decision(self) -> RetrievalDecision | None:
+        return self._last_decision.get()
+
+    @last_decision.setter
+    def last_decision(self, decision: RetrievalDecision | None) -> None:
+        self._last_decision.set(decision)
 
     def search(self, query: SearchQuery, documents: list[KnowledgeDocument]) -> list[SearchResult]:
         decision = self.plan(query)
@@ -107,7 +119,8 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
         return self._decision("bm25", risk, max(query.top_k, 1), "balanced mode with sufficient detected resources")
 
     def decision_metadata(self) -> dict[str, object] | None:
-        return self.last_decision.to_dict() if self.last_decision else None
+        decision = self.last_decision
+        return decision.to_dict() if decision else None
 
     def _constraint_reason(self) -> tuple[bool, str]:
         if self.config.mode == "survival":
