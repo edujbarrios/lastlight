@@ -89,7 +89,7 @@ en
 ('bleeding', 'emergency', 'services', 'waiting')
 ```
 
-Source paths are **pack-relative and stable**: the same document keeps the same logical path whether the pack is a directory, a ZIP file, or the ZIP is renamed. Once the package and knowledge pack are local, querying does not require a network connection.
+Source paths are **pack-relative and stable**: the same document keeps the same logical path whether the pack is a directory, a ZIP file, or the ZIP is renamed. Pack identity metadata (`pack_name`, `pack_version`, `pack_source`, and `pack_path`) is preserved consistently whether one pack or several packs are mounted. Once the package and knowledge pack are local, querying does not require a network connection.
 
 ## Confidence-aware refusal
 
@@ -144,7 +144,7 @@ engine.validate_packs()       # structured validation reports
 engine.verify_provenance()    # integrity/freshness reports
 ```
 
-These package-root contracts are the intended integration boundary for UIs, benchmarks and other companion repositories. See [Python API](docs/python_api.md).
+These package-root contracts are the intended integration boundary for UIs, benchmarks and other companion repositories. Explicit knowledge sources are validated at this public boundary, so missing, empty, or unsupported paths fail fast instead of looking like empty retrieval results. Public retrieval methods also require `top_k` to be an integer greater than or equal to 1. See [Python API](docs/python_api.md).
 
 ## Compare retrieval strategies
 
@@ -278,7 +278,7 @@ A minimal manifest starts with:
 
 `format_version` identifies the LastLight pack schema; `version` identifies the knowledge content release. Validation checks the schema version, required field types, semantic content version, language codes, provenance entries and optional SHA-256 fingerprints.
 
-Pack loading also rejects unsafe ZIP paths and duplicate normalized archive members, limits uncompressed Markdown sizes/counts, prevents directory symlinks from escaping the pack root, and reports malformed pack data through the public `PackError` hierarchy.
+Pack loading rejects unsafe ZIP paths and duplicate normalized archive members, limits uncompressed Markdown sizes/counts, and applies a manifest size limit in both ZIP and directory packs. Directory manifests and Markdown documents may not escape the pack root through symlinks. Directory and ZIP packs also use matching Markdown-discovery rules, including case-insensitive `.md` extensions and ignoring hidden/`__MACOSX` metadata paths. Malformed pack data is reported through the public `PackError` hierarchy.
 
 See [Knowledge Packs](docs/knowledge_packs.md) and [Knowledge Pack Provenance](docs/pack_provenance.md).
 
