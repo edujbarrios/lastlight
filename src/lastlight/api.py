@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Sequence
 
 from .application.factory import ApplicationFactory
-from .errors import ConfigurationError, PackValidationError
+from .errors import ConfigurationError, PackError, PackValidationError
 from .knowledge.pack_validation import validate_pack
 from .knowledge.provenance import verify_pack_provenance
 from .safety.triage import first_acceptable_result
@@ -37,6 +37,25 @@ def _validate_top_k(top_k: int) -> int:
     return top_k
 
 
+def _validate_knowledge_sources(sources: KnowledgeSources) -> None:
+    if sources is None:
+        return
+
+    normalized = (sources,) if isinstance(sources, (str, Path)) else tuple(sources)
+    for source in normalized:
+        if isinstance(source, str) and not source.strip():
+            raise PackError("knowledge source path cannot be empty")
+
+        path = Path(source)
+        if not path.exists():
+            raise PackError(f"knowledge source does not exist: {path}")
+        if path.is_dir():
+            continue
+        if path.is_file() and path.suffix.casefold() == ".zip":
+            continue
+        raise PackError(f"knowledge source must be a directory or .zip pack: {path}")
+
+
 class LastLight:
     """Small public facade over the offline LastLight application runtime.
 
@@ -64,6 +83,7 @@ class LastLight:
             raise ConfigurationError(
                 f"unsupported adaptive mode: {mode!r}; choose one of: {choices}"
             )
+        _validate_knowledge_sources(knowledge)
 
         self.strategy = strategy
         self.mode = mode
