@@ -56,7 +56,7 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
 
         pack_root = self.knowledge_dir.resolve()
         documents: list[KnowledgeDocument] = []
-        for path in sorted(self.knowledge_dir.rglob("*.md")):
+        for path in sorted(self.knowledge_dir.rglob("*")):
             if not path.is_file() or not _is_directory_markdown_document(path, self.knowledge_dir):
                 continue
             resolved = path.resolve()
@@ -145,7 +145,12 @@ def _is_directory_markdown_document(path: Path, pack_root: Path) -> bool:
         relative = path.relative_to(pack_root)
     except ValueError:
         return False
-    return not (len(relative.parts) == 1 and relative.name.casefold() == PACK_README.casefold())
+    parts = relative.parts
+    if any(part.startswith(".") or part == "__MACOSX" for part in parts):
+        return False
+    if len(parts) == 1 and relative.name.casefold() == PACK_README.casefold():
+        return False
+    return relative.suffix.casefold() == ".md"
 
 
 def _canonical_zip_name(name: str) -> str:
