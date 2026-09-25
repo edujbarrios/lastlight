@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ..retrieval.tokenizer import tokenize
 from .domain import SearchResult
 
 TRIAGE_RULES: tuple[tuple[tuple[str, ...], tuple[str, ...]], ...] = (
@@ -104,7 +105,7 @@ def suggest_follow_up_questions(
     haystack = _result_text(result)
     questions: list[str] = []
     for terms, rule_questions in TRIAGE_RULES:
-        if any(term in haystack for term in terms):
+        if any(_contains_triage_term(haystack, term) for term in terms):
             questions.extend(rule_questions)
         if len(questions) >= max_questions:
             break
@@ -137,7 +138,7 @@ def append_follow_up_questions(answer: str, result: SearchResult | None) -> str:
 
 def _result_text(result: SearchResult) -> str:
     document = result.document
-    return " ".join(
+    raw = " ".join(
         (
             document.title,
             document.path,
@@ -146,7 +147,15 @@ def _result_text(result: SearchResult) -> str:
             result.passage,
             " ".join(result.matched_terms),
         )
-    ).casefold()
+    )
+    return " ".join(tokenize(raw, keep_stopwords=True))
+
+
+def _contains_triage_term(normalized: str, term: str) -> bool:
+    normalized_term = " ".join(tokenize(term, keep_stopwords=True))
+    if not normalized_term:
+        return False
+    return f" {normalized_term} " in f" {normalized} "
 
 
 def _dedupe(values: list[str]) -> list[str]:
