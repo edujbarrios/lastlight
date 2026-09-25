@@ -87,6 +87,20 @@ class AdaptiveRetrievalTests(unittest.TestCase):
     def test_spanish_hemorrhage_is_classified_as_critical(self) -> None:
         self.assertEqual(classify_query_risk("tiene una hemorragia"), "critical")
 
+    def test_heatstroke_is_not_misclassified_by_embedded_stroke(self) -> None:
+        strategy = AdaptiveRetrievalStrategy(
+            AdaptiveRetrievalConfig(mode="accuracy"),
+            profile(),
+        )
+
+        decision = strategy.plan(SearchQuery("person may have heatstroke", top_k=5))
+
+        self.assertEqual(decision.risk, "high")
+        self.assertEqual(decision.strategy, "bm25")
+
+    def test_risk_terms_do_not_match_inside_unrelated_words(self) -> None:
+        self.assertEqual(classify_query_risk("navigation near Las Vegas"), "normal")
+
 
 if __name__ == "__main__":
     unittest.main()
