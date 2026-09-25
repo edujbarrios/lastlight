@@ -26,6 +26,18 @@ class PackPublicApiTests(unittest.TestCase):
         self.assertEqual(packs[0].document_count, 3)
         self.assertIn("en", packs[0].languages)
 
+    def test_single_pack_search_results_include_pack_identity(self) -> None:
+        engine = LastLight(EXAMPLE_PACK)
+        results = engine.search(
+            "Someone has a deep cut and is bleeding heavily. "
+            "What should I do while waiting for emergency services?"
+        )
+
+        self.assertTrue(results)
+        self.assertEqual(results[0].pack_name, "LastLight Example Pack EN")
+        self.assertEqual(results[0].pack_version, "1.1.0")
+        self.assertEqual(results[0].pack_path, str(EXAMPLE_PACK))
+
     def test_validate_packs_returns_structured_reports(self) -> None:
         engine = LastLight(EXAMPLE_PACK)
         reports = engine.validate_packs()
