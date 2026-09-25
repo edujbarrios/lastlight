@@ -95,6 +95,18 @@ class IndexerTests(unittest.TestCase):
         self.assertFalse(report["ok"])
         self.assertIn("error", report)
 
+    def test_rejects_valid_json_with_non_object_shape(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "knowledge"
+            root.mkdir()
+            index_path = Path(tmp) / "index.json"
+            index_path.write_text("[]", encoding="utf-8")
+
+            report = verify_index(MarkdownKnowledgeRepository(root), index_path)
+
+        self.assertFalse(report["ok"])
+        self.assertEqual(report["error"], "unsupported or malformed index")
+
 
 if __name__ == "__main__":
     unittest.main()

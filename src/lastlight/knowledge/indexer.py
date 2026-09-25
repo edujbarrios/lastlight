@@ -22,7 +22,11 @@ def verify_index(
     except (OSError, json.JSONDecodeError) as error:
         return {"ok": False, "error": str(error), "missing": [], "modified": [], "unexpected": []}
 
-    if stored.get("index_version") != INDEX_VERSION or not isinstance(stored.get("documents"), list):
+    if (
+        not isinstance(stored, dict)
+        or stored.get("index_version") != INDEX_VERSION
+        or not isinstance(stored.get("documents"), list)
+    ):
         return {
             "ok": False,
             "error": "unsupported or malformed index",
