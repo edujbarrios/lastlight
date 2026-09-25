@@ -22,7 +22,19 @@ MAX_MANIFEST_BYTES = 256 * 1024
 
 class MarkdownKnowledgeRepository(KnowledgeRepository):
     def __init__(self, knowledge_dir: Path | str | None = None) -> None:
-        self.knowledge_dir = Path(knowledge_dir) if knowledge_dir else project_root() / "knowledge"
+        if knowledge_dir is None:
+            self.knowledge_dir = project_root() / "knowledge"
+            return
+
+        if isinstance(knowledge_dir, str) and not knowledge_dir.strip():
+            raise PackError("knowledge source path cannot be empty")
+
+        path = Path(knowledge_dir)
+        if not path.exists():
+            raise PackError(f"knowledge source does not exist: {path}")
+        if not path.is_dir() and not (path.is_file() and path.suffix.casefold() == ".zip"):
+            raise PackError(f"knowledge source must be a directory or .zip pack: {path}")
+        self.knowledge_dir = path
 
     def describe_pack(self) -> KnowledgePack:
         if _is_zip_pack(self.knowledge_dir):
