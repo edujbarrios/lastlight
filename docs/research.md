@@ -18,7 +18,7 @@ Generative experiments, native acceleration, large stress datasets, hardware pro
 
 ## Core regression suite
 
-The core keeps `data/eval_core.jsonl`, the small hand-curated seed suite used to catch retrieval and refusal regressions. Cases may declare one expected tag, several tags for a multi-intent query, or `should_refuse` for requests that the mounted corpus cannot safely support.
+The core ships `lastlight.evaluation/data/eval_core.jsonl` as package data, the small hand-curated seed suite used to catch retrieval and refusal regressions. In the source tree it lives at `src/lastlight/evaluation/data/eval_core.jsonl`. Cases may declare one expected tag, several tags for a multi-intent query, or `should_refuse` for requests that the mounted corpus cannot safely support.
 
 Decision metrics use `HIGH` and `MEDIUM` confidence as acceptance:
 
