@@ -24,6 +24,29 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(len(docs), 1)
         self.assertEqual(docs[0].title, "A")
 
+    def test_directory_markdown_extension_is_case_insensitive(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "guide.MD").write_text("Uppercase extension", encoding="utf-8")
+
+            docs = MarkdownKnowledgeRepository(root).list_documents()
+
+        self.assertEqual(len(docs), 1)
+        self.assertEqual(docs[0].path, "guide.MD")
+
+    def test_directory_ignores_hidden_metadata_markdown(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / ".hidden").mkdir()
+            (root / "__MACOSX").mkdir()
+            (root / ".hidden" / "notes.md").write_text("hidden", encoding="utf-8")
+            (root / "__MACOSX" / "water.md").write_text("metadata", encoding="utf-8")
+            (root / "water.md").write_text("Boil water.", encoding="utf-8")
+
+            docs = MarkdownKnowledgeRepository(root).list_documents()
+
+        self.assertEqual([doc.path for doc in docs], ["water.md"])
+
     def test_ignores_root_readme_in_directory_pack(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
