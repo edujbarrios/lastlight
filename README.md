@@ -37,56 +37,46 @@ curl -L \
   -o lastlight-example-en.zip
 ```
 
-Then use LastLight as a normal Python library:
+Ask LastLight a normal question, much like you would ask an offline assistant:
 
 ```python
 from lastlight import LastLight
 
-query = (
-    "Someone has a deep cut and is bleeding heavily. "
-    "What should I do while waiting for emergency services?"
+engine = LastLight("lastlight-example-en.zip")
+
+question = (
+    "The power has been out for several hours. "
+    "How long will food stay safe in my refrigerator if I keep the door closed?"
 )
 
-engine = LastLight(
-    "lastlight-example-en.zip",
-    strategy="lexical",
-)
+result = engine.query(question)
 
-result = engine.query(query)
-
-print(result.accepted)
-print(result.confidence)
-print(result.sources[0].title)
-print(f"{result.sources[0].score:.3f}")
-print(result.passage)
+if result.accepted:
+    print(result.passage)
+else:
+    print("I don't have enough reliable local knowledge to answer that.")
 ```
 
 Observed output:
 
 ```text
-True
-HIGH
-Severe external bleeding
-2.748
-For life-threatening external bleeding, call emergency services as soon as possible. Apply firm, continuous direct pressure to the wound with a dressing or clean material.
+Keep refrigerator and freezer doors closed as much as possible. As a reference, an unopened refrigerator keeps food cold for about 4 hours.
 ```
 
-The source object remains available for attribution and inspection:
+The interaction is intentionally assistant-like, but the answer is **retrieved from local knowledge, not generated**. The source remains available for inspection:
 
 ```python
 source = result.sources[0]
 
-print(source.path)
-print(source.language)
-print(source.tags)
-print(source.matched_terms)
+print(f"Source: {source.title}")
+print(f"Path: {source.path}")
+print(f"Confidence: {result.confidence}")
 ```
 
 ```text
-en/first-aid/severe-bleeding.md
-en
-('first-aid', 'bleeding', 'hemorrhage')
-('bleeding', 'emergency', 'services', 'waiting')
+Source: Food safety during a power outage
+Path: en/blackout/food-safety.md
+Confidence: HIGH
 ```
 
 Source paths are **pack-relative and stable**: the same document keeps the same logical path whether the pack is a directory, a ZIP file, or the ZIP is renamed. Pack identity metadata (`pack_name`, `pack_version`, `pack_source`, and `pack_path`) is preserved consistently whether one pack or several packs are mounted. Once the package and knowledge pack are local, querying does not require a network connection.
