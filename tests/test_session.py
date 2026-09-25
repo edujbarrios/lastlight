@@ -13,6 +13,7 @@ class RecordingApp:
         title: str = "Generator Safety",
         tags: tuple[str, ...] = ("generator", "carbon-monoxide"),
         matched_terms: tuple[str, ...] = ("generator",),
+        refuse_queries: tuple[str, ...] = (),
     ) -> None:
         self.queries: list[str] = []
         self.document = KnowledgeDocument(
@@ -23,9 +24,12 @@ class RecordingApp:
             tags=tags,
         )
         self.matched_terms = matched_terms
+        self.refuse_queries = set(refuse_queries)
 
     def search(self, text: str, top_k: int = 3) -> list[SearchResult]:
         self.queries.append(text)
+        if text in self.refuse_queries:
+            return []
         return [
             SearchResult(
                 document=self.document,
@@ -82,6 +86,17 @@ class SessionTests(unittest.TestCase):
         session.answer("water purification emergency")
 
         self.assertEqual(app.queries[-1], "water purification emergency")
+
+    def test_refused_new_topic_does_not_leave_previous_context(self) -> None:
+        app = RecordingApp(refuse_queries=("diesel engine repair",))
+        session = LastLightSession(app)
+
+        session.answer("generator safety")
+        session.answer("diesel engine repair")
+        session.answer("indoors?")
+
+        self.assertEqual(app.queries[1], "diesel engine repair")
+        self.assertEqual(app.queries[2], "indoors?")
 
     def test_answer_adds_triage_checks_for_accepted_result(self) -> None:
         app = RecordingApp()
