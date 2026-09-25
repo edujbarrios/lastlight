@@ -9,6 +9,7 @@ BULLET_RE = re.compile(r"^\s*(?:[-*]|\d+[.)])\s+")
 
 
 def chunk_text(text: str, max_chars: int = 700) -> list[str]:
+    _require_positive_max_chars(max_chars)
     chunks: list[str] = []
     for paragraph in (part.strip() for part in text.split("\n\n")):
         if not paragraph:
@@ -61,6 +62,7 @@ def _hard_wrap(text: str, max_chars: int) -> list[str]:
 
 def sentence_windows(text: str, max_chars: int = 700) -> list[str]:
     """Return sentence-aware windows with useful local context."""
+    _require_positive_max_chars(max_chars)
     windows: list[str] = []
     for paragraph in (part.strip() for part in text.split("\n\n")):
         if not paragraph:
@@ -114,3 +116,8 @@ def _window_around_sentence(
     if len(window) > max_chars:
         return _hard_wrap(window, max_chars)[0]
     return window
+
+
+def _require_positive_max_chars(max_chars: int) -> None:
+    if max_chars < 1:
+        raise ValueError("max_chars must be at least 1")

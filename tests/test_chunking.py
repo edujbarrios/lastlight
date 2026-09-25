@@ -43,6 +43,14 @@ class ChunkingTests(unittest.TestCase):
 
         self.assertIn("Check breathing Apply pressure Call for help", windows)
 
+    def test_rejects_non_positive_limits(self) -> None:
+        for max_chars in (0, -1):
+            with self.subTest(max_chars=max_chars):
+                with self.assertRaisesRegex(ValueError, "max_chars"):
+                    chunk_text("Safety guidance.", max_chars=max_chars)
+                with self.assertRaisesRegex(ValueError, "max_chars"):
+                    sentence_windows("Safety guidance.", max_chars=max_chars)
+
 
 if __name__ == "__main__":
     unittest.main()
