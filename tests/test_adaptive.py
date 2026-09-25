@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 import unittest
 
 import helpers  # noqa: F401
@@ -9,7 +10,7 @@ from lastlight.adaptive import (
     ResourceProfile,
     classify_query_risk,
 )
-from lastlight.domain import SearchQuery
+from lastlight.domain import KnowledgeDocument, SearchQuery
 
 
 def profile(
@@ -100,6 +101,44 @@ class AdaptiveRetrievalTests(unittest.TestCase):
 
     def test_risk_terms_do_not_match_inside_unrelated_words(self) -> None:
         self.assertEqual(classify_query_risk("navigation near Las Vegas"), "normal")
+
+    def test_decision_metadata_is_isolated_per_thread(self) -> None:
+        strategy = AdaptiveRetrievalStrategy(
+            AdaptiveRetrievalConfig(mode="accuracy"),
+            profile(),
+        )
+        document = KnowledgeDocument(
+            title="Mixed guide",
+            path="knowledge/en/mixed.md",
+            body="Person not breathing. Organize a field kit.",
+            language="en",
+        )
+        barrier = threading.Barrier(2)
+        observed: dict[str, tuple[object, object]] = {}
+
+        def run(name: str, text: str) -> None:
+            strategy.search(SearchQuery(text, top_k=4), [document])
+            barrier.wait(timeout=5)
+            metadata = strategy.decision_metadata() or {}
+            observed[name] = (metadata.get("risk"), metadata.get("strategy"))
+
+        critical = threading.Thread(
+            target=run,
+            args=("critical", "person is not breathing"),
+        )
+        normal = threading.Thread(
+            target=run,
+            args=("normal", "organize a field kit"),
+        )
+        critical.start()
+        normal.start()
+        critical.join(timeout=5)
+        normal.join(timeout=5)
+
+        self.assertFalse(critical.is_alive())
+        self.assertFalse(normal.is_alive())
+        self.assertEqual(observed["critical"], ("critical", "lexical"))
+        self.assertEqual(observed["normal"], ("normal", "bm25"))
 
 
 if __name__ == "__main__":
