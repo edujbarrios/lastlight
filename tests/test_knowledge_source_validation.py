@@ -24,6 +24,22 @@ class KnowledgeSourceValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(PackError, "at least one knowledge source"):
             LastLight.from_packs([])
 
+    def test_non_path_top_level_source_uses_public_pack_error(self) -> None:
+        with self.assertRaisesRegex(PackError, "path or a sequence of paths"):
+            LastLight(123)  # type: ignore[arg-type]
+
+    def test_non_path_source_inside_pack_collection_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            valid_directory = Path(temp_dir) / "pack"
+            valid_directory.mkdir()
+
+            with self.assertRaisesRegex(PackError, "path string or Path"):
+                LastLight.from_packs([valid_directory, 123])  # type: ignore[list-item]
+
+    def test_bytes_source_does_not_leak_pathlib_type_error(self) -> None:
+        with self.assertRaisesRegex(PackError, "path string or Path"):
+            LastLight(b"pack.zip")  # type: ignore[arg-type]
+
     def test_existing_non_pack_file_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             source = Path(temp_dir) / "notes.txt"
