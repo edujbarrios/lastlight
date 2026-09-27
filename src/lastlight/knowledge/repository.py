@@ -14,10 +14,16 @@ from .util import project_root
 
 PACK_MANIFEST = "lastlight-pack.json"
 PACK_README = "README.md"
-MAX_ZIP_DOCUMENTS = 10_000
-MAX_ZIP_ENTRY_BYTES = 2 * 1024 * 1024
-MAX_ZIP_TOTAL_BYTES = 64 * 1024 * 1024
+MAX_PACK_DOCUMENTS = 10_000
+MAX_DOCUMENT_BYTES = 2 * 1024 * 1024
+MAX_TOTAL_DOCUMENT_BYTES = 64 * 1024 * 1024
 MAX_MANIFEST_BYTES = 256 * 1024
+
+# Backward-compatible names retained for callers that imported the ZIP-specific
+# constants before directory packs adopted the same resource limits.
+MAX_ZIP_DOCUMENTS = MAX_PACK_DOCUMENTS
+MAX_ZIP_ENTRY_BYTES = MAX_DOCUMENT_BYTES
+MAX_ZIP_TOTAL_BYTES = MAX_TOTAL_DOCUMENT_BYTES
 
 
 class MarkdownKnowledgeRepository(KnowledgeRepository):
@@ -55,13 +61,31 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
             return self._list_zip_documents(self.knowledge_dir)
 
         pack_root = self.knowledge_dir.resolve()
-        documents: list[KnowledgeDocument] = []
+        markdown_paths: list[Path] = []
+        total_size = 0
         for path in sorted(self.knowledge_dir.rglob("*")):
             if not path.is_file() or not _is_directory_markdown_document(path, self.knowledge_dir):
                 continue
             resolved = path.resolve()
             if not resolved.is_relative_to(pack_root):
                 raise PackError(f"knowledge document escapes pack root: {path}")
+            try:
+                size = path.stat().st_size
+            except OSError as error:
+                raise PackError(f"cannot inspect knowledge document {path}: {error}") from error
+            if size > MAX_DOCUMENT_BYTES:
+                raise PackError(f"knowledge document exceeds maximum size: {path}")
+            markdown_paths.append(path)
+            if len(markdown_paths) > MAX_PACK_DOCUMENTS:
+                raise PackError(
+                    f"directory pack contains more than {MAX_PACK_DOCUMENTS} Markdown documents"
+                )
+            total_size += size
+            if total_size > MAX_TOTAL_DOCUMENT_BYTES:
+                raise PackError("directory pack Markdown content exceeds maximum total size")
+
+        documents: list[KnowledgeDocument] = []
+        for path in markdown_paths:
             try:
                 documents.append(load_markdown_document(path, self.knowledge_dir))
             except (OSError, UnicodeDecodeError) as error:
@@ -94,13 +118,15 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
             with ZipFile(pack_path) as archive:
                 infos = _validated_zip_infos(archive)
                 markdown_infos = [info for info in infos if _is_zip_markdown_document(info.filename)]
-                if len(markdown_infos) > MAX_ZIP_DOCUMENTS:
-                    raise PackError(f"ZIP pack contains more than {MAX_ZIP_DOCUMENTS} Markdown documents")
+                if len(markdown_infos) > MAX_PACK_DOCUMENTS:
+                    raise PackError(
+                        f"ZIP pack contains more than {MAX_PACK_DOCUMENTS} Markdown documents"
+                    )
                 total_size = sum(info.file_size for info in markdown_infos)
-                if total_size > MAX_ZIP_TOTAL_BYTES:
+                if total_size > MAX_TOTAL_DOCUMENT_BYTES:
                     raise PackError("ZIP pack Markdown content exceeds maximum uncompressed size")
                 for info in sorted(markdown_infos, key=lambda item: _canonical_zip_name(item.filename)):
-                    if info.file_size > MAX_ZIP_ENTRY_BYTES:
+                    if info.file_size > MAX_DOCUMENT_BYTES:
                         raise PackError(f"ZIP entry exceeds maximum size: {info.filename}")
                     name = _canonical_zip_name(info.filename)
                     text = archive.read(info).decode("utf-8")
