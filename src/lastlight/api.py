@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from math import isfinite
 from pathlib import Path
 from typing import Sequence
 
@@ -35,6 +36,27 @@ def _validate_top_k(top_k: int) -> int:
     if isinstance(top_k, bool) or not isinstance(top_k, int) or top_k < 1:
         raise ConfigurationError("top_k must be an integer greater than or equal to 1")
     return top_k
+
+
+def _validate_energy_budget_mwh(value: float | None) -> float | None:
+    if value is None:
+        return None
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not isfinite(value)
+        or value <= 0
+    ):
+        raise ConfigurationError("energy_budget_mwh must be a finite number greater than 0")
+    return float(value)
+
+
+def _validate_memory_budget_mb(value: int | None) -> int | None:
+    if value is None:
+        return None
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        raise ConfigurationError("memory_budget_mb must be an integer greater than or equal to 1")
+    return value
 
 
 def _validate_knowledge_sources(sources: KnowledgeSources) -> None:
@@ -86,6 +108,8 @@ class LastLight:
             raise ConfigurationError(
                 f"unsupported adaptive mode: {mode!r}; choose one of: {choices}"
             )
+        energy_budget_mwh = _validate_energy_budget_mwh(energy_budget_mwh)
+        memory_budget_mb = _validate_memory_budget_mb(memory_budget_mb)
         _validate_knowledge_sources(knowledge)
 
         self.strategy = strategy
