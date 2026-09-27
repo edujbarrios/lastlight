@@ -15,7 +15,9 @@ The core planner considers:
 1. query risk (`critical`, `high`, or `normal`),
 2. operating mode (`survival`, `balanced`, or `accuracy`),
 3. explicit energy and memory budgets,
-4. a small local device profile: ARM/Termux detection, physical memory when available, and battery percentage on Linux power-supply sysfs.
+4. a small local device profile: 32-bit ARM/Termux detection, physical memory when available, and battery percentage on Linux power-supply sysfs.
+
+64-bit ARM (`arm64`/`aarch64`) is not treated as constrained by architecture alone because that category also includes Apple Silicon and server-class ARM systems. Operators can still select the low-cost path through survival mode, explicit budgets, or a detected low battery.
 
 It never calls the network and adds no third-party dependency.
 
@@ -90,7 +92,7 @@ Values depend on the device and query.
 The planner applies constraints in this order:
 
 1. survival mode or tight explicit resource budget,
-2. low detected battery or ARM/Termux low-resource target,
+2. low detected battery or 32-bit ARM/Termux low-resource target,
 3. critical-risk safety policy,
 4. high-risk balanced policy,
 5. requested accuracy/balanced policy.
