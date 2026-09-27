@@ -59,6 +59,12 @@ def _validate_memory_budget_mb(value: int | None) -> int | None:
     return value
 
 
+def _validate_stale_after_days(value: int) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        raise ConfigurationError("stale_after_days must be an integer greater than or equal to 1")
+    return value
+
+
 def _validate_knowledge_sources(sources: KnowledgeSources) -> None:
     if sources is None:
         return
@@ -169,6 +175,7 @@ class LastLight:
     def verify_provenance(self, *, stale_after_days: int = 365) -> tuple[PackProvenance, ...]:
         """Verify fingerprints, freshness and provenance for every mounted pack."""
 
+        stale_after_days = _validate_stale_after_days(stale_after_days)
         reports: list[PackProvenance] = []
         for repository in self._repositories():
             report = verify_pack_provenance(
