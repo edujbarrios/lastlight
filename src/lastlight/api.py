@@ -42,6 +42,9 @@ def _validate_knowledge_sources(sources: KnowledgeSources) -> None:
         return
 
     normalized = (sources,) if isinstance(sources, (str, Path)) else tuple(sources)
+    if not normalized:
+        raise PackError("at least one knowledge source is required when knowledge is explicit")
+
     for source in normalized:
         if isinstance(source, str) and not source.strip():
             raise PackError("knowledge source path cannot be empty")
