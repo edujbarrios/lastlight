@@ -132,7 +132,7 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
         if self.profile.battery_percent is not None and self.profile.battery_percent <= 20:
             return True, "detected battery is at or below 20%"
         if self.profile.low_resource_target:
-            return True, "ARM/Termux low-resource target detected"
+            return True, "32-bit ARM/Termux low-resource target detected"
         return False, ""
 
     def _decision(self, strategy: str, risk: str, effective_top_k: int, reason: str) -> RetrievalDecision:
