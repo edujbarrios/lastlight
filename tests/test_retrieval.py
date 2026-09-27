@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 import helpers  # noqa: F401
 from lastlight.domain import KnowledgeDocument, SearchQuery
 from lastlight.retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy, select_passage
+from lastlight.retrieval.ranking import prepare_bm25_corpus
 
 
 class RetrievalTests(unittest.TestCase):
@@ -65,6 +67,73 @@ class RetrievalTests(unittest.TestCase):
 
         self.assertEqual(results[0].document.title, "Battery Saving")
         self.assertIn(results[0].confidence, {"HIGH", "MEDIUM"})
+
+    def test_bm25_reuses_prepared_statistics_for_equivalent_corpus(self) -> None:
+        docs = [
+            KnowledgeDocument(
+                title="Battery Saving",
+                path="knowledge/energy/battery_saving.md",
+                body="Reduce phone screen brightness and use low power mode.",
+                tags=("battery", "phone"),
+                priority="high",
+            ),
+            KnowledgeDocument(
+                title="Burns",
+                path="knowledge/medical/burns.md",
+                body="Cool burns with clean water.",
+                tags=("burns",),
+            ),
+        ]
+        reloaded_docs = [
+            KnowledgeDocument(
+                title=document.title,
+                path=document.path,
+                body=document.body,
+                source_sha256=document.source_sha256,
+                language=document.language,
+                tags=document.tags,
+                priority=document.priority,
+            )
+            for document in docs
+        ]
+        strategy = BM25RetrievalStrategy()
+
+        with patch(
+            "lastlight.retrieval.strategies.prepare_bm25_corpus",
+            wraps=prepare_bm25_corpus,
+        ) as prepare:
+            strategy.search(SearchQuery("save phone battery", 2), docs)
+            strategy.search(SearchQuery("clean water", 2), reloaded_docs)
+
+        self.assertEqual(prepare.call_count, 1)
+
+    def test_bm25_rebuilds_prepared_statistics_when_content_changes(self) -> None:
+        docs = [
+            KnowledgeDocument(
+                title="Battery Saving",
+                path="knowledge/energy/battery_saving.md",
+                body="Reduce phone screen brightness and use low power mode.",
+                tags=("battery", "phone"),
+            )
+        ]
+        changed_docs = [
+            KnowledgeDocument(
+                title="Battery Saving",
+                path="knowledge/energy/battery_saving.md",
+                body="Disconnect the battery before electrical maintenance.",
+                tags=("battery", "phone"),
+            )
+        ]
+        strategy = BM25RetrievalStrategy()
+
+        with patch(
+            "lastlight.retrieval.strategies.prepare_bm25_corpus",
+            wraps=prepare_bm25_corpus,
+        ) as prepare:
+            strategy.search(SearchQuery("save phone battery", 1), docs)
+            strategy.search(SearchQuery("electrical maintenance", 1), changed_docs)
+
+        self.assertEqual(prepare.call_count, 2)
 
     def test_select_passage_prefers_best_sentence_window(self) -> None:
         body = (
