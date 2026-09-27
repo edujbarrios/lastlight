@@ -4,11 +4,23 @@ from __future__ import annotations
 
 import math
 from collections import Counter
+from dataclasses import dataclass
 
 from ..domain import KnowledgeDocument
 from .tokenizer import expand_query_tokens, normalize_text, tokenize
 
 PRIORITY_BOOSTS = {"critical": 1.3, "high": 1.2, "normal": 1.0, "low": 0.9}
+
+
+@dataclass(frozen=True)
+class BM25Corpus:
+    """Query-independent BM25 statistics for one ordered document corpus."""
+
+    token_counts: tuple[Counter[str], ...]
+    lengths: tuple[int, ...]
+    average_length: float
+    document_frequency: Counter[str]
+    searchable_text: tuple[str, ...]
 
 
 def lexical_score(query_text: str, document: KnowledgeDocument, corpus_size: int = 1) -> tuple[float, tuple[str, ...]]:
@@ -62,24 +74,54 @@ def document_tokens(document: KnowledgeDocument) -> list[str]:
     return title_tokens * 3 + tag_tokens * 2 + body_tokens
 
 
+def prepare_bm25_corpus(documents: list[KnowledgeDocument]) -> BM25Corpus:
+    """Build the query-independent token statistics used by BM25 scoring."""
+
+    tokenized_documents = [document_tokens(document) for document in documents]
+    lengths = tuple(len(tokens) for tokens in tokenized_documents)
+    average_length = sum(lengths) / len(lengths) if lengths else 1.0
+    document_frequency: Counter[str] = Counter()
+    for tokens in tokenized_documents:
+        document_frequency.update(set(tokens))
+    token_counts = tuple(Counter(tokens) for tokens in tokenized_documents)
+    searchable_text = tuple(
+        normalize_text(f"{document.title} {' '.join(document.tags)} {document.body}")
+        for document in documents
+    )
+    return BM25Corpus(
+        token_counts=token_counts,
+        lengths=lengths,
+        average_length=average_length,
+        document_frequency=document_frequency,
+        searchable_text=searchable_text,
+    )
+
+
 def bm25_scores(
-    query_text: str, documents: list[KnowledgeDocument], k1: float = 1.2, b: float = 0.75
+    query_text: str,
+    documents: list[KnowledgeDocument],
+    k1: float = 1.2,
+    b: float = 0.75,
+    *,
+    corpus: BM25Corpus | None = None,
 ) -> list[tuple[float, tuple[str, ...]]]:
     query_tokens = expand_query_tokens(tokenize(query_text))
     if not query_tokens or not documents:
         return [(0.0, ()) for _ in documents]
 
-    tokenized_documents = [document_tokens(document) for document in documents]
-    lengths = [len(tokens) for tokens in tokenized_documents]
-    average_length = sum(lengths) / len(lengths) if lengths else 1.0
-    document_frequency: Counter[str] = Counter()
-    for tokens in tokenized_documents:
-        document_frequency.update(set(tokens))
+    prepared = corpus
+    if prepared is None or len(prepared.lengths) != len(documents):
+        prepared = prepare_bm25_corpus(documents)
 
+    normalized_query = normalize_text(query_text)
     scores: list[tuple[float, tuple[str, ...]]] = []
     total_documents = len(documents)
-    for tokens, length, document in zip(tokenized_documents, lengths, documents):
-        counts = Counter(tokens)
+    for counts, length, searchable, document in zip(
+        prepared.token_counts,
+        prepared.lengths,
+        prepared.searchable_text,
+        documents,
+    ):
         matched: set[str] = set()
         score = 0.0
         for token in query_tokens:
@@ -87,14 +129,14 @@ def bm25_scores(
             if frequency == 0:
                 continue
             matched.add(token)
-            df = document_frequency[token]
+            df = prepared.document_frequency[token]
             idf = math.log(1.0 + (total_documents - df + 0.5) / (df + 0.5))
-            denominator = frequency + k1 * (1.0 - b + b * length / max(average_length, 1.0))
+            denominator = frequency + k1 * (
+                1.0 - b + b * length / max(prepared.average_length, 1.0)
+            )
             score += idf * (frequency * (k1 + 1.0)) / denominator
 
         if matched:
-            normalized_query = normalize_text(query_text)
-            searchable = normalize_text(f"{document.title} {' '.join(document.tags)} {document.body}")
             if normalized_query and normalized_query in searchable:
                 score += 1.0
             score *= PRIORITY_BOOSTS.get(document.priority.casefold(), 1.0)
