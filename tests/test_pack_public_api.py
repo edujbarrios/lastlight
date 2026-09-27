@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 import helpers  # noqa: F401
-from lastlight import LastLight, PackInfo, PackProvenance, PackValidation
+from lastlight import ConfigurationError, LastLight, PackInfo, PackProvenance, PackValidation
 
 
 EXAMPLE_PACK = (
@@ -55,6 +55,17 @@ class PackPublicApiTests(unittest.TestCase):
         self.assertIsInstance(reports[0], PackProvenance)
         self.assertEqual(reports[0].pack.name, "LastLight Example Pack EN")
         self.assertEqual(len(reports[0].fingerprint_sha256), 64)
+
+    def test_verify_provenance_rejects_invalid_freshness_windows(self) -> None:
+        engine = LastLight(EXAMPLE_PACK)
+        invalid_values = (0, -1, True, 1.5, "30")
+
+        for value in invalid_values:
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ConfigurationError, "stale_after_days"):
+                    engine.verify_provenance(
+                        stale_after_days=value,  # type: ignore[arg-type]
+                    )
 
     def test_multi_pack_metadata_is_returned_per_mount(self) -> None:
         engine = LastLight.from_packs([EXAMPLE_PACK, EXAMPLE_PACK])
