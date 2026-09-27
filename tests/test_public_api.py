@@ -86,6 +86,43 @@ class PublicApiTests(unittest.TestCase):
         with self.assertRaisesRegex(ConfigurationError, "top_k"):
             engine.plan(query, top_k=1.5)  # type: ignore[arg-type]
 
+    def test_invalid_energy_budget_is_rejected_at_the_public_boundary(self) -> None:
+        invalid_values = (0, -1, float("nan"), float("inf"), True, "0.4")
+
+        for value in invalid_values:
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ConfigurationError, "energy_budget_mwh"):
+                    LastLight(
+                        EXAMPLE_PACK,
+                        strategy="lexical",
+                        energy_budget_mwh=value,  # type: ignore[arg-type]
+                    )
+
+    def test_invalid_memory_budget_is_rejected_at_the_public_boundary(self) -> None:
+        invalid_values = (0, -1, 1.5, True, "64")
+
+        for value in invalid_values:
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ConfigurationError, "memory_budget_mb"):
+                    LastLight(
+                        EXAMPLE_PACK,
+                        strategy="bm25",
+                        memory_budget_mb=value,  # type: ignore[arg-type]
+                    )
+
+    def test_valid_resource_budgets_are_preserved_in_adaptive_metadata(self) -> None:
+        engine = LastLight(
+            EXAMPLE_PACK,
+            strategy="adaptive",
+            energy_budget_mwh=1,
+            memory_budget_mb=128,
+        )
+
+        plan = engine.plan("organize a field kit")
+
+        self.assertEqual(plan.energy_budget_mwh, 1.0)
+        self.assertEqual(plan.memory_budget_mb, 128)
+
     def test_unknown_strategy_is_rejected_instead_of_falling_back(self) -> None:
         with self.assertRaisesRegex(ConfigurationError, "unsupported retrieval strategy"):
             LastLight(EXAMPLE_PACK, strategy="bm225")
