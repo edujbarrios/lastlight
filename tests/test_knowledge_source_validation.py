@@ -20,6 +20,10 @@ class KnowledgeSourceValidationTests(unittest.TestCase):
         with self.assertRaisesRegex(PackError, "knowledge source path cannot be empty"):
             LastLight("")
 
+    def test_empty_explicit_pack_collection_is_rejected(self) -> None:
+        with self.assertRaisesRegex(PackError, "at least one knowledge source"):
+            LastLight.from_packs([])
+
     def test_existing_non_pack_file_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             source = Path(temp_dir) / "notes.txt"
