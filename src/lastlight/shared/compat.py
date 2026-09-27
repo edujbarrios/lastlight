@@ -65,9 +65,14 @@ def format_self_check(results: list[CheckResult]) -> str:
 
 def is_low_resource_target() -> bool:
     machine = platform.machine().casefold()
-    termux = bool(os.environ.get("TERMUX_VERSION") or "com.termux" in os.environ.get("PREFIX", ""))
-    arm = machine.startswith(("arm", "aarch", "armv"))
-    return termux or arm
+    termux = bool(
+        os.environ.get("TERMUX_VERSION")
+        or "com.termux" in os.environ.get("PREFIX", "")
+    )
+    # Architecture alone is only a useful constraint signal for 32-bit ARM.
+    # arm64/aarch64 also covers Apple Silicon and high-capacity ARM servers.
+    arm32 = machine == "arm" or machine in {"armel", "armhf"} or machine.startswith("armv")
+    return termux or arm32
 
 
 def suggested_python_command() -> str:
