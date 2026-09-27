@@ -4,12 +4,14 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 from zipfile import ZIP_DEFLATED, ZipFile
 
 import helpers  # noqa: F401
+import lastlight.knowledge.repository as repository_module
 from lastlight.errors import PackError
 from lastlight.knowledge.provenance import pack_fingerprint
-from lastlight.knowledge.repository import MAX_MANIFEST_BYTES
+from lastlight.knowledge.repository import MAX_DOCUMENT_BYTES, MAX_MANIFEST_BYTES
 from lastlight.repository import MarkdownKnowledgeRepository
 
 
@@ -84,6 +86,41 @@ class PackLoadingHardeningTests(unittest.TestCase):
 
             with self.assertRaisesRegex(PackError, "manifest exceeds maximum allowed size"):
                 MarkdownKnowledgeRepository(root).describe_pack()
+
+    def test_rejects_oversized_directory_document_before_reading_it(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "pack"
+            root.mkdir()
+            (root / "oversized.md").write_text(
+                "x" * (MAX_DOCUMENT_BYTES + 1),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(PackError, "document exceeds maximum size"):
+                MarkdownKnowledgeRepository(root).list_documents()
+
+    def test_rejects_directory_document_count_over_limit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "pack"
+            root.mkdir()
+            (root / "one.md").write_text(DOCUMENT, encoding="utf-8")
+            (root / "two.md").write_text(DOCUMENT, encoding="utf-8")
+
+            with patch.object(repository_module, "MAX_PACK_DOCUMENTS", 1):
+                with self.assertRaisesRegex(PackError, "more than 1 Markdown documents"):
+                    MarkdownKnowledgeRepository(root).list_documents()
+
+    def test_rejects_directory_total_markdown_size_over_limit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "pack"
+            root.mkdir()
+            (root / "one.md").write_text(DOCUMENT, encoding="utf-8")
+            (root / "two.md").write_text(DOCUMENT, encoding="utf-8")
+            one_size = (root / "one.md").stat().st_size
+
+            with patch.object(repository_module, "MAX_TOTAL_DOCUMENT_BYTES", one_size + 1):
+                with self.assertRaisesRegex(PackError, "maximum total size"):
+                    MarkdownKnowledgeRepository(root).list_documents()
 
     def test_rejects_zip_path_traversal(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
