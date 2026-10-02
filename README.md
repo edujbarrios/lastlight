@@ -264,6 +264,8 @@ The same bounded ranking path now applies to a long document with no headings an
 
 Prepared internal units are reused across repeated queries while the corpus remains equivalent. This avoids re-parsing and re-chunking large manuals on every lexical or BM25 search; changing the document content or ranking metadata invalidates the cached preparation automatically.
 
+The repository layer also reuses parsed Markdown documents and pack metadata while the mounted source is unchanged. ZIP packs normally reduce repeated queries to lightweight file-metadata checks instead of reopening, decompressing, hashing, and reparsing every Markdown body. Directory packs still perform a lightweight file metadata scan so edits, additions, removals, and renames are noticed automatically, but unchanged document bodies are not reread. Multi-pack composition is cached as well, so unchanged source documents are not repeatedly copied just to attach the same pack identity fields.
+
 Short documents continue to use the original document-level ranking path, so existing small packs retain their established behavior and score characteristics.
 
 ## Knowledge Pack Format v1
