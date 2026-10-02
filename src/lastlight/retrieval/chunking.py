@@ -1,4 +1,4 @@
-"""Small text chunking helpers for passage selection."""
+"""Small text chunking helpers for passage selection and retrieval."""
 
 from __future__ import annotations
 
@@ -18,6 +18,65 @@ def chunk_text(text: str, max_chars: int = 700) -> list[str]:
             chunks.append(paragraph)
             continue
         chunks.extend(_chunk_long_paragraph(paragraph, max_chars))
+    return chunks or [text[:max_chars].strip()]
+
+
+def overlapping_chunks(
+    text: str,
+    max_chars: int = 1_800,
+    overlap_chars: int = 250,
+) -> list[str]:
+    """Return bounded chunks with paragraph-aware overlap between neighbors.
+
+    The helper starts from ``chunk_text`` atoms, packs adjacent atoms up to
+    ``max_chars``, and carries as much complete trailing context as fits within
+    ``overlap_chars`` into the next chunk. This keeps ranking units bounded
+    without producing one candidate per short paragraph.
+    """
+
+    _require_positive_max_chars(max_chars)
+    if overlap_chars < 0:
+        raise ValueError("overlap_chars must be at least 0")
+    if overlap_chars >= max_chars:
+        raise ValueError("overlap_chars must be smaller than max_chars")
+
+    atoms = chunk_text(text, max_chars=max_chars)
+    if len(atoms) <= 1:
+        return atoms
+
+    chunks: list[str] = []
+    start = 0
+    while start < len(atoms):
+        end = start
+        selected: list[str] = []
+
+        while end < len(atoms):
+            candidate = "\n\n".join([*selected, atoms[end]])
+            if selected and len(candidate) > max_chars:
+                break
+            selected.append(atoms[end])
+            end += 1
+            if len(candidate) >= max_chars:
+                break
+
+        chunk = "\n\n".join(selected).strip()
+        if chunk and (not chunks or chunks[-1] != chunk):
+            chunks.append(chunk)
+        if end >= len(atoms):
+            break
+
+        overlap_start = end
+        if overlap_chars:
+            for candidate_start in range(end - 1, start - 1, -1):
+                overlap = "\n\n".join(atoms[candidate_start:end])
+                if len(overlap) > overlap_chars:
+                    break
+                overlap_start = candidate_start
+
+        # Always consume at least one new atom. This matters when a short
+        # completed window would otherwise fit entirely inside the overlap.
+        start = max(overlap_start, start + 1) if overlap_start < end else end
+
     return chunks or [text[:max_chars].strip()]
 
 
