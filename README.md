@@ -240,6 +240,28 @@ for source in result.sources:
 
 This is the intended integration point for projects such as `lastlight-ui` and `lastlight-bench`: import the library instead of spawning and parsing the CLI.
 
+## Long structured Markdown guides
+
+Large manuals can remain as readable Markdown files instead of being manually split into many artificial documents. When a Markdown document is at least 4,000 characters and contains multiple non-empty `#`/`##`/`###` sections, LastLight ranks those sections independently for both lexical and BM25 retrieval.
+
+For example:
+
+```markdown
+# First Aid Field Guide
+
+## Burns
+...
+
+## Severe bleeding
+
+### Tourniquet use
+...
+```
+
+A query about tourniquet use is scored against the local `First Aid Field Guide > Severe bleeding > Tourniquet use` section rather than diluting that evidence across the entire manual. The final passage is selected from the winning section, but the public source still points to the original Markdown file with the same path and pack metadata.
+
+Short documents continue to use the original document-level ranking path, so existing small packs retain their established behavior and score characteristics.
+
 ## Knowledge Pack Format v1
 
 Distributable LastLight packs use an explicit versioned manifest contract. A typical pack looks like:
