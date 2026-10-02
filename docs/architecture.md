@@ -45,6 +45,10 @@ The optional index builder writes a human-readable JSON summary of a selected kn
 
 `RetrievalStrategy` defines search behavior. `LexicalRetrievalStrategy` implements deterministic lexical ranking. `BM25RetrievalStrategy` provides an optional in-memory BM25 ranker, and adaptive retrieval can select between core strategies under explicit resource constraints.
 
+Long structured Markdown guides use an internal section-aware scoring layer before the selected retrieval strategy runs. Documents of at least 4,000 characters with multiple non-empty ATX-heading sections are represented as retrieval units whose ranking titles preserve the heading hierarchy. Lexical and BM25 score those units independently, then collapse them back to the best result per original source document. Passage selection runs only inside the winning section. Short documents retain the legacy document-level representation.
+
+This section layer is intentionally internal: public results still expose the original document path, body, pack identity and provenance rather than synthetic chunk paths. The goal is to improve retrieval from manuals and field guides without changing the Knowledge Pack contract or requiring pack authors to pre-split human-readable documents.
+
 ## Factory Pattern
 
 `ApplicationFactory` wires repositories and retrieval strategies into `LastLightApp`.
