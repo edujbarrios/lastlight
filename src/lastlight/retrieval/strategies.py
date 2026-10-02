@@ -7,11 +7,13 @@ from ..interfaces import RetrievalStrategy
 from .chunking import sentence_windows
 from .ranking import (
     BM25Corpus,
+    LexicalCorpus,
     bm25_scores,
     confidence_for_bm25_score,
     confidence_for_score,
-    lexical_score,
+    lexical_scores,
     prepare_bm25_corpus,
+    prepare_lexical_corpus,
 )
 from .sections import RetrievalUnit, retrieval_units
 from .tokenizer import expand_query_tokens, tokenize
@@ -50,18 +52,20 @@ class _UnitCachingRetrievalStrategy(RetrievalStrategy):
 class LexicalRetrievalStrategy(_UnitCachingRetrievalStrategy):
     def __init__(self) -> None:
         super().__init__()
+        self._corpus_cache: tuple[CorpusSignature, LexicalCorpus] | None = None
 
     def search(
         self, query: SearchQuery, documents: list[KnowledgeDocument]
     ) -> list[SearchResult]:
         units = self._prepared_units(documents)
+        ranking_documents = [unit.ranking_document for unit in units]
+        corpus = self._prepared_corpus(ranking_documents)
         best_by_source: dict[int, SearchResult] = {}
-        for unit in units:
-            score, matched_terms = lexical_score(
-                query.text,
-                unit.ranking_document,
-                len(units),
-            )
+
+        for unit, (score, matched_terms) in zip(
+            units,
+            lexical_scores(query.text, ranking_documents, corpus=corpus),
+        ):
             if score <= 0:
                 continue
             confidence = confidence_for_score(score)
@@ -79,6 +83,16 @@ class LexicalRetrievalStrategy(_UnitCachingRetrievalStrategy):
         results = list(best_by_source.values())
         results.sort(key=lambda result: (-result.score, result.document.path))
         return results[: max(query.top_k, 1)]
+
+    def _prepared_corpus(self, documents: list[KnowledgeDocument]) -> LexicalCorpus:
+        signature = _corpus_signature(documents)
+        cached = self._corpus_cache
+        if cached is not None and cached[0] == signature:
+            return cached[1]
+
+        corpus = prepare_lexical_corpus(documents)
+        self._corpus_cache = (signature, corpus)
+        return corpus
 
 
 def select_passage(body: str, query_text: str, max_chars: int = 700) -> str:
