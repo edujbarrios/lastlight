@@ -9,6 +9,27 @@ from lastlight.retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy,
 from lastlight.retrieval.ranking import prepare_bm25_corpus
 
 
+def _long_first_aid_guide() -> KnowledgeDocument:
+    filler = "General preparedness information and routine supplies. " * 120
+    body = (
+        "# First Aid Field Guide\n\n"
+        f"{filler}\n\n"
+        "## Burns\n\nCool a minor burn with clean running water.\n\n"
+        "## Severe bleeding\n\n"
+        "### Tourniquet use\n\n"
+        "For life-threatening limb bleeding that cannot be controlled with direct pressure, "
+        "apply a tourniquet according to the guide and seek emergency help.\n\n"
+        "## Fractures\n\nImmobilize the injured area and avoid unnecessary movement."
+    )
+    return KnowledgeDocument(
+        title="First Aid Field Guide",
+        path="knowledge/medical/first-aid.md",
+        body=body,
+        tags=("first-aid", "medical"),
+        priority="high",
+    )
+
+
 class RetrievalTests(unittest.TestCase):
     def test_ranks_relevant_document_first(self) -> None:
         docs = [
@@ -134,6 +155,34 @@ class RetrievalTests(unittest.TestCase):
             strategy.search(SearchQuery("electrical maintenance", 1), changed_docs)
 
         self.assertEqual(prepare.call_count, 2)
+
+    def test_lexical_ranks_long_markdown_guide_by_relevant_section(self) -> None:
+        guide = _long_first_aid_guide()
+
+        results = LexicalRetrievalStrategy().search(
+            SearchQuery("tourniquet severe bleeding", 1),
+            [guide],
+        )
+
+        self.assertEqual(results[0].document, guide)
+        self.assertIn("life-threatening limb bleeding", results[0].passage)
+        self.assertNotIn("General preparedness information", results[0].passage)
+
+    def test_bm25_builds_statistics_over_sections_for_long_markdown_guide(self) -> None:
+        guide = _long_first_aid_guide()
+        strategy = BM25RetrievalStrategy()
+
+        with patch(
+            "lastlight.retrieval.strategies.prepare_bm25_corpus",
+            wraps=prepare_bm25_corpus,
+        ) as prepare:
+            results = strategy.search(SearchQuery("tourniquet severe bleeding", 1), [guide])
+
+        ranked_documents = prepare.call_args.args[0]
+        self.assertGreater(len(ranked_documents), 1)
+        self.assertTrue(any("Tourniquet use" in doc.title for doc in ranked_documents))
+        self.assertEqual(results[0].document, guide)
+        self.assertIn("apply a tourniquet", results[0].passage)
 
     def test_select_passage_prefers_best_sentence_window(self) -> None:
         body = (
