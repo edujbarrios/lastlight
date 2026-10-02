@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 
 import helpers  # noqa: F401
-from lastlight.chunking import chunk_text, sentence_windows
+from lastlight.chunking import chunk_text, overlapping_chunks, sentence_windows
 
 
 class ChunkingTests(unittest.TestCase):
@@ -18,6 +18,29 @@ class ChunkingTests(unittest.TestCase):
 
         self.assertGreater(len(chunks), 1)
         self.assertTrue(all(len(chunk) <= 90 for chunk in chunks))
+
+    def test_overlapping_chunks_pack_short_paragraphs(self) -> None:
+        text = "Alpha guidance.\n\nBeta guidance.\n\nGamma guidance.\n\nDelta guidance."
+
+        chunks = overlapping_chunks(text, max_chars=45, overlap_chars=18)
+
+        self.assertGreater(len(chunks), 1)
+        self.assertTrue(all(len(chunk) <= 45 for chunk in chunks))
+        self.assertTrue(any("Alpha guidance." in chunk and "Beta guidance." in chunk for chunk in chunks))
+
+    def test_overlapping_chunks_carry_complete_trailing_context(self) -> None:
+        text = (
+            "First context.\n\n"
+            "Shared context.\n\n"
+            "Third instruction.\n\n"
+            "Fourth instruction."
+        )
+
+        chunks = overlapping_chunks(text, max_chars=34, overlap_chars=18)
+
+        containing_shared = [chunk for chunk in chunks if "Shared context." in chunk]
+        self.assertGreaterEqual(len(containing_shared), 2)
+        self.assertTrue(all(len(chunk) <= 34 for chunk in chunks))
 
     def test_sentence_windows_include_neighboring_context(self) -> None:
         text = "First step. Important middle instruction. Final warning."
@@ -50,6 +73,14 @@ class ChunkingTests(unittest.TestCase):
                     chunk_text("Safety guidance.", max_chars=max_chars)
                 with self.assertRaisesRegex(ValueError, "max_chars"):
                     sentence_windows("Safety guidance.", max_chars=max_chars)
+                with self.assertRaisesRegex(ValueError, "max_chars"):
+                    overlapping_chunks("Safety guidance.", max_chars=max_chars)
+
+    def test_overlapping_chunks_validate_overlap(self) -> None:
+        with self.assertRaisesRegex(ValueError, "overlap_chars"):
+            overlapping_chunks("Safety guidance.", max_chars=100, overlap_chars=-1)
+        with self.assertRaisesRegex(ValueError, "overlap_chars"):
+            overlapping_chunks("Safety guidance.", max_chars=100, overlap_chars=100)
 
 
 if __name__ == "__main__":
