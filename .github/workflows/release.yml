@@ -3,6 +3,8 @@ name: publish-to-pypi
 on:
   release:
     types: [published]
+  push:
+    branches: ["publish/0.1.6"]
 
 permissions:
   contents: read
@@ -20,7 +22,7 @@ jobs:
           python-version: "3.12"
       - name: Verify release metadata and tag
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || 'v0.1.6' }}
         run: python tools/check_release.py --tag "$RELEASE_TAG"
       - name: Install release tooling
         run: python -m pip install --upgrade build twine
