@@ -3,23 +3,32 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+
+from ..domain import KnowledgeDocument
 
 ATX_HEADING_RE = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$")
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
+SECTION_AWARE_MIN_CHARS = 4_000
 
 
 @dataclass(frozen=True)
 class MarkdownSection:
-    """One structurally meaningful Markdown section.
-
-    ``heading_path`` preserves the heading hierarchy that leads to the section.
-    ``body`` contains only the content owned by that heading, without content
-    from later sibling/child sections.
-    """
+    """One structurally meaningful Markdown section."""
 
     heading_path: tuple[str, ...]
     body: str
+
+
+@dataclass(frozen=True)
+class RetrievalUnit:
+    """Internal scoring unit that still points back to its source document."""
+
+    source_index: int
+    source: KnowledgeDocument
+    ranking_document: KnowledgeDocument
+    passage_body: str
+    heading_path: tuple[str, ...] = ()
 
 
 def markdown_sections(text: str) -> list[MarkdownSection]:
@@ -70,3 +79,61 @@ def markdown_sections(text: str) -> list[MarkdownSection]:
 
     flush()
     return sections
+
+
+def retrieval_units(documents: list[KnowledgeDocument]) -> list[RetrievalUnit]:
+    """Create scoring units, splitting only sufficiently large structured guides.
+
+    Small documents keep the exact legacy scoring representation. Long Markdown
+    guides with multiple non-empty sections are ranked section-by-section while
+    results still reference the original source document.
+    """
+
+    units: list[RetrievalUnit] = []
+    for source_index, document in enumerate(documents):
+        units.extend(document_retrieval_units(document, source_index=source_index))
+    return units
+
+
+def document_retrieval_units(
+    document: KnowledgeDocument,
+    *,
+    source_index: int = 0,
+) -> list[RetrievalUnit]:
+    sections = markdown_sections(document.body)
+    if len(document.body) < SECTION_AWARE_MIN_CHARS or len(sections) < 2:
+        return [
+            RetrievalUnit(
+                source_index=source_index,
+                source=document,
+                ranking_document=document,
+                passage_body=document.body,
+            )
+        ]
+
+    return [
+        RetrievalUnit(
+            source_index=source_index,
+            source=document,
+            ranking_document=replace(
+                document,
+                title=_section_ranking_title(document.title, section.heading_path),
+                body=section.body,
+            ),
+            passage_body=section.body,
+            heading_path=section.heading_path,
+        )
+        for section in sections
+    ]
+
+
+def _section_ranking_title(document_title: str, heading_path: tuple[str, ...]) -> str:
+    if not heading_path:
+        return document_title
+
+    components = heading_path
+    if heading_path[0].strip().casefold() == document_title.strip().casefold():
+        components = heading_path[1:]
+    if not components:
+        return document_title
+    return f"{document_title} > {' > '.join(components)}"
