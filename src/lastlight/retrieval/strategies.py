@@ -13,7 +13,7 @@ from .ranking import (
     lexical_score,
     prepare_bm25_corpus,
 )
-from .sections import retrieval_units
+from .sections import RetrievalUnit, retrieval_units
 from .tokenizer import expand_query_tokens, tokenize
 
 # Generic glue words that should never be the only evidence for a LOW result.
@@ -23,17 +23,38 @@ WEAK_LOW_CONFIDENCE_TERMS = frozenset(
     {"about", "does", "had", "has", "have", "that", "will"}
 )
 
-BM25CorpusSignature = tuple[
+CorpusSignature = tuple[
     tuple[str, str, str, tuple[str, ...], str, str],
     ...,
 ]
 
 
-class LexicalRetrievalStrategy(RetrievalStrategy):
+class _UnitCachingRetrievalStrategy(RetrievalStrategy):
+    def __init__(self) -> None:
+        self._unit_cache: tuple[CorpusSignature, tuple[RetrievalUnit, ...]] | None = None
+
+    def _prepared_units(self, documents: list[KnowledgeDocument]) -> tuple[RetrievalUnit, ...]:
+        signature = _corpus_signature(documents)
+        cached = self._unit_cache
+        if cached is not None and cached[0] == signature:
+            return cached[1]
+
+        units = tuple(retrieval_units(documents))
+        # Store signature and units together so concurrent readers never observe
+        # units built for a different corpus. Concurrent misses may duplicate the
+        # deterministic preparation work but cannot mix corpus state.
+        self._unit_cache = (signature, units)
+        return units
+
+
+class LexicalRetrievalStrategy(_UnitCachingRetrievalStrategy):
+    def __init__(self) -> None:
+        super().__init__()
+
     def search(
         self, query: SearchQuery, documents: list[KnowledgeDocument]
     ) -> list[SearchResult]:
-        units = retrieval_units(documents)
+        units = self._prepared_units(documents)
         best_by_source: dict[int, SearchResult] = {}
         for unit in units:
             score, matched_terms = lexical_score(
@@ -90,14 +111,15 @@ def _passage_score(
     return (score, -len(chunk))
 
 
-class BM25RetrievalStrategy(RetrievalStrategy):
+class BM25RetrievalStrategy(_UnitCachingRetrievalStrategy):
     def __init__(self) -> None:
-        self._corpus_cache: tuple[BM25CorpusSignature, BM25Corpus] | None = None
+        super().__init__()
+        self._corpus_cache: tuple[CorpusSignature, BM25Corpus] | None = None
 
     def search(
         self, query: SearchQuery, documents: list[KnowledgeDocument]
     ) -> list[SearchResult]:
-        units = retrieval_units(documents)
+        units = self._prepared_units(documents)
         ranking_documents = [unit.ranking_document for unit in units]
         corpus = self._prepared_corpus(ranking_documents)
         best_by_source: dict[int, SearchResult] = {}
@@ -125,7 +147,7 @@ class BM25RetrievalStrategy(RetrievalStrategy):
         return results[: max(query.top_k, 1)]
 
     def _prepared_corpus(self, documents: list[KnowledgeDocument]) -> BM25Corpus:
-        signature = _bm25_corpus_signature(documents)
+        signature = _corpus_signature(documents)
         cached = self._corpus_cache
         if cached is not None and cached[0] == signature:
             return cached[1]
@@ -138,7 +160,7 @@ class BM25RetrievalStrategy(RetrievalStrategy):
         return corpus
 
 
-def _bm25_corpus_signature(documents: list[KnowledgeDocument]) -> BM25CorpusSignature:
+def _corpus_signature(documents: list[KnowledgeDocument]) -> CorpusSignature:
     return tuple(
         (
             document.path,
