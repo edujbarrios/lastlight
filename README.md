@@ -240,11 +240,11 @@ for source in result.sources:
 
 This is the intended integration point for projects such as `lastlight-ui` and `lastlight-bench`: import the library instead of spawning and parsing the CLI.
 
-## Long structured Markdown guides
+## Large Markdown documents
 
-Large manuals can remain as readable Markdown files instead of being manually split into many artificial documents. When a Markdown document is at least 4,000 characters and contains multiple non-empty `#`/`##`/`###` sections, LastLight ranks those sections independently for both lexical and BM25 retrieval.
+Large manuals and field notes can remain as readable Markdown files instead of being manually split into many artificial documents. For documents of at least 4,000 characters, LastLight builds bounded internal ranking units for both lexical and BM25 retrieval while keeping the original file as the public source.
 
-For example:
+Markdown headings are used first when available:
 
 ```markdown
 # First Aid Field Guide
@@ -258,7 +258,11 @@ For example:
 ...
 ```
 
-A query about tourniquet use is scored against the local `First Aid Field Guide > Severe bleeding > Tourniquet use` section rather than diluting that evidence across the entire manual. The final passage is selected from the winning section, but the public source still points to the original Markdown file with the same path and pack metadata.
+A query about tourniquet use inherits the local `First Aid Field Guide > Severe bleeding > Tourniquet use` heading path. Oversized sections are then split into paragraph-aware ranking chunks of at most 1,800 characters with a small complete-paragraph overlap, so relevant evidence near a chunk boundary is not lost.
+
+The same bounded ranking path now applies to a long document with no headings and to a guide that contains only one very large section. The final passage is selected from the winning internal unit, but the public source still points to the original Markdown file with the same path, body, pack metadata, and provenance.
+
+Prepared internal units are reused across repeated queries while the corpus remains equivalent. This avoids re-parsing and re-chunking large manuals on every lexical or BM25 search; changing the document content or ranking metadata invalidates the cached preparation automatically.
 
 Short documents continue to use the original document-level ranking path, so existing small packs retain their established behavior and score characteristics.
 

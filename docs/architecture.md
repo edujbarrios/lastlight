@@ -45,9 +45,13 @@ The optional index builder writes a human-readable JSON summary of a selected kn
 
 `RetrievalStrategy` defines search behavior. `LexicalRetrievalStrategy` implements deterministic lexical ranking. `BM25RetrievalStrategy` provides an optional in-memory BM25 ranker, and adaptive retrieval can select between core strategies under explicit resource constraints.
 
-Long structured Markdown guides use an internal section-aware scoring layer before the selected retrieval strategy runs. Documents of at least 4,000 characters with multiple non-empty ATX-heading sections are represented as retrieval units whose ranking titles preserve the heading hierarchy. Lexical and BM25 score those units independently, then collapse them back to the best result per original source document. Passage selection runs only inside the winning section. Short documents retain the legacy document-level representation.
+Documents of at least 4,000 characters use an internal hierarchical scoring layer before the selected retrieval strategy runs. Markdown structure is used first when available: ATX-heading sections become retrieval regions whose ranking titles preserve the heading hierarchy. Each region is then represented by bounded, paragraph-aware scoring units of at most 1,800 characters with up to 250 characters of complete trailing context carried into the next unit. Large documents without headings and guides containing a single oversized section therefore receive the same bounded ranking treatment instead of falling back to one flat document.
 
-This section layer is intentionally internal: public results still expose the original document path, body, pack identity and provenance rather than synthetic chunk paths. The goal is to improve retrieval from manuals and field guides without changing the Knowledge Pack contract or requiring pack authors to pre-split human-readable documents.
+Lexical and BM25 score those internal units independently, then collapse them back to the best result per original source document. Passage selection runs only inside the winning unit. Documents below the large-document threshold retain the legacy document-level representation and established score behavior.
+
+Prepared retrieval units are cached by deterministic corpus signature for repeated queries. BM25 keeps its query-independent statistics cache on top of that unit cache, so an unchanged large corpus does not need to be re-parsed and re-chunked for each search. Any change to document path, source hash, title, tags, priority, or body invalidates the relevant prepared state.
+
+This hierarchical unit layer is intentionally internal: public results still expose the original document path, body, pack identity and provenance rather than synthetic chunk paths. The goal is to improve retrieval from manuals, field guides, and long unstructured notes without changing the Knowledge Pack contract or requiring pack authors to pre-split human-readable documents.
 
 ## Factory Pattern
 
@@ -63,7 +67,7 @@ The domain layer uses dataclasses for `KnowledgeDocument`, `KnowledgePack`, `Sea
 
 ## Verification boundary
 
-The `core` GitHub Actions workflow runs the unit/integration suite on Python 3.10 and 3.12 and performs CLI smoke tests against the committed English example pack: pack validation, a natural-language retrieval query and an expected refusal.
+The `core` GitHub Actions workflow runs the unit/integration suite on Python 3.10, 3.11, and 3.12, executes the core evaluation regression gate, validates the built distributions, installs the wheel in isolation, and verifies documented retrieval behavior.
 
 ## Dependency Boundaries
 
