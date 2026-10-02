@@ -7,6 +7,7 @@ import helpers  # noqa: F401
 from lastlight.domain import KnowledgeDocument, SearchQuery
 from lastlight.retrieval import BM25RetrievalStrategy, LexicalRetrievalStrategy, select_passage
 from lastlight.retrieval.ranking import prepare_bm25_corpus
+from lastlight.retrieval.sections import RETRIEVAL_UNIT_MAX_CHARS
 
 
 def _long_first_aid_guide() -> KnowledgeDocument:
@@ -26,6 +27,25 @@ def _long_first_aid_guide() -> KnowledgeDocument:
         path="knowledge/medical/first-aid.md",
         body=body,
         tags=("first-aid", "medical"),
+        priority="high",
+    )
+
+
+def _long_unstructured_guide() -> KnowledgeDocument:
+    filler = "\n\n".join(
+        f"Routine note {index}. " + "General equipment inventory and preparedness detail. " * 10
+        for index in range(18)
+    )
+    body = (
+        f"{filler}\n\n"
+        "Emergency beacon deployment. Extend the telescoping antenna fully, keep the beacon "
+        "upright with a clear view of the sky, and activate the distress transmission."
+    )
+    return KnowledgeDocument(
+        title="Field Operations Notes",
+        path="knowledge/operations/field-notes.md",
+        body=body,
+        tags=("operations", "field"),
         priority="high",
     )
 
@@ -183,6 +203,37 @@ class RetrievalTests(unittest.TestCase):
         self.assertTrue(any("Tourniquet use" in doc.title for doc in ranked_documents))
         self.assertEqual(results[0].document, guide)
         self.assertIn("apply a tourniquet", results[0].passage)
+
+    def test_lexical_retrieves_target_near_end_of_long_unstructured_document(self) -> None:
+        guide = _long_unstructured_guide()
+
+        results = LexicalRetrievalStrategy().search(
+            SearchQuery("emergency beacon telescoping antenna", 1),
+            [guide],
+        )
+
+        self.assertEqual(results[0].document, guide)
+        self.assertIn("Extend the telescoping antenna fully", results[0].passage)
+        self.assertNotIn("Routine note 0", results[0].passage)
+
+    def test_bm25_uses_bounded_units_for_long_unstructured_document(self) -> None:
+        guide = _long_unstructured_guide()
+        strategy = BM25RetrievalStrategy()
+
+        with patch(
+            "lastlight.retrieval.strategies.prepare_bm25_corpus",
+            wraps=prepare_bm25_corpus,
+        ) as prepare:
+            results = strategy.search(
+                SearchQuery("emergency beacon telescoping antenna", 1),
+                [guide],
+            )
+
+        ranked_documents = prepare.call_args.args[0]
+        self.assertGreater(len(ranked_documents), 1)
+        self.assertTrue(all(len(doc.body) <= RETRIEVAL_UNIT_MAX_CHARS for doc in ranked_documents))
+        self.assertEqual(results[0].document, guide)
+        self.assertIn("distress transmission", results[0].passage)
 
     def test_select_passage_prefers_best_sentence_window(self) -> None:
         body = (

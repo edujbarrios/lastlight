@@ -3,7 +3,13 @@ from __future__ import annotations
 import unittest
 
 import helpers  # noqa: F401
-from lastlight.retrieval.sections import MarkdownSection, markdown_sections
+from lastlight.domain import KnowledgeDocument
+from lastlight.retrieval.sections import (
+    RETRIEVAL_UNIT_MAX_CHARS,
+    MarkdownSection,
+    document_retrieval_units,
+    markdown_sections,
+)
 
 
 class MarkdownSectionTests(unittest.TestCase):
@@ -51,6 +57,59 @@ class MarkdownSectionTests(unittest.TestCase):
         self.assertEqual(
             sections,
             [MarkdownSection(("Guide", "Topic", "Detail"), "Useful text.")],
+        )
+
+    def test_small_document_keeps_legacy_scoring_unit(self) -> None:
+        document = KnowledgeDocument(
+            title="Compact Guide",
+            path="knowledge/compact.md",
+            body="Short guidance remains unchanged.",
+        )
+
+        units = document_retrieval_units(document)
+
+        self.assertEqual(len(units), 1)
+        self.assertIs(units[0].ranking_document, document)
+        self.assertEqual(units[0].passage_body, document.body)
+
+    def test_long_unstructured_document_uses_bounded_units(self) -> None:
+        body = "\n\n".join(
+            f"Paragraph {index}. " + "Routine preparedness detail. " * 12
+            for index in range(24)
+        )
+        document = KnowledgeDocument(
+            title="Long Notes",
+            path="knowledge/long-notes.md",
+            body=body,
+        )
+
+        units = document_retrieval_units(document)
+
+        self.assertGreater(len(units), 1)
+        self.assertTrue(
+            all(len(unit.ranking_document.body) <= RETRIEVAL_UNIT_MAX_CHARS for unit in units)
+        )
+        self.assertTrue(all(unit.heading_path == () for unit in units))
+        self.assertTrue(all(unit.source is document for unit in units))
+
+    def test_long_single_heading_section_is_chunked(self) -> None:
+        body = "# Radio Manual\n\n" + "\n\n".join(
+            f"Procedure {index}. " + "Radio maintenance guidance. " * 12
+            for index in range(24)
+        )
+        document = KnowledgeDocument(
+            title="Radio Manual",
+            path="knowledge/radio.md",
+            body=body,
+        )
+
+        units = document_retrieval_units(document)
+
+        self.assertGreater(len(units), 1)
+        self.assertTrue(all(unit.heading_path == ("Radio Manual",) for unit in units))
+        self.assertTrue(all(unit.ranking_document.title == "Radio Manual" for unit in units))
+        self.assertTrue(
+            all(len(unit.ranking_document.body) <= RETRIEVAL_UNIT_MAX_CHARS for unit in units)
         )
 
 
