@@ -27,19 +27,37 @@ MAX_ZIP_TOTAL_BYTES = MAX_TOTAL_DOCUMENT_BYTES
 
 DirectoryFingerprint = tuple[tuple[str, int, int, int], ...]
 DocumentCacheKey = tuple[str, object]
+PackCacheKey = tuple[str, object]
 
 
 class MarkdownKnowledgeRepository(KnowledgeRepository):
     def __init__(self, knowledge_dir: Path | str | None = None) -> None:
         self.knowledge_dir = Path(knowledge_dir) if knowledge_dir else project_root() / "knowledge"
         self._document_cache: tuple[DocumentCacheKey, tuple[KnowledgeDocument, ...]] | None = None
+        self._pack_cache: tuple[PackCacheKey, KnowledgePack] | None = None
 
     def describe_pack(self) -> KnowledgePack:
         if _is_zip_pack(self.knowledge_dir):
-            return self._describe_zip_pack(self.knowledge_dir)
+            key: PackCacheKey = ("zip", _file_fingerprint(self.knowledge_dir))
+            cached = self._cached_pack(key)
+            if cached is not None:
+                return cached
+
+            pack = self._describe_zip_pack(self.knowledge_dir)
+            stable_key: PackCacheKey = ("zip", _file_fingerprint(self.knowledge_dir))
+            if stable_key == key:
+                self._pack_cache = (key, pack)
+            else:
+                self._pack_cache = None
+            return pack
 
         manifest_path = self.knowledge_dir / PACK_MANIFEST
         if manifest_path.exists():
+            key = ("manifest", _file_fingerprint(manifest_path))
+            cached = self._cached_pack(key)
+            if cached is not None:
+                return cached
+
             try:
                 pack_root = self.knowledge_dir.resolve()
                 resolved_manifest = manifest_path.resolve()
@@ -54,9 +72,31 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
                 raise PackError(f"cannot read pack manifest: {error}") from error
             if not isinstance(metadata, dict):
                 raise PackError("pack manifest must contain a JSON object")
-            return self._pack_from_metadata(metadata, str(self.knowledge_dir))
+            pack = self._pack_from_metadata(metadata, str(self.knowledge_dir))
+            stable_key = ("manifest", _file_fingerprint(manifest_path))
+            if stable_key == key:
+                self._pack_cache = (key, pack)
+            else:
+                self._pack_cache = None
+            return pack
 
-        return self._inferred_pack()
+        documents = self.list_documents()
+        document_key = self._current_document_key(documents)
+        key = ("inferred", document_key)
+        cached = self._cached_pack(key)
+        if cached is not None:
+            return cached
+
+        languages = tuple(
+            sorted({doc.language for doc in documents if doc.language != "unknown"})
+        )
+        pack = KnowledgePack(
+            name=self.knowledge_dir.stem or "knowledge",
+            languages=languages,
+            path=str(self.knowledge_dir),
+        )
+        self._pack_cache = (key, pack)
+        return pack
 
     def list_documents(self) -> list[KnowledgeDocument]:
         """Return searchable documents, reusing parsed content while the pack is unchanged.
@@ -114,6 +154,18 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
         if cached is None or cached[0] != key:
             return None
         return list(cached[1])
+
+    def _cached_pack(self, key: PackCacheKey) -> KnowledgePack | None:
+        cached = self._pack_cache
+        if cached is None or cached[0] != key:
+            return None
+        return cached[1]
+
+    def _current_document_key(self, documents: list[KnowledgeDocument]) -> object:
+        cached = self._document_cache
+        if cached is not None:
+            return cached[0]
+        return tuple((document.path, document.source_sha256) for document in documents)
 
     def _directory_snapshot(self) -> tuple[tuple[Path, ...], DirectoryFingerprint]:
         try:
