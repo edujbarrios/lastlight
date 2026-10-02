@@ -8,8 +8,8 @@ authors:
 repository-code: "https://github.com/edujbarrios/lastlight"
 url: "https://github.com/edujbarrios/lastlight"
 license: "MPL-2.0"
-version: "0.1.5"
-date-released: "2026-09-28"
+version: "0.1.6"
+date-released: "2026-10-02"
 keywords:
   - "offline retrieval"
   - "disaster response"
