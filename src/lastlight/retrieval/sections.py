@@ -1,4 +1,4 @@
-"""Markdown-aware retrieval sections for long guidance documents."""
+"""Markdown-aware retrieval units for long guidance documents."""
 
 from __future__ import annotations
 
@@ -6,10 +6,13 @@ import re
 from dataclasses import dataclass, replace
 
 from ..domain import KnowledgeDocument
+from .chunking import overlapping_chunks
 
 ATX_HEADING_RE = re.compile(r"^(#{1,6})[ \t]+(.+?)[ \t]*#*[ \t]*$")
 FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
 SECTION_AWARE_MIN_CHARS = 4_000
+RETRIEVAL_UNIT_MAX_CHARS = 1_800
+RETRIEVAL_UNIT_OVERLAP_CHARS = 250
 
 
 @dataclass(frozen=True)
@@ -82,11 +85,12 @@ def markdown_sections(text: str) -> list[MarkdownSection]:
 
 
 def retrieval_units(documents: list[KnowledgeDocument]) -> list[RetrievalUnit]:
-    """Create scoring units, splitting only sufficiently large structured guides.
+    """Create bounded scoring units for sufficiently large documents.
 
-    Small documents keep the exact legacy scoring representation. Long Markdown
-    guides with multiple non-empty sections are ranked section-by-section while
-    results still reference the original source document.
+    Small documents keep the exact legacy scoring representation. Long documents
+    are split first by Markdown structure and then, when needed, into bounded
+    overlapping chunks. This also improves large unstructured documents and
+    guides that contain one oversized section.
     """
 
     units: list[RetrievalUnit] = []
@@ -100,31 +104,41 @@ def document_retrieval_units(
     *,
     source_index: int = 0,
 ) -> list[RetrievalUnit]:
-    sections = markdown_sections(document.body)
-    if len(document.body) < SECTION_AWARE_MIN_CHARS or len(sections) < 2:
-        return [
-            RetrievalUnit(
-                source_index=source_index,
-                source=document,
-                ranking_document=document,
-                passage_body=document.body,
-            )
-        ]
+    if len(document.body) < SECTION_AWARE_MIN_CHARS:
+        return [_legacy_unit(document, source_index)]
 
-    return [
-        RetrievalUnit(
-            source_index=source_index,
-            source=document,
-            ranking_document=replace(
-                document,
-                title=_section_ranking_title(document.title, section.heading_path),
-                body=section.body,
-            ),
-            passage_body=section.body,
-            heading_path=section.heading_path,
-        )
-        for section in sections
-    ]
+    sections = markdown_sections(document.body)
+    if not sections:
+        return [_legacy_unit(document, source_index)]
+
+    units: list[RetrievalUnit] = []
+    for section in sections:
+        title = _section_ranking_title(document.title, section.heading_path)
+        for chunk in overlapping_chunks(
+            section.body,
+            max_chars=RETRIEVAL_UNIT_MAX_CHARS,
+            overlap_chars=RETRIEVAL_UNIT_OVERLAP_CHARS,
+        ):
+            units.append(
+                RetrievalUnit(
+                    source_index=source_index,
+                    source=document,
+                    ranking_document=replace(document, title=title, body=chunk),
+                    passage_body=chunk,
+                    heading_path=section.heading_path,
+                )
+            )
+
+    return units or [_legacy_unit(document, source_index)]
+
+
+def _legacy_unit(document: KnowledgeDocument, source_index: int) -> RetrievalUnit:
+    return RetrievalUnit(
+        source_index=source_index,
+        source=document,
+        ranking_document=document,
+        passage_body=document.body,
+    )
 
 
 def _section_ranking_title(document_title: str, heading_path: tuple[str, ...]) -> str:
