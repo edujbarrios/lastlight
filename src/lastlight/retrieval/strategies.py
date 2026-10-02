@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 from ..domain import KnowledgeDocument, SearchQuery, SearchResult
 from ..interfaces import RetrievalStrategy
 from .chunking import sentence_windows
@@ -29,6 +31,14 @@ CorpusSignature = tuple[
     tuple[str, str, str, tuple[str, ...], str, str],
     ...,
 ]
+
+
+@dataclass(frozen=True)
+class _ScoredUnit:
+    unit: RetrievalUnit
+    score: float
+    confidence: str
+    matched_terms: tuple[str, ...]
 
 
 class _UnitCachingRetrievalStrategy(RetrievalStrategy):
@@ -60,7 +70,7 @@ class LexicalRetrievalStrategy(_UnitCachingRetrievalStrategy):
         units = self._prepared_units(documents)
         ranking_documents = [unit.ranking_document for unit in units]
         corpus = self._prepared_corpus(ranking_documents)
-        best_by_source: dict[int, SearchResult] = {}
+        best_by_source: dict[int, _ScoredUnit] = {}
 
         for unit, (score, matched_terms) in zip(
             units,
@@ -71,18 +81,13 @@ class LexicalRetrievalStrategy(_UnitCachingRetrievalStrategy):
             confidence = confidence_for_score(score)
             if _weak_low_confidence_match(confidence, matched_terms):
                 continue
-            result = SearchResult(
-                document=unit.source,
-                score=score,
-                confidence=confidence,
-                passage=select_passage(unit.passage_body, query.text),
-                matched_terms=matched_terms,
+            _keep_best_scored_unit(
+                best_by_source,
+                unit.source_index,
+                _ScoredUnit(unit, score, confidence, matched_terms),
             )
-            _keep_best_result(best_by_source, unit.source_index, result)
 
-        results = list(best_by_source.values())
-        results.sort(key=lambda result: (-result.score, result.document.path))
-        return results[: max(query.top_k, 1)]
+        return _finalize_results(best_by_source, query)
 
     def _prepared_corpus(self, documents: list[KnowledgeDocument]) -> LexicalCorpus:
         signature = _corpus_signature(documents)
@@ -136,7 +141,7 @@ class BM25RetrievalStrategy(_UnitCachingRetrievalStrategy):
         units = self._prepared_units(documents)
         ranking_documents = [unit.ranking_document for unit in units]
         corpus = self._prepared_corpus(ranking_documents)
-        best_by_source: dict[int, SearchResult] = {}
+        best_by_source: dict[int, _ScoredUnit] = {}
 
         for unit, (score, matched_terms) in zip(
             units,
@@ -147,18 +152,13 @@ class BM25RetrievalStrategy(_UnitCachingRetrievalStrategy):
             confidence = confidence_for_bm25_score(score)
             if _weak_low_confidence_match(confidence, matched_terms):
                 continue
-            result = SearchResult(
-                document=unit.source,
-                score=score,
-                confidence=confidence,
-                passage=select_passage(unit.passage_body, query.text),
-                matched_terms=matched_terms,
+            _keep_best_scored_unit(
+                best_by_source,
+                unit.source_index,
+                _ScoredUnit(unit, score, confidence, matched_terms),
             )
-            _keep_best_result(best_by_source, unit.source_index, result)
 
-        results = list(best_by_source.values())
-        results.sort(key=lambda result: (-result.score, result.document.path))
-        return results[: max(query.top_k, 1)]
+        return _finalize_results(best_by_source, query)
 
     def _prepared_corpus(self, documents: list[KnowledgeDocument]) -> BM25Corpus:
         signature = _corpus_signature(documents)
@@ -188,14 +188,33 @@ def _corpus_signature(documents: list[KnowledgeDocument]) -> CorpusSignature:
     )
 
 
-def _keep_best_result(
-    best_by_source: dict[int, SearchResult],
+def _keep_best_scored_unit(
+    best_by_source: dict[int, _ScoredUnit],
     source_index: int,
-    result: SearchResult,
+    candidate: _ScoredUnit,
 ) -> None:
     current = best_by_source.get(source_index)
-    if current is None or result.score > current.score:
-        best_by_source[source_index] = result
+    if current is None or candidate.score > current.score:
+        best_by_source[source_index] = candidate
+
+
+def _finalize_results(
+    best_by_source: dict[int, _ScoredUnit],
+    query: SearchQuery,
+) -> list[SearchResult]:
+    winners = list(best_by_source.values())
+    winners.sort(key=lambda item: (-item.score, item.unit.source.path))
+    winners = winners[: max(query.top_k, 1)]
+    return [
+        SearchResult(
+            document=item.unit.source,
+            score=item.score,
+            confidence=item.confidence,
+            passage=select_passage(item.unit.passage_body, query.text),
+            matched_terms=item.matched_terms,
+        )
+        for item in winners
+    ]
 
 
 def _weak_low_confidence_match(confidence: str, matched_terms: tuple[str, ...]) -> bool:
