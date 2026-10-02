@@ -20,8 +20,8 @@ class TypedPackageTests(unittest.TestCase):
             {"no_matching_knowledge", "insufficient_confidence"},
         )
 
-    def test_release_version_is_0_1_5(self) -> None:
-        self.assertEqual(__version__, "0.1.5")
+    def test_release_version_is_0_1_6(self) -> None:
+        self.assertEqual(__version__, "0.1.6")
 
 
 if __name__ == "__main__":
