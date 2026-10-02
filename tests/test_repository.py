@@ -3,9 +3,11 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 from zipfile import ZipFile
 
 import helpers  # noqa: F401
+from lastlight.knowledge.markdown_loader import load_markdown_document, load_markdown_text
 from lastlight.repository import MarkdownKnowledgeRepository
 
 
@@ -71,6 +73,42 @@ class RepositoryTests(unittest.TestCase):
 
         self.assertEqual(docs, [])
 
+    def test_reuses_parsed_directory_documents_while_snapshot_is_unchanged(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "water.md").write_text("Boil water.", encoding="utf-8")
+            repository = MarkdownKnowledgeRepository(root)
+
+            with patch(
+                "lastlight.knowledge.repository.load_markdown_document",
+                wraps=load_markdown_document,
+            ) as load:
+                first = repository.list_documents()
+                second = repository.list_documents()
+
+            self.assertEqual(load.call_count, 1)
+            self.assertEqual(first, second)
+            self.assertIsNot(first, second)
+
+    def test_invalidates_directory_cache_when_markdown_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            document = root / "water.md"
+            document.write_text("Boil water.", encoding="utf-8")
+            repository = MarkdownKnowledgeRepository(root)
+
+            with patch(
+                "lastlight.knowledge.repository.load_markdown_document",
+                wraps=load_markdown_document,
+            ) as load:
+                first = repository.list_documents()
+                document.write_text("Boil water for emergency use.", encoding="utf-8")
+                second = repository.list_documents()
+
+            self.assertEqual(load.call_count, 2)
+            self.assertNotEqual(first[0].source_sha256, second[0].source_sha256)
+            self.assertIn("emergency use", second[0].body)
+
     def test_loads_markdown_from_zip_pack(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             pack = Path(tmp) / "pack.zip"
@@ -86,6 +124,44 @@ class RepositoryTests(unittest.TestCase):
         self.assertEqual(len(docs), 1)
         self.assertEqual(docs[0].title, "Packed Water")
         self.assertEqual(docs[0].path, "water/purification.md")
+
+    def test_reuses_parsed_zip_documents_while_archive_is_unchanged(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pack = Path(tmp) / "pack.zip"
+            with ZipFile(pack, "w") as archive:
+                archive.writestr("water.md", "Boil water.")
+            repository = MarkdownKnowledgeRepository(pack)
+
+            with patch(
+                "lastlight.knowledge.repository.load_markdown_text",
+                wraps=load_markdown_text,
+            ) as load:
+                first = repository.list_documents()
+                second = repository.list_documents()
+
+            self.assertEqual(load.call_count, 1)
+            self.assertEqual(first, second)
+            self.assertIsNot(first, second)
+
+    def test_invalidates_zip_cache_when_archive_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pack = Path(tmp) / "pack.zip"
+            with ZipFile(pack, "w") as archive:
+                archive.writestr("water.md", "Boil water.")
+            repository = MarkdownKnowledgeRepository(pack)
+
+            with patch(
+                "lastlight.knowledge.repository.load_markdown_text",
+                wraps=load_markdown_text,
+            ) as load:
+                first = repository.list_documents()
+                with ZipFile(pack, "w") as archive:
+                    archive.writestr("water.md", "Boil water before emergency storage.")
+                second = repository.list_documents()
+
+            self.assertEqual(load.call_count, 2)
+            self.assertNotEqual(first[0].source_sha256, second[0].source_sha256)
+            self.assertIn("emergency storage", second[0].body)
 
     def test_ignores_root_readme_in_zip_pack(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
