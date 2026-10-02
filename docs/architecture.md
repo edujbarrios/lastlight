@@ -31,9 +31,15 @@ A pack can include `lastlight-pack.json` at its root. The manifest records pack 
 
 Root-level `README.md` files are treated as pack documentation rather than searchable knowledge. Markdown below language/topic directories remains normal retrieval content.
 
+`MarkdownKnowledgeRepository` keeps a deterministic in-process snapshot cache for repeated queries. Unchanged ZIP packs reuse parsed `KnowledgeDocument` values and parsed pack metadata after a lightweight archive file-stat check, avoiding repeated decompression, UTF-8 decoding, front-matter parsing, and SHA-256 hashing. Directory packs retain hot-reload behavior by scanning Markdown file metadata on each access; unchanged bodies reuse their parsed document objects, while additions, removals, renames, size changes, and normal filesystem edits change the snapshot fingerprint and trigger a reload. Pack manifests use the same file-fingerprint invalidation model. Cache entries are not retained when the source changes while it is being inspected.
+
+The cache is deliberately process-local and ephemeral. It does not create a database or sidecar index, and callers still receive fresh list containers so application filtering cannot mutate cached repository state.
+
 ## Composite Repository
 
 Multiple packs can be mounted together. `CompositeKnowledgeRepository` combines their documents into one retrieval corpus while retaining pack identity, version, source and local artifact path on each document. Packs remain separate files; they do not need to be merged or rewritten.
+
+The composed document snapshot is also cached. When child repositories return the same immutable document objects and pack identity is unchanged, the composite layer reuses the already-decorated `KnowledgeDocument` values instead of repeating `dataclasses.replace()` across the full corpus. Any child snapshot or pack identity change rebuilds the composed corpus automatically.
 
 This boundary is intentionally compatible with external catalogs and removable-media distribution: distribution can evolve independently from the offline runtime.
 
