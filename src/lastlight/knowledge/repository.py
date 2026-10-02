@@ -25,10 +25,14 @@ MAX_ZIP_DOCUMENTS = MAX_PACK_DOCUMENTS
 MAX_ZIP_ENTRY_BYTES = MAX_DOCUMENT_BYTES
 MAX_ZIP_TOTAL_BYTES = MAX_TOTAL_DOCUMENT_BYTES
 
+DirectoryFingerprint = tuple[tuple[str, int, int, int], ...]
+DocumentCacheKey = tuple[str, object]
+
 
 class MarkdownKnowledgeRepository(KnowledgeRepository):
     def __init__(self, knowledge_dir: Path | str | None = None) -> None:
         self.knowledge_dir = Path(knowledge_dir) if knowledge_dir else project_root() / "knowledge"
+        self._document_cache: tuple[DocumentCacheKey, tuple[KnowledgeDocument, ...]] | None = None
 
     def describe_pack(self) -> KnowledgePack:
         if _is_zip_pack(self.knowledge_dir):
@@ -55,24 +59,90 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
         return self._inferred_pack()
 
     def list_documents(self) -> list[KnowledgeDocument]:
-        if not self.knowledge_dir.exists():
-            return []
-        if _is_zip_pack(self.knowledge_dir):
-            return self._list_zip_documents(self.knowledge_dir)
+        """Return searchable documents, reusing parsed content while the pack is unchanged.
 
-        pack_root = self.knowledge_dir.resolve()
+        Directory packs still receive a lightweight metadata scan on each call so
+        additions, removals, renames, size changes, and normal file edits are
+        detected without rereading every Markdown body. ZIP packs use the archive
+        file metadata as their snapshot token. Cached documents are stored as an
+        immutable tuple and each caller receives a fresh list container.
+        """
+
+        if not self.knowledge_dir.exists():
+            key: DocumentCacheKey = ("missing", str(self.knowledge_dir))
+            self._document_cache = (key, ())
+            return []
+
+        if _is_zip_pack(self.knowledge_dir):
+            key = ("zip", _file_fingerprint(self.knowledge_dir))
+            cached = self._cached_documents(key)
+            if cached is not None:
+                return cached
+
+            documents = tuple(self._list_zip_documents(self.knowledge_dir))
+            try:
+                stable_key: DocumentCacheKey = ("zip", _file_fingerprint(self.knowledge_dir))
+            except PackError:
+                self._document_cache = None
+                raise
+            if stable_key == key:
+                self._document_cache = (key, documents)
+            else:
+                # The archive changed while it was being read. The opened ZIP is
+                # still a coherent snapshot, but do not reuse it on a later call.
+                self._document_cache = None
+            return list(documents)
+
+        markdown_paths, fingerprint = self._directory_snapshot()
+        key = ("directory", fingerprint)
+        cached = self._cached_documents(key)
+        if cached is not None:
+            return cached
+
+        documents = tuple(self._load_directory_documents(markdown_paths))
+        _, stable_fingerprint = self._directory_snapshot()
+        if stable_fingerprint == fingerprint:
+            self._document_cache = (key, documents)
+        else:
+            # Avoid retaining a potentially stale directory snapshot if an editor
+            # or synchronization process changed the pack during the read.
+            self._document_cache = None
+        return list(documents)
+
+    def _cached_documents(self, key: DocumentCacheKey) -> list[KnowledgeDocument] | None:
+        cached = self._document_cache
+        if cached is None or cached[0] != key:
+            return None
+        return list(cached[1])
+
+    def _directory_snapshot(self) -> tuple[tuple[Path, ...], DirectoryFingerprint]:
+        try:
+            pack_root = self.knowledge_dir.resolve()
+        except OSError as error:
+            raise PackError(f"cannot inspect knowledge directory: {error}") from error
+
         markdown_paths: list[Path] = []
+        fingerprint: list[tuple[str, int, int, int]] = []
         total_size = 0
-        for path in sorted(self.knowledge_dir.rglob("*")):
+        try:
+            candidates = sorted(self.knowledge_dir.rglob("*"))
+        except OSError as error:
+            raise PackError(f"cannot inspect knowledge directory: {error}") from error
+
+        for path in candidates:
             if not path.is_file() or not _is_directory_markdown_document(path, self.knowledge_dir):
                 continue
-            resolved = path.resolve()
-            if not resolved.is_relative_to(pack_root):
-                raise PackError(f"knowledge document escapes pack root: {path}")
             try:
-                size = path.stat().st_size
+                resolved = path.resolve()
+                if not resolved.is_relative_to(pack_root):
+                    raise PackError(f"knowledge document escapes pack root: {path}")
+                stat = path.stat()
+            except PackError:
+                raise
             except OSError as error:
                 raise PackError(f"cannot inspect knowledge document {path}: {error}") from error
+
+            size = stat.st_size
             if size > MAX_DOCUMENT_BYTES:
                 raise PackError(f"knowledge document exceeds maximum size: {path}")
             markdown_paths.append(path)
@@ -84,6 +154,12 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
             if total_size > MAX_TOTAL_DOCUMENT_BYTES:
                 raise PackError("directory pack Markdown content exceeds maximum total size")
 
+            relative = path.relative_to(self.knowledge_dir).as_posix()
+            fingerprint.append((relative, size, stat.st_mtime_ns, stat.st_ctime_ns))
+
+        return tuple(markdown_paths), tuple(fingerprint)
+
+    def _load_directory_documents(self, markdown_paths: tuple[Path, ...]) -> list[KnowledgeDocument]:
         documents: list[KnowledgeDocument] = []
         for path in markdown_paths:
             try:
@@ -160,6 +236,14 @@ class MarkdownKnowledgeRepository(KnowledgeRepository):
         documents = self.list_documents()
         languages = tuple(sorted({doc.language for doc in documents if doc.language != "unknown"}))
         return KnowledgePack(name=self.knowledge_dir.stem or "knowledge", languages=languages, path=str(self.knowledge_dir))
+
+
+def _file_fingerprint(path: Path) -> tuple[int, int, int]:
+    try:
+        stat = path.stat()
+    except OSError as error:
+        raise PackError(f"cannot inspect knowledge pack {path}: {error}") from error
+    return stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns
 
 
 def _is_zip_pack(path: Path) -> bool:
