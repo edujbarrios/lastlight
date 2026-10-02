@@ -13,6 +13,7 @@ from .ranking import (
     lexical_score,
     prepare_bm25_corpus,
 )
+from .sections import retrieval_units
 from .tokenizer import expand_query_tokens, tokenize
 
 # Generic glue words that should never be the only evidence for a LOW result.
@@ -32,23 +33,29 @@ class LexicalRetrievalStrategy(RetrievalStrategy):
     def search(
         self, query: SearchQuery, documents: list[KnowledgeDocument]
     ) -> list[SearchResult]:
-        results: list[SearchResult] = []
-        for document in documents:
-            score, matched_terms = lexical_score(query.text, document, len(documents))
+        units = retrieval_units(documents)
+        best_by_source: dict[int, SearchResult] = {}
+        for unit in units:
+            score, matched_terms = lexical_score(
+                query.text,
+                unit.ranking_document,
+                len(units),
+            )
             if score <= 0:
                 continue
             confidence = confidence_for_score(score)
             if _weak_low_confidence_match(confidence, matched_terms):
                 continue
-            results.append(
-                SearchResult(
-                    document=document,
-                    score=score,
-                    confidence=confidence,
-                    passage=select_passage(document.body, query.text),
-                    matched_terms=matched_terms,
-                )
+            result = SearchResult(
+                document=unit.source,
+                score=score,
+                confidence=confidence,
+                passage=select_passage(unit.passage_body, query.text),
+                matched_terms=matched_terms,
             )
+            _keep_best_result(best_by_source, unit.source_index, result)
+
+        results = list(best_by_source.values())
         results.sort(key=lambda result: (-result.score, result.document.path))
         return results[: max(query.top_k, 1)]
 
@@ -90,26 +97,30 @@ class BM25RetrievalStrategy(RetrievalStrategy):
     def search(
         self, query: SearchQuery, documents: list[KnowledgeDocument]
     ) -> list[SearchResult]:
-        corpus = self._prepared_corpus(documents)
-        results: list[SearchResult] = []
-        for document, (score, matched_terms) in zip(
-            documents,
-            bm25_scores(query.text, documents, corpus=corpus),
+        units = retrieval_units(documents)
+        ranking_documents = [unit.ranking_document for unit in units]
+        corpus = self._prepared_corpus(ranking_documents)
+        best_by_source: dict[int, SearchResult] = {}
+
+        for unit, (score, matched_terms) in zip(
+            units,
+            bm25_scores(query.text, ranking_documents, corpus=corpus),
         ):
             if score <= 0:
                 continue
             confidence = confidence_for_bm25_score(score)
             if _weak_low_confidence_match(confidence, matched_terms):
                 continue
-            results.append(
-                SearchResult(
-                    document=document,
-                    score=score,
-                    confidence=confidence,
-                    passage=select_passage(document.body, query.text),
-                    matched_terms=matched_terms,
-                )
+            result = SearchResult(
+                document=unit.source,
+                score=score,
+                confidence=confidence,
+                passage=select_passage(unit.passage_body, query.text),
+                matched_terms=matched_terms,
             )
+            _keep_best_result(best_by_source, unit.source_index, result)
+
+        results = list(best_by_source.values())
         results.sort(key=lambda result: (-result.score, result.document.path))
         return results[: max(query.top_k, 1)]
 
@@ -139,6 +150,16 @@ def _bm25_corpus_signature(documents: list[KnowledgeDocument]) -> BM25CorpusSign
         )
         for document in documents
     )
+
+
+def _keep_best_result(
+    best_by_source: dict[int, SearchResult],
+    source_index: int,
+    result: SearchResult,
+) -> None:
+    current = best_by_source.get(source_index)
+    if current is None or result.score > current.score:
+        best_by_source[source_index] = result
 
 
 def _weak_low_confidence_match(confidence: str, matched_terms: tuple[str, ...]) -> bool:
