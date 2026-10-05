@@ -130,6 +130,22 @@ class RetrievalMetadata:
 
 
 @dataclass(frozen=True)
+class DecisionMetadata:
+    """Structured evidence behind the final answer/refusal decision."""
+
+    accepted: bool
+    confidence: str | None
+    reason: str
+    score: float | None
+    runner_up_score: float | None
+    score_margin: float | None
+    score_ratio: float | None
+    query_coverage: float
+    query_terms: tuple[str, ...] = field(default_factory=tuple)
+    matched_terms: tuple[str, ...] = field(default_factory=tuple)
+
+
+@dataclass(frozen=True)
 class QueryResult:
     """Stable result returned by :meth:`LastLight.query`."""
 
@@ -139,4 +155,16 @@ class QueryResult:
     passage: str | None
     sources: tuple[SourceResult, ...]
     retrieval: RetrievalMetadata
+    refusal_reason: RefusalReason | None = None
+    decision: DecisionMetadata | None = None
+
+
+@dataclass(frozen=True)
+class QueryExplanation:
+    """Auditable explanation returned by :meth:`LastLight.explain`."""
+
+    query: str
+    decision: DecisionMetadata
+    retrieval: RetrievalMetadata
+    sources: tuple[SourceResult, ...]
     refusal_reason: RefusalReason | None = None
