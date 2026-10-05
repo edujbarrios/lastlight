@@ -37,7 +37,7 @@ jobs:
       - name: Install package from repository
         run: python -m pip install --no-deps .
       - name: Import installed library
-        run: python -c "from lastlight import LastLight, QueryResult, RetrievalMetadata, SourceResult; print(LastLight.__name__)"
+        run: python -c "from lastlight import DecisionMetadata, LastLight, QueryExplanation, QueryResult, RetrievalMetadata, SourceResult; print(LastLight.__name__)"
       - name: Installed CLI entrypoint
         run: lastlight --help
 
@@ -62,7 +62,7 @@ jobs:
         run: |
           python -m venv .package-venv
           .package-venv/bin/python -m pip install --no-deps dist/*.whl
-          .package-venv/bin/python -c "from lastlight import LastLight, QueryResult; print(LastLight.__name__)"
+          .package-venv/bin/python -c "from lastlight import DecisionMetadata, LastLight, QueryExplanation, QueryResult; print(LastLight.__name__)"
           .package-venv/bin/python -c "from importlib.resources import files; assert files('lastlight').joinpath('py.typed').is_file(); assert files('lastlight.evaluation').joinpath('data/eval_core.jsonl').is_file()"
           .package-venv/bin/lastlight --help >/dev/null
       - name: Verify packaged evaluation gate
@@ -86,16 +86,20 @@ jobs:
           pack = "examplepack/lastlight-example-en.zip"
           bleeding = "Someone has a deep cut and is bleeding heavily. What should I do while waiting for emergency services?"
           food = "The power has been out for several hours. How long will food stay safe in my refrigerator if I keep the door closed?"
-          assert __version__ == "0.1.9"
+          assert __version__ == "0.2.0"
           practical = LastLight(pack, strategy="lexical").query(bleeding)
           assert practical.accepted and practical.confidence == "HIGH"
+          assert practical.decision is not None and practical.decision.accepted
           assert practical.sources[0].title == "Severe external bleeding"
           assert practical.sources[0].path == "en/first-aid/severe-bleeding.md"
           lexical = LastLight(pack, strategy="lexical").query(food)
           assert lexical.accepted and lexical.sources[0].title == "Food safety during a power outage"
           bm25 = LastLight(pack, strategy="bm25").query(food)
           assert bm25.accepted and bm25.sources[0].title == "Food safety during a power outage"
+          explanation = LastLight(pack, strategy="bm25").explain(food)
+          assert explanation.decision.accepted and explanation.decision.score is not None
           refusal = LastLight(pack).query("How do I repair a diesel engine that will not start?")
           assert refusal.accepted is False and refusal.sources == ()
+          assert refusal.decision is not None and refusal.decision.reason == "no_matching_knowledge"
           print("installed-library README examples: PASS")
           PY

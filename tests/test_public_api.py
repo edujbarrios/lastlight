@@ -6,7 +6,9 @@ from pathlib import Path
 import helpers  # noqa: F401
 from lastlight import (
     ConfigurationError,
+    DecisionMetadata,
     LastLight,
+    QueryExplanation,
     QueryResult,
     RetrievalMetadata,
     SourceDocument,
@@ -50,6 +52,28 @@ class PublicApiTests(unittest.TestCase):
         self.assertEqual(result.sources[0].title, "Safe water during an emergency")
         self.assertIsInstance(result.retrieval, RetrievalMetadata)
         self.assertEqual(result.retrieval.strategy, "lexical")
+        self.assertIsInstance(result.decision, DecisionMetadata)
+        assert result.decision is not None
+        self.assertTrue(result.decision.accepted)
+        self.assertGreater(result.decision.score or 0.0, 0.0)
+        self.assertGreater(result.decision.query_coverage, 0.0)
+        self.assertTrue(result.decision.matched_terms)
+
+    def test_explain_returns_auditable_decision_trace(self) -> None:
+        engine = LastLight(EXAMPLE_PACK, strategy="bm25")
+        explanation = engine.explain(
+            "How long will food stay cold during a power outage?"
+        )
+
+        self.assertIsInstance(explanation, QueryExplanation)
+        self.assertTrue(explanation.decision.accepted)
+        self.assertIn(explanation.decision.confidence, {"HIGH", "MEDIUM"})
+        self.assertEqual(
+            explanation.sources[0].title,
+            "Food safety during a power outage",
+        )
+        self.assertGreater(explanation.decision.query_coverage, 0.0)
+        self.assertGreater(explanation.decision.score or 0.0, 0.0)
 
     def test_query_represents_refusal_without_parsing_cli_text(self) -> None:
         engine = LastLight(EXAMPLE_PACK)
@@ -58,6 +82,10 @@ class PublicApiTests(unittest.TestCase):
         self.assertFalse(result.accepted)
         self.assertIsNone(result.confidence)
         self.assertIsNone(result.passage)
+        self.assertIsNotNone(result.decision)
+        assert result.decision is not None
+        self.assertEqual(result.decision.reason, "no_matching_knowledge")
+        self.assertEqual(result.refusal_reason, "no_matching_knowledge")
 
     def test_public_facade_exposes_adaptive_plan(self) -> None:
         engine = LastLight(EXAMPLE_PACK, strategy="adaptive", mode="survival")
@@ -81,6 +109,8 @@ class PublicApiTests(unittest.TestCase):
             engine.search(query, top_k=0)
         with self.assertRaisesRegex(ConfigurationError, "top_k"):
             engine.query(query, top_k=-1)
+        with self.assertRaisesRegex(ConfigurationError, "top_k"):
+            engine.explain(query, top_k=0)
         with self.assertRaisesRegex(ConfigurationError, "top_k"):
             engine.answer(query, top_k=True)
         with self.assertRaisesRegex(ConfigurationError, "top_k"):

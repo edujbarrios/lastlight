@@ -20,20 +20,29 @@ LOW_CONFIDENCE_RESPONSE = (
 
 
 def safe_answer(results: list[SearchResult]) -> str:
+    """Compatibility formatter using the historical confidence boundary."""
+
     acceptable = [result for result in results if result.confidence in {"HIGH", "MEDIUM"}]
-    if not acceptable:
+    return safe_answer_for_result(acceptable[0] if acceptable else None)
+
+
+def safe_answer_for_result(result: SearchResult | None, confidence: str | None = None) -> str:
+    """Format the result selected by the calibrated answer-decision layer."""
+
+    if result is None:
         return f"{LOW_CONFIDENCE_RESPONSE}\n\n{DISCLAIMER}"
-    return format_result(acceptable[0])
+    return format_result(result, confidence=confidence)
 
 
-def format_result(result: SearchResult) -> str:
+def format_result(result: SearchResult, *, confidence: str | None = None) -> str:
     doc = result.document
     tags = ", ".join(doc.tags) if doc.tags else "none"
     pack_line = ""
     if doc.pack_path:
         pack_line = f"Pack: {doc.pack_name} {doc.pack_version}\n"
+    display_confidence = confidence or result.confidence
     return (
-        f"[{result.confidence} CONFIDENCE]\n\n"
+        f"[{display_confidence} CONFIDENCE]\n\n"
         f"Title: {doc.title}\n"
         f"{pack_line}"
         f"Source: {doc.path}\n"

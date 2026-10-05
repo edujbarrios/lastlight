@@ -35,6 +35,46 @@ else:
 
 `query()` returns a stable `QueryResult` rather than CLI text, so UIs and other integrations do not need to parse terminal output.
 
+## Confidence-aware decisions
+
+LastLight 0.2 separates retrieval confidence from the final answer decision. The final decision combines the winner's strategy-specific confidence with query-term coverage and the score margin to the runner-up from the same retrieval execution.
+
+```python
+result = engine.query("How can I make collected water safer to drink?")
+
+decision = result.decision
+if decision is not None:
+    print(decision.accepted)
+    print(decision.confidence)
+    print(decision.reason)
+    print(decision.query_coverage)
+    print(decision.score_margin)
+```
+
+The decision layer is deterministic. It does not compare numeric lexical scores with BM25 scores across different searches. A clear high-confidence winner remains `HIGH`; a near-tie between strong candidates can be downgraded to `MEDIUM`; and a weakly covered `MEDIUM` result with a nearly tied alternative can be refused as `insufficient_confidence`.
+
+`search()` remains the raw ranked-source boundary and continues to expose the retrieval strategy's own score and confidence for each source.
+
+## Explain a decision
+
+`explain()` returns the same decision used by `query()` and `answer()`, together with retrieval-policy metadata and the ranked sources that supported it:
+
+```python
+explanation = engine.explain(
+    "How long will food stay cold during a power outage?"
+)
+
+print(explanation.decision.reason)
+print(explanation.decision.score)
+print(explanation.decision.runner_up_score)
+print(explanation.decision.score_ratio)
+print(explanation.decision.query_terms)
+print(explanation.decision.matched_terms)
+print(explanation.retrieval.strategy)
+```
+
+This is intended for audit UIs, regression tests, and incident reproduction. It exposes evidence already available to the local runtime; it does not add telemetry or a network dependency.
+
 ## Multiple packs
 
 ```python
@@ -74,7 +114,9 @@ The package root intentionally exposes a small API:
 
 ```python
 from lastlight import (
+    DecisionMetadata,
     LastLight,
+    QueryExplanation,
     QueryResult,
     RetrievalMetadata,
     SourceResult,
