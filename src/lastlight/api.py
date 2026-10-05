@@ -10,13 +10,15 @@ from .application.factory import ApplicationFactory
 from .errors import ConfigurationError, PackError, PackValidationError
 from .knowledge.pack_validation import validate_pack
 from .knowledge.provenance import verify_pack_provenance
-from .safety.triage import first_acceptable_result
+from .safety.decision import AnswerDecision, evaluate_answer_decision
 from .shared.domain import SearchResult
 from .types import (
     AdaptiveMode,
+    DecisionMetadata,
     PackInfo,
     PackProvenance,
     PackValidation,
+    QueryExplanation,
     QueryResult,
     RefusalReason,
     RetrievalMetadata,
@@ -219,19 +221,33 @@ class LastLight:
         """Return a stable, structured result suitable for UIs and integrations."""
 
         results = self._search_internal(text, top_k=top_k)
-        accepted = first_acceptable_result(results)
+        decision = evaluate_answer_decision(text, results)
         metadata = self._metadata(top_k)
-        refusal_reason: RefusalReason | None = None
-        if accepted is None:
-            refusal_reason = "no_matching_knowledge" if not results else "insufficient_confidence"
+        refusal_reason = self._refusal_reason(decision)
+        public_decision = self._decision_metadata(decision)
         return QueryResult(
             query=text,
-            accepted=accepted is not None,
-            confidence=accepted.confidence if accepted else None,
-            passage=accepted.passage if accepted else None,
+            accepted=decision.accepted,
+            confidence=decision.confidence,
+            passage=decision.result.passage if decision.result else None,
             sources=tuple(self._source_result(result) for result in results),
             retrieval=metadata,
             refusal_reason=refusal_reason,
+            decision=public_decision,
+        )
+
+    def explain(self, text: str, *, top_k: int = 3) -> QueryExplanation:
+        """Explain why a query was accepted, downgraded, or refused."""
+
+        result = self.query(text, top_k=top_k)
+        if result.decision is None:  # Defensive compatibility guard.
+            raise RuntimeError("query result did not include decision metadata")
+        return QueryExplanation(
+            query=result.query,
+            decision=result.decision,
+            retrieval=result.retrieval,
+            sources=result.sources,
+            refusal_reason=result.refusal_reason,
         )
 
     def answer(self, text: str, *, top_k: int = 3) -> str:
@@ -317,6 +333,29 @@ class LastLight:
                 else None
             ),
         )
+
+    @staticmethod
+    def _decision_metadata(decision: AnswerDecision) -> DecisionMetadata:
+        return DecisionMetadata(
+            accepted=decision.accepted,
+            confidence=decision.confidence,
+            reason=decision.reason,
+            score=decision.score,
+            runner_up_score=decision.runner_up_score,
+            score_margin=decision.score_margin,
+            score_ratio=decision.score_ratio,
+            query_coverage=decision.query_coverage,
+            query_terms=decision.query_terms,
+            matched_terms=decision.matched_terms,
+        )
+
+    @staticmethod
+    def _refusal_reason(decision: AnswerDecision) -> RefusalReason | None:
+        if decision.refusal_reason == "no_matching_knowledge":
+            return "no_matching_knowledge"
+        if decision.refusal_reason == "insufficient_confidence":
+            return "insufficient_confidence"
+        return None
 
     @staticmethod
     def _source_result(result: SearchResult) -> SourceResult:
