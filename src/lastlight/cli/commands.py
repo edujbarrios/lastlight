@@ -20,10 +20,10 @@ from .safety import (
     LOW_CONFIDENCE_RESPONSE,
     STARTUP_WARNING,
     result_to_dict,
-    safe_answer,
 )
 from .session import LastLightSession
-from .triage import first_acceptable_result
+from ..safety.decision import evaluate_answer_decision
+from ..safety.safety import safe_answer_for_result
 
 
 class InteractiveCommand:
@@ -88,31 +88,31 @@ class QueryCommand:
         else:
             print(answer)
         if self.fail_on_refusal:
-            accepted = first_acceptable_result(
-                self.app.search(self.query, top_k=self.top_k)
+            decision = evaluate_answer_decision(
+                self.query, self.app.search(self.query, top_k=self.top_k)
             )
-            return 0 if accepted else 2
+            return 0 if decision.accepted else 2
         return 0
 
     def _json_output(self) -> tuple[str, bool]:
         results = self.app.search(self.query, top_k=self.top_k)
-        accepted = first_acceptable_result(results)
+        decision = evaluate_answer_decision(self.query, results)
         payload: dict[str, object] = {
             "query": self.query,
-            "accepted": accepted is not None,
-            "answer": safe_answer(results),
+            "accepted": decision.accepted,
+            "answer": safe_answer_for_result(decision.result, confidence=decision.confidence),
             "results": [result_to_dict(result) for result in results],
         }
-        if accepted is None:
+        if not decision.accepted:
             payload["message"] = LOW_CONFIDENCE_RESPONSE
         return (
             json.dumps(payload, ensure_ascii=True, indent=2, sort_keys=True),
-            accepted is not None,
+            decision.accepted,
         )
 
     def _sources_output(self) -> tuple[str, bool]:
         results = self.app.search(self.query, top_k=self.top_k)
-        accepted = first_acceptable_result(results)
+        decision = evaluate_answer_decision(self.query, results)
         if not results:
             return LOW_CONFIDENCE_RESPONSE, False
 
@@ -124,7 +124,7 @@ class QueryCommand:
                 f"{index}. [{result.confidence}] {document.title} | "
                 f"{document.path} | score={result.score:.3f} | tags={tags}"
             )
-        return "\n".join(lines), accepted is not None
+        return "\n".join(lines), decision.accepted
 
 
 class BatchQueryCommand:
@@ -175,11 +175,11 @@ class BatchQueryCommand:
 
     def _record(self, query: str) -> dict[str, object]:
         results = self.app.search(query, top_k=self.top_k)
-        accepted = first_acceptable_result(results)
+        decision = evaluate_answer_decision(query, results)
         return {
             "query": query,
-            "accepted": accepted is not None,
-            "answer": safe_answer(results),
+            "accepted": decision.accepted,
+            "answer": safe_answer_for_result(decision.result, confidence=decision.confidence),
             "results": [result_to_dict(result) for result in results],
         }
 
@@ -214,9 +214,12 @@ class FieldGuideCommand:
         accepted_count = 0
         for query in queries:
             results = self.app.search(query, top_k=self.top_k)
-            accepted = first_acceptable_result(results)
-            accepted_count += accepted is not None
-            sections.extend([f"## {query}", "", safe_answer(results), ""])
+            decision = evaluate_answer_decision(query, results)
+            accepted_count += decision.accepted
+            sections.extend([
+                f"## {query}", "",
+                safe_answer_for_result(decision.result, confidence=decision.confidence), "",
+            ])
 
         try:
             self.output_path.parent.mkdir(parents=True, exist_ok=True)
