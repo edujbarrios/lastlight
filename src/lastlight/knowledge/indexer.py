@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections import Counter
 from pathlib import Path
 
@@ -10,6 +11,36 @@ from .interfaces import KnowledgeRepository
 from .tokenizer import tokenize
 
 INDEX_VERSION = 1
+
+
+def _valid_index_shape(index: object) -> bool:
+    """An invalid audit snapshot must never silently verify as complete."""
+    if not isinstance(index, dict):
+        return False
+    version = index.get("index_version")
+    documents = index.get("documents")
+    count = index.get("document_count")
+    if type(version) is not int or version != INDEX_VERSION:
+        return False
+    if not isinstance(documents, list) or type(count) is not int or count != len(documents):
+        return False
+    paths: set[str] = set()
+    for item in documents:
+        if not isinstance(item, dict):
+            return False
+        path = item.get("path")
+        digest = item.get("source_sha256")
+        if (
+            not isinstance(path, str)
+            or not path.strip()
+            or path in paths
+            or not isinstance(digest, str)
+            or re.fullmatch(r"[0-9a-fA-F]{64}", digest) is None
+        ):
+            return False
+        paths.add(path)
+    return True
+
 
 
 def verify_index(
@@ -22,11 +53,7 @@ def verify_index(
     except (OSError, json.JSONDecodeError) as error:
         return {"ok": False, "error": str(error), "missing": [], "modified": [], "unexpected": []}
 
-    if (
-        not isinstance(stored, dict)
-        or stored.get("index_version") != INDEX_VERSION
-        or not isinstance(stored.get("documents"), list)
-    ):
+    if not _valid_index_shape(stored):
         return {
             "ok": False,
             "error": "unsupported or malformed index",
@@ -35,11 +62,7 @@ def verify_index(
             "unexpected": [],
         }
 
-    expected = {
-        item.get("path"): item.get("source_sha256")
-        for item in stored["documents"]
-        if isinstance(item, dict) and isinstance(item.get("path"), str)
-    }
+    expected = {item["path"]: item["source_sha256"] for item in stored["documents"]}
     current = {
         document.path: document.source_sha256
         for document in repository.list_documents()
