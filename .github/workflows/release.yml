@@ -3,12 +3,25 @@ name: publish-to-pypi
 on:
   release:
     types: [published]
+  # A reviewed release PR may opt in via a distinctive squash-commit title.
+  push:
+    branches: [main]
+    paths:
+      - pyproject.toml
+      - src/lastlight/__init__.py
+      - docs/releases/**
+      - .github/workflows/release.yml
 
 permissions:
   contents: read
 
+concurrency:
+  group: lastlight-production-release
+  cancel-in-progress: false
+
 jobs:
   build:
+    if: github.event_name == 'release' || contains(github.event.head_commit.message, '[publish-pypi]')
     name: Build release distributions
     runs-on: ubuntu-latest
     steps:
@@ -18,10 +31,28 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-      - name: Verify release metadata and tag
+      - name: Verify release metadata, ref and uniqueness
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: python tools/check_release.py --tag "$RELEASE_TAG"
+          EVENT_NAME: ${{ github.event_name }}
+        shell: bash
+        run: |
+          python tools/check_release.py
+          if [ "$EVENT_NAME" = "release" ]; then
+            python tools/check_release.py --tag "$RELEASE_TAG"
+          else
+            if [ "$GITHUB_REF" != "refs/heads/main" ]; then
+              echo "Production push releases must run on main."
+              exit 1
+            fi
+            VERSION="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+            TAG="v$VERSION"
+            if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+              echo "Release tag $TAG exists; do not upload an existing version."
+              exit 1
+            fi
+            test -f "docs/releases/$VERSION.md"
+          fi
       - name: Install release tooling
         run: python -m pip install --upgrade build twine
       - name: Build wheel and source distribution
@@ -59,3 +90,53 @@ jobs:
           path: dist/
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+
+  tag:
+    if: github.event_name == 'push'
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Create annotated version tag after successful PyPI upload
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          VERSION="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          TAG="v$VERSION"
+          TAG_OBJECT_SHA="$(
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/tags" \
+              -f tag="$TAG" \
+              -f message="LastLight $VERSION" \
+              -f object="$GITHUB_SHA" \
+              -f type="commit" --jq .sha
+          )"
+          gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f ref="refs/tags/$TAG" \
+            -f sha="$TAG_OBJECT_SHA"
+
+  github-release:
+    if: github.event_name == 'push'
+    needs: tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Publish matching GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          VERSION="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
+          gh release create "v$VERSION" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "LastLight $VERSION" \
+            --notes-file "docs/releases/$VERSION.md"

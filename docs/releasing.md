@@ -59,6 +59,24 @@ python -m twine check dist/*
 
 The normal `core` GitHub Actions workflow also builds the wheel and source distribution, runs `twine check`, installs the wheel in an isolated virtual environment, imports the public API, and executes the installed `lastlight` command.
 
+## Guarded release PR (recommended for automated publication)
+
+After all change PRs are merged and core CI is green, create a separate release PR
+that updates `pyproject.toml`, `src/lastlight/__init__.py`, `CITATION.cff`,
+`docs/releases/VERSION.md`, and any pinned version assertions in tests or CI.
+Do not include `[publish-pypi]` in ordinary changes.
+
+Once that PR has green CI, **squash merge with a commit title containing
+`[publish-pypi]`**. The guarded main-branch push workflow validates the
+version and confirms its tag does not already exist, builds and smoke-tests the
+distributions, publishes the exact artifacts using PyPI Trusted Publishing, and
+only then creates the annotated tag and a GitHub Release from the matching
+`docs/releases/VERSION.md` file. The `pypi` environment can still require
+manual approval.
+
+Normal pushes to `main` and workflow changes without this marker do not publish.
+The original manual GitHub Release publishing flow remains supported.
+
 ## Publishing a release
 
 The production publisher is `.github/workflows/release.yml`. It runs only when a GitHub Release is published.
