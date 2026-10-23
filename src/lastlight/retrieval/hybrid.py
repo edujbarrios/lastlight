@@ -9,6 +9,7 @@ from typing import Iterable
 from ..domain import KnowledgeDocument, SearchQuery, SearchResult
 from ..interfaces import RetrievalStrategy
 from .strategies import BM25RetrievalStrategy, LexicalRetrievalStrategy
+from .sections import SectionConfig
 
 
 def reciprocal_rank_fusion(
@@ -58,13 +59,16 @@ def reciprocal_rank_fusion(
 class HybridRetrievalStrategy(RetrievalStrategy):
     """Two offline candidate searches + deterministic reciprocal-rank fusion."""
 
-    def __init__(self, rank_constant: int = 60, candidate_factor: int = 3) -> None:
+    def __init__(
+        self, rank_constant: int = 60, candidate_factor: int = 3,
+        section_config: SectionConfig | None = None,
+    ) -> None:
         if rank_constant < 1 or candidate_factor < 1:
             raise ValueError("fusion parameters must be positive")
         self.rank_constant = rank_constant
         self.candidate_factor = candidate_factor
-        self.lexical = LexicalRetrievalStrategy()
-        self.bm25 = BM25RetrievalStrategy()
+        self.lexical = LexicalRetrievalStrategy(section_config=section_config)
+        self.bm25 = BM25RetrievalStrategy(section_config=section_config)
         self._last: ContextVar[dict[str, object] | None] = ContextVar(
             "lastlight_hybrid_decision", default=None
         )
