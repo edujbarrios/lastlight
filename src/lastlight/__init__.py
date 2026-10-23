@@ -1,6 +1,8 @@
 """LastLight: offline intelligence under extreme constraints."""
 
 from .api import LastLight
+from .safety.calibration_v3 import CalibrationConfig, StrategyCalibration
+from .retrieval.sections import SectionConfig
 from .errors import ConfigurationError, LastLightError, PackError, PackValidationError
 from .types import (
     AdaptiveMode,
@@ -22,6 +24,9 @@ __version__ = "0.2.2"
 
 __all__ = [
     "AdaptiveMode",
+    "CalibrationConfig",
+    "StrategyCalibration",
+    "SectionConfig",
     "ConfigurationError",
     "DecisionMetadata",
     "DecisionProfileName",
