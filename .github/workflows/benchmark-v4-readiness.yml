@@ -1,0 +1,64 @@
+name: benchmark-v4-readiness
+
+# Read-only verification of the independent external benchmark. Missing v4
+# data is reported explicitly; no lower-version dataset is silently substituted.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - tools/benchmark_v4_readiness.py
+      - tools/controlled_v4_comparison.py
+      - tools/diagnose_v4_false_rejections.py
+      - tests/test_benchmark_v4_readiness.py
+      - .github/workflows/benchmark-v4-readiness.yml
+
+permissions:
+  contents: read
+
+jobs:
+  external-benchmark-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check independent v4 gate tests
+        run: |
+          python -m pip install 'pytest>=8,<9'
+          python -m pytest -q tests/test_benchmark_v4_readiness.py
+      - uses: actions/checkout@v4
+        with:
+          repository: edujbarrios/lastlight-bench
+          path: external-benchmark
+          persist-credentials: false
+      - name: Check corpus-v4 dataset identity and hashes
+        id: v4
+        continue-on-error: true
+        run: |
+          python tools/benchmark_v4_readiness.py \
+            --checkout external-benchmark \
+            --report /tmp/benchmark-v4-readiness.json
+      - name: Explain blocked comparison
+        if: steps.v4.outcome != 'success'
+        run: |
+          echo '::warning::The external benchmark is not corpus v4. Controlled comparison skipped.'
+          cat /tmp/benchmark-v4-readiness.json
+      - name: Independent-process v0.2.2 versus v0.3.0 comparison
+        if: steps.v4.outcome == 'success'
+        run: |
+          python tools/controlled_v4_comparison.py \
+            --benchmark external-benchmark \
+            --output /tmp/lastlight-v4-comparison \
+            --workspace /tmp/lastlight-virtualenvs \
+            --repeats 3
+      - name: Store readiness and (when available) baseline artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-v4-readiness-and-comparison
+          path: |
+            /tmp/benchmark-v4-readiness.json
+            /tmp/lastlight-v4-comparison/
+          if-no-files-found: warn
