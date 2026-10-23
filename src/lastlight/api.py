@@ -242,7 +242,7 @@ class LastLight:
         _validate_top_k(top_k)
         results = self._search_internal(text, top_k=max(2, top_k))
         decision = self._app.decide(text, results)
-        metadata = self._metadata(top_k)
+        metadata = self._metadata(max(2, top_k))
         refusal_reason = self._refusal_reason(decision)
         public_decision = self._decision_metadata(decision)
         return QueryResult(
