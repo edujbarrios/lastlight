@@ -85,3 +85,63 @@ recall and top-1 ranking quality separately on the final holdout. Changes
 to the development suite are not evidence of benchmark improvement.
 
 Passage selection excludes heading-only windows if substantive text exists; headings may aid ranking but never substitute for answer-bearing evidence. Original backend token coverage also guards against weak near ties even when passage vocabulary is richer than matched_terms.
+
+## Candidate 0.3.0: independent V3 calibration (unreleased)
+
+The 0.2.2 thresholds above remain the legacy `THRESHOLDS` contract for direct
+users of `lastlight.safety.decision.evaluate_answer_decision()`; applications
+created by the 0.3.0 factory use `evaluate_calibrated_decision()`.
+
+`CalibrationConfig` gives separate policies with **initial development
+defaults**, selected before any final external benchmark run:
+
+| Strategy | Min normalized strength | Min focused coverage | Min passage coverage | Min bounded evidence score | Near-tie ratio |
+|---|---:|---:|---:|---:|---:|
+| lexical | 0.37 | 0.30 | 0.28 | 0.45 | 1.05 |
+| BM25 | 0.48 | 0.32 | 0.28 | 0.47 | 1.08 |
+| hybrid | 0.45 | 0.37 | 0.30 | 0.49 | 1.06 |
+
+`conservative` adds 0.12 to focused coverage, passage coverage and decision
+score requirements, and 0.06 to normalized strength. Raising a minimum cannot
+turn a rejected case into an accepted case with the same fixed inputs.
+
+The evidence score is a weighted sum, clamped to [0,1]:
+
+- normalized **backend-specific** score strength: 0.22;
+- focused IDF-weighted query coverage in rank/passage evidence: 0.33;
+- focused IDF-weighted coverage inside selected passage: 0.30;
+- focused coverage in title/tags/section heading: 0.10;
+- independent backend agreement: 0.05.
+
+These values are declared and validated on `CalibrationConfig`; no hidden
+weights or automatic online optimization are used. Strength is
+`raw/(raw + reference)`: reference = 0.65 for lexical, 3 for BM25 and
+0.028 for RRF fusion. These are monotonically increasing convenience
+transforms, not statistical probability calibration. Scores from different
+strategies are **never** directly compared.
+
+Hard refusals still apply to dynamic/live information, confidential credentials
+and unsupported facts. Short topic matches alone cannot bypass the passage
+requirement. Near-duplicate neighbours with materially comparable evidence
+produce `AMBIGUOUS_CANDIDATES`.
+
+Structured codes in `decision.refusal_code` are:
+
+| Code | Meaning |
+|---|---|
+| `INSUFFICIENT_EVIDENCE` | A candidate exists but sufficient grounded evidence does not |
+| `AMBIGUOUS_CANDIDATES` | Unresolved disagreement or similar evidence among neighbours |
+| `OUT_OF_DOMAIN` | No credible document candidate in the mounted pack |
+| `MISSING_REQUESTED_FACT` | Passage lacks a requested number, time, role or explicit condition |
+| `DYNAMIC_INFORMATION_REQUIRED` | Requires fresh or future data unavailable offline |
+| `PRIVATE_OR_CREDENTIAL_DATA` | Requests a credential, private information or restricted decision |
+| `AUTHORITY_DECISION_REQUIRED` | Requires authority to approve, certify or prescribe |
+
+`refusal_reason` retains its previous limited string enumeration for older
+clients. `decision.refusal_code`, `decision.calibrated_score` and
+`decision.explanation` are optional additional audit fields. This logic is
+heuristic, cannot establish full semantic entailment, and makes no claim of
+clinical or operational authority.
+
+Development fixtures: `tests/test_calibration_v3.py`. No final benchmark
+queries or labels are included in the library.
