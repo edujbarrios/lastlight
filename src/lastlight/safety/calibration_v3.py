@@ -86,11 +86,12 @@ def _focus_terms(query: str) -> tuple[str, ...]:
 
 
 def _fraction(terms: Sequence[str], tokens: set[str], corpus: Sequence[KnowledgeDocument],
-              query: str) -> float:
+              query: str, frequency: object | None = None) -> float:
     if not terms:
         return 0.0
     return legacy._weighted_coverage(tuple(terms), tokens,
-                                     legacy._document_frequency(corpus), len(corpus), query)
+                                     frequency if frequency is not None else legacy._document_frequency(corpus),
+                                     len(corpus), query)
 
 
 def _code(reason: str, accepted: bool, *, no_results: bool = False) -> str | None:
@@ -156,15 +157,16 @@ def evaluate_calibrated_decision(
             explanation="The requested fact or authorization is not established by the passage.",
         )
 
+    frequency = legacy._document_frequency(documents)
     terms = _focus_terms(query_text)
     passage_tokens = set(tokenize(passage, keep_stopwords=True))
     heading_text = winner.section or ""
     title_tokens = set(tokenize(winner.document.title + " " + heading_text +
                                 " " + " ".join(winner.document.tags), keep_stopwords=True))
     hits = set(winner.matched_terms) | passage_tokens
-    coverage = _fraction(terms, hits, documents, query_text)
-    passage_coverage = _fraction(terms, passage_tokens, documents, query_text)
-    title_coverage = _fraction(terms, title_tokens, documents, query_text)
+    coverage = _fraction(terms, hits, documents, query_text, frequency)
+    passage_coverage = _fraction(terms, passage_tokens, documents, query_text, frequency)
+    title_coverage = _fraction(terms, title_tokens, documents, query_text, frequency)
     raw_strength = (
         winner.score / (winner.score + .028) if strategy == "hybrid"
         else legacy._strength(winner.score, strategy)
@@ -187,7 +189,7 @@ def evaluate_calibrated_decision(
     # the backend_scores values from different ranking systems.
     near_tie = ratio is not None and ratio < policy.ambiguity_ratio
     runner_passage = results[1].passage if len(results) > 1 else ""
-    runner_evidence = _fraction(terms, set(tokenize(runner_passage)), documents, query_text)
+    runner_evidence = _fraction(terms, set(tokenize(runner_passage)), documents, query_text, frequency)
     uncorroborated = verification_agreement is False and profile == "conservative"
     ambiguous = (near_tie and runner_evidence + .12 >= passage_coverage
                  and (strategy == "hybrid" or coverage < .65))
@@ -208,7 +210,8 @@ def evaluate_calibrated_decision(
     else:
         reason = "calibrated_passage_evidence"
     confidence = (
-        "HIGH" if accepted and calibrated >= .60 and not near_tie and winner.confidence == "HIGH" else
+        "HIGH" if accepted and not near_tie and winner.confidence == "HIGH"
+        and (calibrated >= .60 or previous.confidence == "HIGH") else
         "MEDIUM" if accepted else None
     )
     return replace(
