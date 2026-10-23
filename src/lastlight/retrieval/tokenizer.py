@@ -80,7 +80,11 @@ def expand_query_tokens(tokens: list[str]) -> list[str]:
     expanded: list[str] = []
     seen: set[str] = set()
     for token in tokens:
-        for candidate in (token, *_simple_variants(token), *QUERY_ALIASES.get(token, ())):
+        variants = (token, *_simple_variants(token))
+        alternatives = tuple(
+            alias for variant in variants for alias in QUERY_ALIASES.get(variant, ())
+        )
+        for candidate in (*variants, *alternatives):
             if candidate and candidate not in seen:
                 seen.add(candidate)
                 expanded.append(candidate)
@@ -88,6 +92,8 @@ def expand_query_tokens(tokens: list[str]) -> list[str]:
 
 
 def _simple_variants(token: str) -> tuple[str, ...]:
+    if len(token) > 4 and token.endswith("ies"):
+        return (token[:-3] + "y",)
     if len(token) > 4 and token.endswith("es"):
         return (token[:-2],)
     if len(token) > 3 and token.endswith("s"):

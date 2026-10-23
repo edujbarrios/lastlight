@@ -17,7 +17,7 @@ from .ranking import (
     prepare_bm25_corpus,
     prepare_lexical_corpus,
 )
-from .sections import RetrievalUnit, retrieval_units
+from .sections import RetrievalUnit, SectionConfig, retrieval_units
 from .tokenizer import expand_query_tokens, tokenize
 
 # Generic glue words that should never be the only evidence for a LOW result.
@@ -42,7 +42,8 @@ class _ScoredUnit:
 
 
 class _UnitCachingRetrievalStrategy(RetrievalStrategy):
-    def __init__(self) -> None:
+    def __init__(self, section_config: SectionConfig | None = None) -> None:
+        self.section_config = section_config or SectionConfig()
         self._unit_cache: tuple[CorpusSignature, tuple[RetrievalUnit, ...]] | None = None
 
     def _prepared_units(self, documents: list[KnowledgeDocument]) -> tuple[RetrievalUnit, ...]:
@@ -51,7 +52,7 @@ class _UnitCachingRetrievalStrategy(RetrievalStrategy):
         if cached is not None and cached[0] == signature:
             return cached[1]
 
-        units = tuple(retrieval_units(documents))
+        units = tuple(retrieval_units(documents, config=self.section_config))
         # Store signature and units together so concurrent readers never observe
         # units built for a different corpus. Concurrent misses may duplicate the
         # deterministic preparation work but cannot mix corpus state.
@@ -60,8 +61,8 @@ class _UnitCachingRetrievalStrategy(RetrievalStrategy):
 
 
 class LexicalRetrievalStrategy(_UnitCachingRetrievalStrategy):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, section_config: SectionConfig | None = None) -> None:
+        super().__init__(section_config)
         self._corpus_cache: tuple[CorpusSignature, LexicalCorpus] | None = None
 
     def search(
@@ -142,8 +143,8 @@ def _passage_score(
 
 
 class BM25RetrievalStrategy(_UnitCachingRetrievalStrategy):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, section_config: SectionConfig | None = None) -> None:
+        super().__init__(section_config)
         self._corpus_cache: tuple[CorpusSignature, BM25Corpus] | None = None
 
     def search(
@@ -223,6 +224,7 @@ def _finalize_results(
             confidence=item.confidence,
             passage=select_passage(item.unit.passage_body, query.text),
             matched_terms=item.matched_terms,
+            section=" > ".join(item.unit.heading_path) or None,
         )
         for item in winners
     ]

@@ -187,6 +187,7 @@ def _decision_metrics(true_accept: int, false_accept: int, true_refusal: int, fa
     return {"true_accept": true_accept, "false_accept": false_accept, "true_refusal": true_refusal, "false_refusal": false_refusal,
             "answer_precision": true_accept / answer_total if answer_total else 0.0,
             "refusal_recall": true_refusal / refusal_total if refusal_total else 0.0,
+            "false_accept_rate": false_accept / refusal_total if refusal_total else 0.0,
             "answerable_recall": true_accept / (true_accept + false_refusal) if true_accept + false_refusal else 0.0}
 
 

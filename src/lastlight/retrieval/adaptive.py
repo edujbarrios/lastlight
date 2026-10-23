@@ -11,6 +11,8 @@ from ..compat import is_low_resource_target
 from ..domain import KnowledgeDocument, SearchQuery, SearchResult
 from ..interfaces import RetrievalStrategy
 from .strategies import BM25RetrievalStrategy, LexicalRetrievalStrategy
+from .sections import SectionConfig
+import re
 from .tokenizer import tokenize
 
 CRITICAL_RISK_TERMS = frozenset(
@@ -79,6 +81,7 @@ class RetrievalDecision:
     memory_budget_mb: int | None
     verification_backend: str | None = None
     verification_agreement: bool | None = None
+    verification_candidates: int = 1
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -87,11 +90,15 @@ class RetrievalDecision:
 class AdaptiveRetrievalStrategy(RetrievalStrategy):
     """Select a core retrieval strategy from query risk and constraints."""
 
-    def __init__(self, config: AdaptiveRetrievalConfig | None = None, profile: ResourceProfile | None = None) -> None:
+    def __init__(
+        self, config: AdaptiveRetrievalConfig | None = None,
+        profile: ResourceProfile | None = None,
+        section_config: SectionConfig | None = None,
+    ) -> None:
         self.config = config or AdaptiveRetrievalConfig()
         self.profile = profile or ResourceProfile.detect()
-        self.lexical = LexicalRetrievalStrategy()
-        self.bm25 = BM25RetrievalStrategy()
+        self.lexical = LexicalRetrievalStrategy(section_config=section_config)
+        self.bm25 = BM25RetrievalStrategy(section_config=section_config)
         self._last_decision: ContextVar[RetrievalDecision | None] = ContextVar(
             "lastlight_adaptive_last_decision",
             default=None,
@@ -108,16 +115,41 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
     def search(self, query: SearchQuery, documents: list[KnowledgeDocument]) -> list[SearchResult]:
         decision = self.plan(query)
         self.last_decision = decision
-        effective_query = SearchQuery(query.text, decision.effective_top_k)
+        # Accuracy spends additional retrieval work on independent candidates
+        # while preserving the public top_k, resource budgets and primary backend.
+        depth = decision.effective_top_k + 2 if (
+            decision.strategy == "bm25" and self.config.mode == "accuracy"
+        ) else decision.effective_top_k
+        effective_query = SearchQuery(query.text, depth)
         strategy = {"lexical": self.lexical, "bm25": self.bm25}[decision.strategy]
-        results = strategy.search(effective_query, documents)
+        candidates = strategy.search(effective_query, documents)
+        results = candidates[:decision.effective_top_k]
         # Verification never changes ranking or numerically mixes score scales.
         # Avoid extra work in low-resource/lexical paths.
         if decision.strategy == "bm25" and results:
-            secondary = self.lexical.search(SearchQuery(query.text, 1), documents)
+            verify_k = 3 if self.config.mode == "accuracy" else 1
+            secondary = self.lexical.search(SearchQuery(query.text, verify_k), documents)
             agreement = bool(secondary) and secondary[0].document.path == results[0].document.path
+            # In accuracy mode, compare independent evidence windows for the
+            # *same document*. A more pertinent verified passage may replace
+            # the primary snippet without changing BM25 rank or raw score.
+            # Candidate order beyond Top-1 is used for audit rather than blindly
+            # promoting a different source.
+            if self.config.mode == "accuracy":
+                primary = results[0]
+                matching = next(
+                    (item for item in secondary if
+                     item.document.path == primary.document.path and
+                     item.document.pack_path == primary.document.pack_path),
+                    None,
+                )
+                if matching is not None and _evidence_window_score(
+                    matching.passage, query.text
+                ) > _evidence_window_score(primary.passage, query.text):
+                    results[0] = replace(primary, passage=matching.passage, section=matching.section)
             self.last_decision = replace(
-                decision, verification_backend="lexical", verification_agreement=agreement
+                decision, verification_backend="lexical", verification_agreement=agreement,
+                verification_candidates=verify_k,
             )
         return results
 
@@ -164,6 +196,30 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
             energy_budget_mwh=self.config.energy_budget_mwh,
             memory_budget_mb=self.config.memory_budget_mb,
         )
+
+
+def _evidence_window_score(passage: str, query: str) -> tuple[int, int]:
+    """Cheap deterministic evidence verifier; backend scores remain untouched."""
+    query_terms = set(tokenize(query))
+    evidence_terms = set(tokenize(passage))
+    overlap = len(query_terms & evidence_terms)
+    normalized = " ".join(tokenize(query, keep_stopwords=True))
+    window = " ".join(tokenize(passage, keep_stopwords=True))
+    numerical = bool(re.search(r"\b\d+(?:[.,]\d+)?\b", passage))
+    wants_quantity = bool(re.search(
+        r"\b(how many|how much|how long|cuanto|cuantos|cuantas|durante cuanto)\b",
+        normalized,
+    ))
+    wants_negative = bool(re.search(
+        r"\b(without|never|must not|should not|sin|nunca|prohibido)\b",
+        normalized,
+    ))
+    negative = bool(re.search(
+        r"\b(not|never|without|avoid|prohibited|must not|sin|nunca|prohibido)\b",
+        window,
+    ))
+    return (overlap + 2 * int(wants_quantity and numerical)
+            + 2 * int(wants_negative and negative), overlap)
 
 
 def classify_query_risk(text: str) -> str:

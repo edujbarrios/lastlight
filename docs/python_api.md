@@ -152,3 +152,37 @@ print(result.decision.weighted_query_coverage, result.decision.evidence_sufficie
 ```
 
 The default is `balanced` for compatibility; `conservative` is an explicit stricter policy. In `adaptive` mode the retrieval backend remains resource-driven, while metadata records the selected backend and the independent decision profile. With BM25 as the selected backend, lexical is an optional verification signal, never a numerically mixed score. A negative answer is a refusal to assert a claim, not proof that it is false.
+
+## 0.3.0 candidate: structured evidence and hybrid retrieval
+
+```python
+from lastlight import LastLight, CalibrationConfig, SectionConfig
+
+engine = LastLight(
+    "examplepack/lastlight-example-en.zip",
+    strategy="hybrid",
+    calibration=CalibrationConfig(),
+    sections=SectionConfig(min_chars=1000, max_chars=1400, overlap_chars=200),
+)
+answer = engine.query("How long will cold food remain safe during an outage?")
+print(answer.decision.calibrated_score)  # bounded [0,1], not a probability
+print(answer.decision.refusal_code)      # None if accepted
+print(answer.decision.explanation)
+for source in answer.sources:
+    print(source.section, source.backend_scores)
+```
+
+`LastLight(…, decision_profile="conservative")` remains available. The default
+is still `balanced`. `CalibrationConfig` holds separate immutable
+`StrategyCalibration` entries for `lexical`, `bm25` and `hybrid`. Each
+entry has independently checked minimum score strength, query evidence coverage,
+passage evidence coverage, decision score and ambiguity ratio. Configuration
+values affect **acceptance only**; they never alter BM25 or lexical ranking.
+The selected source section and raw backend component scores are optional
+fields on `SourceResult`. Hybrid `SourceResult.score` is a fusion score.
+
+For CLI use: `lastlight --strategy hybrid --decision-profile balanced
+--knowledge pack.zip "question"`.
+
+Important: the above additions are not published on PyPI until a separately
+authorized release is completed.

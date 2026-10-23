@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
 
-RetrievalStrategyName = Literal["lexical", "bm25", "adaptive"]
+RetrievalStrategyName = Literal["lexical", "bm25", "adaptive", "hybrid"]
 AdaptiveMode = Literal["survival", "balanced", "accuracy"]
 DecisionProfileName = Literal["balanced", "conservative"]
 RefusalReason = Literal["no_matching_knowledge", "insufficient_confidence"]
@@ -36,6 +36,9 @@ class SourceResult:
     confidence: str
     passage: str
     matched_terms: tuple[str, ...] = field(default_factory=tuple)
+    section: str | None = None
+    backend_scores: tuple[tuple[str, float], ...] = field(default_factory=tuple)
+    calibrated_score: float | None = None
 
     @property
     def title(self) -> str:
@@ -132,6 +135,7 @@ class RetrievalMetadata:
     decision_profile: str = "balanced"
     verification_backend: str | None = None
     verification_agreement: bool | None = None
+    verification_candidates: int | None = None
 
 
 @dataclass(frozen=True)
@@ -157,6 +161,10 @@ class DecisionMetadata:
     discriminative_matches: int = 0
     evidence_sufficient: bool = False
     verification_agreement: bool | None = None
+    calibrated_score: float | None = None
+    refusal_code: str | None = None
+    explanation: str = ""
+    section: str | None = None
 
 
 @dataclass(frozen=True)
