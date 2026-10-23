@@ -123,6 +123,37 @@ class AdaptiveRetrievalTests(unittest.TestCase):
         self.assertEqual(metadata["verification_backend"], "lexical")
         self.assertIs(metadata["verification_agreement"], True)
 
+    def test_accuracy_uses_lexical_candidate_for_stronger_passage(self) -> None:
+        from lastlight.domain import SearchResult
+        from lastlight.retrieval.sections import SectionConfig
+        strategy = AdaptiveRetrievalStrategy(
+            AdaptiveRetrievalConfig(mode="accuracy"),
+            profile(),
+            section_config=SectionConfig(min_chars=100, max_chars=200, overlap_chars=20),
+        )
+        self.assertEqual(strategy.bm25.section_config.min_chars, 100)
+        self.assertEqual(strategy.lexical.section_config.min_chars, 100)
+        document = KnowledgeDocument("Amber cells", "amber.md",
+            "Amber cells operate for 7 hours. Amber cells must stay dry.")
+        other = KnowledgeDocument("Quartz cells", "quartz.md",
+            "Quartz cells operate for 3 hours.")
+        def mocked_bm25(query, docs):
+            return [
+                SearchResult(document, 8.0, "HIGH", "Amber cells must stay dry.",
+                             ("amber", "cells")),
+                SearchResult(other, 2.0, "MEDIUM", other.body, ("cells",)),
+            ]
+        def mocked_lexical(query, docs):
+            return [SearchResult(document, 3.0, "HIGH",
+                                 "Amber cells operate for 7 hours.",
+                                 ("amber", "cells", "hours"))]
+        strategy.bm25.search = mocked_bm25  # type: ignore[method-assign]
+        strategy.lexical.search = mocked_lexical  # type: ignore[method-assign]
+        output = strategy.search(SearchQuery("How long amber cells operate?"), [document, other])
+        self.assertEqual(output[0].score, 8.0)
+        self.assertIn("7 hours", output[0].passage)
+        self.assertEqual(strategy.decision_metadata()["verification_candidates"], 3)
+
     def test_decision_metadata_is_isolated_per_thread(self) -> None:
         strategy = AdaptiveRetrievalStrategy(
             AdaptiveRetrievalConfig(mode="accuracy"),
