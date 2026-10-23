@@ -15,6 +15,7 @@ from .shared.domain import SearchResult
 from .types import (
     AdaptiveMode,
     DecisionMetadata,
+    DecisionProfileName,
     PackInfo,
     PackProvenance,
     PackValidation,
@@ -32,6 +33,7 @@ KnowledgeSources = KnowledgeSource | Sequence[KnowledgeSource] | None
 
 SUPPORTED_STRATEGIES = frozenset({"lexical", "bm25", "adaptive"})
 SUPPORTED_MODES = frozenset({"survival", "balanced", "accuracy"})
+SUPPORTED_DECISION_PROFILES = frozenset({"balanced", "conservative"})
 
 
 def _validate_top_k(top_k: int) -> int:
@@ -117,6 +119,7 @@ class LastLight:
         mode: AdaptiveMode = "balanced",
         energy_budget_mwh: float | None = None,
         memory_budget_mb: int | None = None,
+        decision_profile: DecisionProfileName = "balanced",
     ) -> None:
         if strategy not in SUPPORTED_STRATEGIES:
             choices = ", ".join(sorted(SUPPORTED_STRATEGIES))
@@ -128,12 +131,15 @@ class LastLight:
             raise ConfigurationError(
                 f"unsupported adaptive mode: {mode!r}; choose one of: {choices}"
             )
+        if decision_profile not in SUPPORTED_DECISION_PROFILES:
+            raise ConfigurationError(f"unsupported decision profile: {decision_profile!r}")
         energy_budget_mwh = _validate_energy_budget_mwh(energy_budget_mwh)
         memory_budget_mb = _validate_memory_budget_mb(memory_budget_mb)
         _validate_knowledge_sources(knowledge)
 
         self.strategy = strategy
         self.mode = mode
+        self.decision_profile = decision_profile
         self._app = ApplicationFactory.create(
             knowledge_dir=knowledge,
             strategy=strategy,
@@ -141,6 +147,7 @@ class LastLight:
             mode=mode,
             energy_budget_mwh=energy_budget_mwh,
             memory_budget_mb=memory_budget_mb,
+            decision_profile=decision_profile,
         )
 
     @classmethod
@@ -221,7 +228,7 @@ class LastLight:
         """Return a stable, structured result suitable for UIs and integrations."""
 
         results = self._search_internal(text, top_k=top_k)
-        decision = evaluate_answer_decision(text, results)
+        decision = self._app.decide(text, results)
         metadata = self._metadata(top_k)
         refusal_reason = self._refusal_reason(decision)
         public_decision = self._decision_metadata(decision)
@@ -332,6 +339,10 @@ class LastLight:
                 if raw.get("memory_budget_mb") is not None
                 else None
             ),
+            requested_strategy=self.strategy,
+            decision_profile=self.decision_profile,
+            verification_backend=(str(raw["verification_backend"]) if raw.get("verification_backend") else None),
+            verification_agreement=(raw.get("verification_agreement") if isinstance(raw.get("verification_agreement"), bool) else None),
         )
 
     @staticmethod
@@ -347,6 +358,15 @@ class LastLight:
             query_coverage=decision.query_coverage,
             query_terms=decision.query_terms,
             matched_terms=decision.matched_terms,
+            strategy=decision.strategy,
+            profile=decision.profile,
+            risk=decision.risk,
+            relevance_strength=decision.relevance_strength,
+            weighted_query_coverage=decision.weighted_query_coverage,
+            passage_coverage=decision.passage_coverage,
+            discriminative_matches=decision.discriminative_matches,
+            evidence_sufficient=decision.evidence_sufficient,
+            verification_agreement=decision.verification_agreement,
         )
 
     @staticmethod
