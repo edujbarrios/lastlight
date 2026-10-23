@@ -221,6 +221,7 @@ def evaluate_calibrated_decision(
         evidence_sufficient=enough, relevance_strength=raw_strength,
         weighted_query_coverage=coverage, passage_coverage=passage_coverage,
         calibrated_score=calibrated, refusal_code=_code(reason, accepted),
+        section=winner.section,
         explanation=(
             f"Evidence score {calibrated:.3f}; focus coverage {coverage:.3f}; "
             f"passage coverage {passage_coverage:.3f}; "
