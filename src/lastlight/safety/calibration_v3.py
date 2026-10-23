@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from collections import Counter
+import re
 from typing import Sequence
 
 from ..retrieval.tokenizer import tokenize
@@ -146,6 +147,12 @@ def evaluate_calibrated_decision(
     winner = results[0]
     passage = winner.passage
     gate = legacy._unsupported_intent(query_text)
+    if gate == "requires_authorized_or_private_evidence" and re.search(
+        r"\b(certify|certified|certification|certificar|certificado|"
+        r"prescribe|prescription|prescribir|recetar|dosage|dose|dosis)\b",
+        legacy.normalize_text(query_text),
+    ):
+        gate = "requires_authority_decision"
     enough, fact_reason = legacy._passage_sufficiency(query_text, passage)
     # Non-negotiable evidence and authorization gates precede calibrated scores.
     if gate is not None or not enough:
