@@ -1,6 +1,6 @@
 # Migrating from 0.2.2 to 0.3.0 (candidate)
 
-This guide covers an **unreleased** feature branch; it does not announce a PyPI release.
+This guide covers the **unpublished 0.3.0 source revision**; it does not announce a PyPI release.
 
 ## Compatibility
 
