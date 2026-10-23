@@ -23,6 +23,7 @@ _GENERIC = frozenset({
     "will", "stay", "long", "should", "would", "could", "help", "know",
     "information", "details", "guide", "emergency", "situation", "now",
     "have", "that", "found", "looks", "should", "would", "supply", "down",
+    "been", "several", "out", "my", "some", "could", "there", "was", "were",
     "today", "currently", "latest", "right", "current", "available",
     "actualmente", "ahora", "hoy", "ultimo", "cuanto", "cuantos",
     "cuando", "quien", "quienes", "cual", "cuales", "what", "who",
@@ -287,6 +288,8 @@ def _term_hit(term: str, matched: set[str]) -> bool:
         candidate in matched
         or (candidate.endswith("s") and candidate[:-1] in matched)
         or (candidate.endswith("es") and candidate[:-2] in matched)
+        or (candidate + "s" in matched)
+        or (candidate + "es" in matched)
         for candidate in candidates
     )
 
