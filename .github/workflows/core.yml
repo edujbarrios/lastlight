@@ -57,6 +57,13 @@ jobs:
         run: python -m build
       - name: Validate distribution metadata and README
         run: python -m twine check dist/*
+      - name: Save test-built distributions for offline validation
+        uses: actions/upload-artifact@v4
+        with:
+          name: lastlight-unpublished-distributions
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 30
       - name: Install built wheel in isolation
         shell: bash
         run: |
