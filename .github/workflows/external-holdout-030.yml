@@ -39,6 +39,7 @@ jobs:
       - name: Execute external suite against installed candidate wheel
         shell: bash
         run: |
+          cd /tmp/lastlight-bench
           /tmp/lastlight-installed/bin/lastlight-bench-suite --output /tmp/holdout-result.json
           # Do not print or inspect case-level labels: report aggregate metrics only.
           /tmp/lastlight-installed/bin/python - <<'PY'
