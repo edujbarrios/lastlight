@@ -1,6 +1,6 @@
-# Migrating from 0.2.2 to 0.3.0 (candidate)
+# Migrating from 0.2.2 to 0.3.0
 
-This guide covers the **unpublished 0.3.0 source revision**; it does not announce a PyPI release.
+This guide covers the 0.3.0 distribution and its backwards-compatible public APIs.
 
 ## Compatibility
 
