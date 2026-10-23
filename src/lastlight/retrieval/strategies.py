@@ -109,7 +109,15 @@ def select_passage(body: str, query_text: str, max_chars: int = 700) -> str:
     if not query_tokens:
         return chunks[0]
 
-    best = max(chunks, key=lambda chunk: _passage_score(chunk, query_text, query_tokens))
+    # Heading-only windows often win on token density but cannot establish
+    # instructions, quantities or conditions. Prefer substantive passage
+    # windows whenever the document offers them.
+    substantive = [
+        chunk for chunk in chunks
+        if not all(line.lstrip().startswith("#") for line in chunk.splitlines() if line.strip())
+    ]
+    candidates = substantive or chunks
+    best = max(candidates, key=lambda chunk: _passage_score(chunk, query_text, query_tokens))
     return best
 
 
