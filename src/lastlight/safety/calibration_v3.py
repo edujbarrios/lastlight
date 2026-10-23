@@ -208,7 +208,7 @@ def evaluate_calibrated_decision(
     else:
         reason = "calibrated_passage_evidence"
     confidence = (
-        "HIGH" if accepted and calibrated >= .72 and not near_tie else
+        "HIGH" if accepted and calibrated >= .60 and not near_tie and winner.confidence == "HIGH" else
         "MEDIUM" if accepted else None
     )
     return replace(
