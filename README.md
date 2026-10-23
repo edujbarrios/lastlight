@@ -82,10 +82,11 @@ Confidence: HIGH
 Source paths are **pack-relative and stable**: the same document keeps the same logical path whether the pack is a directory, a ZIP file, or the ZIP is renamed. Pack identity metadata (`pack_name`, `pack_version`, `pack_source`, and `pack_path`) is preserved consistently whether one pack or several packs are mounted. Once the package and knowledge pack are local, querying does not require a network connection.
 
 
-## 0.3.0 candidate: hybrid retrieval and configurable evidence calibration
+## 0.3.0 source release candidate: hybrid retrieval and configurable evidence calibration
 
-This section describes the **unreleased 0.3.0 development branch**. Do not assume these
-features are already available in the current PyPI package.
+This section describes **unpublished 0.3.0 source code**. Do not assume these
+features are already available in the current PyPI distribution. Install
+from a trusted 0.3.0 checkout or an appropriately reviewed distribution.
 
 ```python
 from lastlight import LastLight, CalibrationConfig, StrategyCalibration, SectionConfig

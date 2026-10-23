@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.3.0] — proposed, not published
+## [0.3.0] — source prepared, not published
 
 - Added separate publicly configurable lexical, BM25 and hybrid evidence calibrators.
 - Added offline reciprocal-rank fusion (`hybrid`) without cross-backend score addition.
