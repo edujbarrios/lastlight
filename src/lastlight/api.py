@@ -10,7 +10,9 @@ from .application.factory import ApplicationFactory
 from .errors import ConfigurationError, PackError, PackValidationError
 from .knowledge.pack_validation import validate_pack
 from .knowledge.provenance import verify_pack_provenance
-from .safety.decision import AnswerDecision, evaluate_answer_decision
+from .safety.decision import AnswerDecision
+from .safety.calibration_v3 import CalibrationConfig
+from .retrieval.sections import SectionConfig
 from .shared.domain import SearchResult
 from .types import (
     AdaptiveMode,
@@ -31,7 +33,7 @@ from .types import (
 KnowledgeSource = Path | str
 KnowledgeSources = KnowledgeSource | Sequence[KnowledgeSource] | None
 
-SUPPORTED_STRATEGIES = frozenset({"lexical", "bm25", "adaptive"})
+SUPPORTED_STRATEGIES = frozenset({"lexical", "bm25", "hybrid", "adaptive"})
 SUPPORTED_MODES = frozenset({"survival", "balanced", "accuracy"})
 SUPPORTED_DECISION_PROFILES = frozenset({"balanced", "conservative"})
 
@@ -120,6 +122,8 @@ class LastLight:
         energy_budget_mwh: float | None = None,
         memory_budget_mb: int | None = None,
         decision_profile: DecisionProfileName = "balanced",
+        calibration: CalibrationConfig | None = None,
+        sections: SectionConfig | None = None,
     ) -> None:
         if strategy not in SUPPORTED_STRATEGIES:
             choices = ", ".join(sorted(SUPPORTED_STRATEGIES))
@@ -135,6 +139,10 @@ class LastLight:
             raise ConfigurationError(f"unsupported decision profile: {decision_profile!r}")
         energy_budget_mwh = _validate_energy_budget_mwh(energy_budget_mwh)
         memory_budget_mb = _validate_memory_budget_mb(memory_budget_mb)
+        if calibration is not None and not isinstance(calibration, CalibrationConfig):
+            raise ConfigurationError("calibration must be a CalibrationConfig")
+        if sections is not None and not isinstance(sections, SectionConfig):
+            raise ConfigurationError("sections must be a SectionConfig")
         _validate_knowledge_sources(knowledge)
 
         self.strategy = strategy
@@ -148,6 +156,8 @@ class LastLight:
             energy_budget_mwh=energy_budget_mwh,
             memory_budget_mb=memory_budget_mb,
             decision_profile=decision_profile,
+            calibration=calibration,
+            sections=sections,
         )
 
     @classmethod
@@ -367,6 +377,10 @@ class LastLight:
             discriminative_matches=decision.discriminative_matches,
             evidence_sufficient=decision.evidence_sufficient,
             verification_agreement=decision.verification_agreement,
+            calibrated_score=decision.calibrated_score,
+            refusal_code=decision.refusal_code,
+            explanation=decision.explanation,
+            section=decision.result.section if decision.result else None,
         )
 
     @staticmethod
@@ -398,4 +412,6 @@ class LastLight:
             confidence=result.confidence,
             passage=result.passage,
             matched_terms=result.matched_terms,
+            section=result.section,
+            backend_scores=result.backend_scores,
         )
