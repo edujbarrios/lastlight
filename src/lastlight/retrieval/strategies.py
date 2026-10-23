@@ -143,8 +143,8 @@ def _passage_score(
 
 
 class BM25RetrievalStrategy(_UnitCachingRetrievalStrategy):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, section_config: SectionConfig | None = None) -> None:
+        super().__init__(section_config)
         self._corpus_cache: tuple[CorpusSignature, BM25Corpus] | None = None
 
     def search(
