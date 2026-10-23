@@ -119,6 +119,10 @@ class AnswerDecision:
     discriminative_matches: int = 0
     evidence_sufficient: bool = False
     verification_agreement: bool | None = None
+    calibrated_score: float | None = None
+    refusal_code: str | None = None
+    explanation: str = ""
+    section: str | None = None
 
 
 def evaluate_answer_decision(
