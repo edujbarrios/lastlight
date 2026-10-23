@@ -58,6 +58,20 @@ class CalibrationV3Tests(unittest.TestCase):
                 self.assertFalse(decision.accepted)
                 self.assertEqual(decision.refusal_code, code)
 
+    def test_authority_request_is_not_mislabeled_private(self):
+        decision = answer("Who can certify quartz safety?",
+                          "The quartz safety instructions mention an operator.")
+        self.assertFalse(decision.accepted)
+        self.assertEqual(decision.refusal_code, "AUTHORITY_DECISION_REQUIRED")
+
+    def test_false_accept_denominator_only_counts_unanswerable(self):
+        from lastlight.evaluation.evaluation import _decision_metrics
+        # 3 accepted answerable, 1 falsely accepted unanswerable, 9 correct
+        # refusals, 4 false refusals: false accept = 1/(1+9), not 1/17.
+        metrics = _decision_metrics(3, 1, 9, 4)
+        self.assertAlmostEqual(metrics["false_accept_rate"], 0.1)
+        self.assertAlmostEqual(metrics["answerable_recall"], 3 / 7)
+
     def test_unknown_question_refuses(self):
         decision = evaluate_calibrated_decision("unrelated asteroids", [],
                                                strategy="bm25", corpus=DOCS)
