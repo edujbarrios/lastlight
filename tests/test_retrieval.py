@@ -237,8 +237,8 @@ class RetrievalTests(unittest.TestCase):
 
     def test_passage_skips_heading_and_citation_only_windows(self) -> None:
         body = (
-            "# Cobalt valve repair\\n\\n"
-            "Disconnect the cobalt valve before opening the sealed housing.\\n\\n"
+            "# Cobalt valve repair\n\n"
+            "Disconnect the cobalt valve before opening the sealed housing.\n\n"
             'Source: "Cobalt valve repair". https://invented.example/cobalt-valve-repair'
         )
         passage = select_passage(body, "cobalt valve repair")
