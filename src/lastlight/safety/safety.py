@@ -71,4 +71,6 @@ def result_to_dict(result: SearchResult) -> dict[str, object]:
         "confidence": result.confidence,
         "passage": result.passage,
         "matched_terms": list(result.matched_terms),
+        "section": result.section,
+        "backend_scores": list(result.backend_scores),
     }
