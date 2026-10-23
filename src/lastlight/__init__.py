@@ -5,6 +5,7 @@ from .errors import ConfigurationError, LastLightError, PackError, PackValidatio
 from .types import (
     AdaptiveMode,
     DecisionMetadata,
+    DecisionProfileName,
     PackInfo,
     PackProvenance,
     PackValidation,
@@ -23,6 +24,7 @@ __all__ = [
     "AdaptiveMode",
     "ConfigurationError",
     "DecisionMetadata",
+    "DecisionProfileName",
     "LastLight",
     "LastLightError",
     "PackError",
