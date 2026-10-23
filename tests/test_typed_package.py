@@ -13,7 +13,7 @@ class TypedPackageTests(unittest.TestCase):
         self.assertTrue(files("lastlight").joinpath("py.typed").is_file())
 
     def test_public_literal_contracts_are_exported(self) -> None:
-        self.assertEqual(set(get_args(RetrievalStrategyName)), {"lexical", "bm25", "adaptive"})
+        self.assertEqual(set(get_args(RetrievalStrategyName)), {"lexical", "bm25", "hybrid", "adaptive"})
         self.assertEqual(set(get_args(AdaptiveMode)), {"survival", "balanced", "accuracy"})
         self.assertEqual(
             set(get_args(RefusalReason)),
