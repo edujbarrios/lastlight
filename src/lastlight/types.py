@@ -135,6 +135,7 @@ class RetrievalMetadata:
     decision_profile: str = "balanced"
     verification_backend: str | None = None
     verification_agreement: bool | None = None
+    verification_candidates: int | None = None
 
 
 @dataclass(frozen=True)
