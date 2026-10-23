@@ -36,7 +36,7 @@ within the same backend**, never combined across backends.
 
 | Selected retrieval | Profile | Min strength | Min query coverage | Min weighted coverage | Min passage coverage | Min discriminative matches |
 |---|---|---:|---:|---:|---:|---:|
-| lexical | balanced | .35 | .20 | .22 | .25 | 1 |
+| lexical | balanced | .35 | .20 | .22 | .13 | 1 |
 | lexical | conservative | .50 | .35 | .45 | .40 | 2 |
 | bm25 | balanced | .44 | .40 | .52 | .30 | 2 |
 | bm25 | conservative | .55 | .50 | .65 | .45 | 2 |
@@ -83,3 +83,5 @@ Keep the final evaluation holdout **outside this repository and outside
 threshold selection**. Report answerable recall, false acceptance, refusal
 recall and top-1 ranking quality separately on the final holdout. Changes
 to the development suite are not evidence of benchmark improvement.
+
+Passage selection excludes heading-only windows if substantive text exists; headings may aid ranking but never substitute for answer-bearing evidence. Original backend token coverage also guards against weak near ties even when passage vocabulary is richer than matched_terms.
