@@ -65,6 +65,33 @@ jobs:
                           aggregates(value, trail + (index,))
           aggregates(report)
           PY
+      - name: Evaluate hybrid using the same untouched external runner
+        shell: bash
+        run: |
+          cd /tmp/lastlight-bench
+          /tmp/lastlight-installed/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+          from lastlight_bench.runner import run_benchmark
+
+          # Public runner, original corpus and original query labels remain unchanged.
+          report = run_benchmark(
+              Path("corpus/field-ops-v1"), Path("datasets/eval.jsonl"),
+              strategy="hybrid", mode="balanced", top_k=3, warmup=3,
+          )
+          summary = report["summary"]
+          Path("/tmp/holdout-hybrid-summary.json").write_text(
+              json.dumps(summary, indent=2) + "\n", encoding="utf-8"
+          )
+          print("AGGREGATE hybrid / balanced", summary)
+          PY
+      - name: Store hybrid aggregate (no case-level data)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: untouched-hybrid-summary-030
+          path: /tmp/holdout-hybrid-summary.json
+          retention-days: 14
       - name: Store full report (not calibration input)
         if: success()
         uses: actions/upload-artifact@v4
