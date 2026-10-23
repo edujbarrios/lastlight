@@ -20,6 +20,7 @@ class ApplicationFactory:
         mode: str = "balanced",
         energy_budget_mwh: float | None = None,
         memory_budget_mb: int | None = None,
+        decision_profile: str = "balanced",
     ) -> LastLightApp:
         repository = build_knowledge_repository(knowledge_dir)
         if strategy == "bm25":
@@ -34,4 +35,4 @@ class ApplicationFactory:
             )
         else:
             retrieval = LexicalRetrievalStrategy()
-        return LastLightApp(repository=repository, retrieval=retrieval, language=language)
+        return LastLightApp(repository=repository, retrieval=retrieval, language=language, decision_profile=decision_profile)
