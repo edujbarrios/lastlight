@@ -34,7 +34,7 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/edujbarrios/lastlight-bench.git /tmp/lastlight-bench
           git -C /tmp/lastlight-bench rev-parse HEAD
-          /tmp/lastlight-installed/bin/python -m pip install --no-deps /tmp/lastlight-bench
+          /tmp/lastlight-installed/bin/python -m pip install --no-deps -e /tmp/lastlight-bench
           /tmp/lastlight-installed/bin/python -m pip show lastlight lastlight-bench
       - name: Execute external suite against installed candidate wheel
         shell: bash
