@@ -46,6 +46,8 @@ class SearchResult:
     confidence: str
     passage: str
     matched_terms: tuple[str, ...] = field(default_factory=tuple)
+    section: str | None = None
+    backend_scores: tuple[tuple[str, float], ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True)
