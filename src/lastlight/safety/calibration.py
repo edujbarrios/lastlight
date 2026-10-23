@@ -216,7 +216,16 @@ def evaluate_answer_decision(
         return finish(False, "weak_absolute_evidence")
     if coverage < bounds.min_coverage or weighted < bounds.min_weighted_coverage + risk_offset:
         return finish(False, "insufficient_query_coverage")
-    if passage_coverage < bounds.min_passage_coverage + risk_offset:
+    # Explicit, locally pertinent time/quantity evidence provides a small
+    # type-aware support credit for balanced questions: temporal answers often
+    # use "4 hours" without repeating "power outage" from the question.
+    # This never bypasses the separate quantity/time sufficiency check, query
+    # coverage gate, risk gate, or conservative profile.
+    evidence_credit = (0.03 if profile == "balanced" and (
+        _TIME.search(normalize_text(query_text))
+        or _QUANTITY.search(normalize_text(query_text))
+    ) else 0.0)
+    if passage_coverage + evidence_credit < bounds.min_passage_coverage + risk_offset:
         return finish(False, "insufficient_passage_coverage")
     required_matches = min(bounds.min_discriminative_matches, len(terms))
     if discriminative < required_matches:
