@@ -153,7 +153,7 @@ print(result.decision.weighted_query_coverage, result.decision.evidence_sufficie
 
 The default is `balanced` for compatibility; `conservative` is an explicit stricter policy. In `adaptive` mode the retrieval backend remains resource-driven, while metadata records the selected backend and the independent decision profile. With BM25 as the selected backend, lexical is an optional verification signal, never a numerically mixed score. A negative answer is a refusal to assert a claim, not proof that it is false.
 
-## 0.3.0 candidate: structured evidence and hybrid retrieval
+## 0.3.0: structured evidence and hybrid retrieval
 
 ```python
 from lastlight import LastLight, CalibrationConfig, SectionConfig
@@ -184,5 +184,4 @@ fields on `SourceResult`. Hybrid `SourceResult.score` is a fusion score.
 For CLI use: `lastlight --strategy hybrid --decision-profile balanced
 --knowledge pack.zip "question"`.
 
-Important: the above additions are not published on PyPI until a separately
-authorized release is completed.
+The above additions are part of version 0.3.0.
