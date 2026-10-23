@@ -221,6 +221,14 @@ def evaluate_answer_decision(
     if discriminative < required_matches:
         return finish(False, "insufficient_discriminative_matches")
 
+    # Near-tied medium candidates matching only one original query concept
+    # remain ambiguous, even if passage vocabulary increases raw coverage.
+    # HIGH neighbours are also unsafe on a thin original rank signal.
+    original_rank_coverage = _coverage(terms, matched)
+    if (second is not None and ratio is not None and ratio < 1.15
+        and len(terms) >= 4 and original_rank_coverage < 0.25):
+        return finish(False, "weak_query_coverage_and_ambiguous_margin")
+
     ambiguous = second is not None and ratio is not None and ratio < (
         1.12 if strategy == "bm25" else 1.05
     )
