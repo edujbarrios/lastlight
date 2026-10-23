@@ -66,7 +66,7 @@ class PublicApiTests(unittest.TestCase):
         )
 
         self.assertIsInstance(explanation, QueryExplanation)
-        self.assertTrue(explanation.decision.accepted)
+        self.assertTrue(explanation.decision.accepted, (explanation.decision, explanation.sources[0].passage if explanation.sources else ''))
         self.assertIn(explanation.decision.confidence, {"HIGH", "MEDIUM"})
         self.assertEqual(
             explanation.sources[0].title,
