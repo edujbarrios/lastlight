@@ -22,6 +22,7 @@ _GENERIC = frozenset({
     "someone", "somebody", "please", "tell", "about", "has", "have", "does",
     "will", "stay", "long", "should", "would", "could", "help", "know",
     "information", "details", "guide", "emergency", "situation", "now",
+    "have", "that", "found", "looks", "should", "would", "supply", "down",
     "today", "currently", "latest", "right", "current", "available",
     "actualmente", "ahora", "hoy", "ultimo", "cuanto", "cuantos",
     "cuando", "quien", "quienes", "cual", "cuales", "what", "who",
@@ -82,7 +83,7 @@ class DecisionThresholds:
 # They are not learned from, or selected against, lastlight-bench.
 THRESHOLDS: dict[str, dict[str, DecisionThresholds]] = {
     "lexical": {
-        "balanced": DecisionThresholds(0.35, 0.20, 0.22, 0.25, 1),
+        "balanced": DecisionThresholds(0.35, 0.20, 0.22, 0.13, 1),
         "conservative": DecisionThresholds(0.50, 0.35, 0.45, 0.40, 2),
     },
     "bm25": {
@@ -156,9 +157,13 @@ def evaluate_answer_decision(
     documents = tuple(corpus) if corpus is not None else tuple(result.document for result in results)
     frequency = _document_frequency(documents)
     n = len(documents)
-    weighted = _weighted_coverage(terms, matched, frequency, n, query_text)
-    coverage = _coverage(terms, matched)
     passage_tokens = set(tokenize(winner.passage, keep_stopwords=True)) if winner else set()
+    # A ranker's matched_terms can omit inflectional/translated evidence that
+    # is genuinely present in the passage. Count that evidence without giving
+    # credit for title/tag-only terms.
+    evidence_tokens = set(matched) | passage_tokens
+    weighted = _weighted_coverage(terms, evidence_tokens, frequency, n, query_text)
+    coverage = _coverage(terms, evidence_tokens)
     passage_coverage = _weighted_coverage(terms, passage_tokens, frequency, n, query_text)
     discriminative = _discriminative_matches(terms, matched, passage_tokens, frequency, n, query_text)
     strength = _strength(winner.score, strategy) if winner else 0.0
@@ -269,9 +274,12 @@ def _term_hit(term: str, matched: set[str]) -> bool:
     # increasing the number of query concepts in the denominator.
     alternatives = (*QUERY_ALIASES.get(term, ()),
                     *(key for key, aliases in QUERY_ALIASES.items() if term in aliases))
-    return any(alias in matched for alias in alternatives) or (
-        (term.endswith("s") and term[:-1] in matched)
-        or (term.endswith("es") and term[:-2] in matched)
+    candidates = (term, *alternatives)
+    return any(
+        candidate in matched
+        or (candidate.endswith("s") and candidate[:-1] in matched)
+        or (candidate.endswith("es") and candidate[:-2] in matched)
+        for candidate in candidates
     )
 
 
