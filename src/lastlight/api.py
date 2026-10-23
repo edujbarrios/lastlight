@@ -237,7 +237,10 @@ class LastLight:
     def query(self, text: str, *, top_k: int = 3) -> QueryResult:
         """Return a stable, structured result suitable for UIs and integrations."""
 
-        results = self._search_internal(text, top_k=top_k)
+        # Decision-making always considers a runner-up for margin/ambiguity,
+        # even if callers request just one published source.
+        _validate_top_k(top_k)
+        results = self._search_internal(text, top_k=max(2, top_k))
         decision = self._app.decide(text, results)
         metadata = self._metadata(top_k)
         refusal_reason = self._refusal_reason(decision)
@@ -250,7 +253,7 @@ class LastLight:
             sources=tuple(
                 self._source_result(result, calibrated_score=(
                     decision.calibrated_score if index == 0 else None
-                )) for index, result in enumerate(results)
+                )) for index, result in enumerate(results[:top_k])
             ),
             retrieval=metadata,
             refusal_reason=refusal_reason,
