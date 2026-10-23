@@ -33,7 +33,7 @@ class ResultMetadataTests(unittest.TestCase):
         result = LastLight(EXAMPLE_PACK).query(
             "Someone is bleeding heavily from a deep cut. What should I do?"
         )
-        self.assertTrue(result.accepted)
+        self.assertTrue(result.accepted, result.decision)
         self.assertIsNone(result.refusal_reason)
 
     def test_adaptive_plan_exposes_active_resource_budget(self) -> None:
