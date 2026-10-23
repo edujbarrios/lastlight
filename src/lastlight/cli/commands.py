@@ -23,7 +23,14 @@ from .safety import (
 )
 from .session import LastLightSession
 from ..safety.decision import evaluate_answer_decision
+from ..shared.domain import SearchResult
 from ..safety.safety import safe_answer_for_result
+
+
+def _calibrated_decision(app: LastLightApp, query: str, results: list[SearchResult]):
+    # Preserve mocked CLI adapters while real callers use one decision policy.
+    return (app.decide(query, results) if isinstance(app, LastLightApp)
+            else evaluate_answer_decision(query, results))
 
 
 class InteractiveCommand:
@@ -88,15 +95,15 @@ class QueryCommand:
         else:
             print(answer)
         if self.fail_on_refusal:
-            decision = evaluate_answer_decision(
-                self.query, self.app.search(self.query, top_k=self.top_k)
+            decision = _calibrated_decision(
+                self.app, self.query, self.app.search(self.query, top_k=self.top_k)
             )
             return 0 if decision.accepted else 2
         return 0
 
     def _json_output(self) -> tuple[str, bool]:
         results = self.app.search(self.query, top_k=self.top_k)
-        decision = evaluate_answer_decision(self.query, results)
+        decision = _calibrated_decision(self.app, self.query, results)
         payload: dict[str, object] = {
             "query": self.query,
             "accepted": decision.accepted,
@@ -112,7 +119,7 @@ class QueryCommand:
 
     def _sources_output(self) -> tuple[str, bool]:
         results = self.app.search(self.query, top_k=self.top_k)
-        decision = evaluate_answer_decision(self.query, results)
+        decision = _calibrated_decision(self.app, self.query, results)
         if not results:
             return LOW_CONFIDENCE_RESPONSE, False
 
@@ -175,7 +182,7 @@ class BatchQueryCommand:
 
     def _record(self, query: str) -> dict[str, object]:
         results = self.app.search(query, top_k=self.top_k)
-        decision = evaluate_answer_decision(query, results)
+        decision = _calibrated_decision(self.app, query, results)
         return {
             "query": query,
             "accepted": decision.accepted,
@@ -214,7 +221,7 @@ class FieldGuideCommand:
         accepted_count = 0
         for query in queries:
             results = self.app.search(query, top_k=self.top_k)
-            decision = evaluate_answer_decision(query, results)
+            decision = _calibrated_decision(self.app, query, results)
             accepted_count += decision.accepted
             sections.extend([
                 f"## {query}", "",

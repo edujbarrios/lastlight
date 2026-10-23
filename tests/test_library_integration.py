@@ -24,7 +24,7 @@ class LibraryIntegrationTests(unittest.TestCase):
         result = engine.query(WATER_QUERY)
 
         self.assertIsInstance(result, QueryResult)
-        self.assertTrue(result.accepted)
+        self.assertTrue(result.accepted, result.decision)
         self.assertEqual(result.confidence, "HIGH")
         self.assertIn("rolling boil for 1 minute", result.passage or "")
         self.assertEqual(result.sources[0].title, "Safe water during an emergency")

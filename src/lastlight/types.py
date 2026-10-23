@@ -7,6 +7,7 @@ from typing import Literal
 
 RetrievalStrategyName = Literal["lexical", "bm25", "adaptive"]
 AdaptiveMode = Literal["survival", "balanced", "accuracy"]
+DecisionProfileName = Literal["balanced", "conservative"]
 RefusalReason = Literal["no_matching_knowledge", "insufficient_confidence"]
 
 
@@ -127,6 +128,10 @@ class RetrievalMetadata:
     battery_percent: float | None = None
     energy_budget_mwh: float | None = None
     memory_budget_mb: int | None = None
+    requested_strategy: str | None = None
+    decision_profile: str = "balanced"
+    verification_backend: str | None = None
+    verification_agreement: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -143,6 +148,15 @@ class DecisionMetadata:
     query_coverage: float
     query_terms: tuple[str, ...] = field(default_factory=tuple)
     matched_terms: tuple[str, ...] = field(default_factory=tuple)
+    strategy: str = "lexical"
+    profile: str = "balanced"
+    risk: str = "normal"
+    relevance_strength: float = 0.0
+    weighted_query_coverage: float = 0.0
+    passage_coverage: float = 0.0
+    discriminative_matches: int = 0
+    evidence_sufficient: bool = False
+    verification_agreement: bool | None = None
 
 
 @dataclass(frozen=True)

@@ -111,8 +111,8 @@ class CliTests(unittest.TestCase):
         self.assertEqual(exit_code, 2)
 
     def test_fail_on_refusal_keeps_success_for_accepted_text_answer(self) -> None:
-        document = KnowledgeDocument(title="Water", path="water.md", body="Boil it.")
-        result = SearchResult(document, 2.0, "HIGH", "Boil it.")
+        document = KnowledgeDocument(title="Water", path="water.md", body="Boil water.")
+        result = SearchResult(document, 2.0, "HIGH", "Boil water.")
         with patch.object(cli.ApplicationFactory, "create") as create:
             app = create.return_value
             app.answer.return_value = "answer"

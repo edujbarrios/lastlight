@@ -45,7 +45,7 @@ class PublicApiTests(unittest.TestCase):
         )
 
         self.assertIsInstance(result, QueryResult)
-        self.assertTrue(result.accepted)
+        self.assertTrue(result.accepted, result.decision)
         self.assertEqual(result.confidence, "HIGH")
         self.assertIn("rolling boil for 1 minute", result.passage or "")
         self.assertIsInstance(result.sources[0], SourceResult)
@@ -66,7 +66,7 @@ class PublicApiTests(unittest.TestCase):
         )
 
         self.assertIsInstance(explanation, QueryExplanation)
-        self.assertTrue(explanation.decision.accepted)
+        self.assertTrue(explanation.decision.accepted, (explanation.decision, explanation.sources[0].passage if explanation.sources else ''))
         self.assertIn(explanation.decision.confidence, {"HIGH", "MEDIUM"})
         self.assertEqual(
             explanation.sources[0].title,
@@ -152,6 +152,18 @@ class PublicApiTests(unittest.TestCase):
 
         self.assertEqual(plan.energy_budget_mwh, 1.0)
         self.assertEqual(plan.memory_budget_mb, 128)
+
+    def test_explicit_conservative_decision_profile_is_auditable(self) -> None:
+        engine = LastLight(EXAMPLE_PACK, strategy="bm25", decision_profile="conservative")
+        result = engine.query("How long will food stay cold during a power outage?")
+        self.assertEqual(result.retrieval.requested_strategy, "bm25")
+        self.assertEqual(result.retrieval.decision_profile, "conservative")
+        self.assertEqual(result.decision.profile, "conservative")
+        self.assertEqual(result.decision.strategy, "bm25")
+
+    def test_unknown_decision_profile_is_rejected(self) -> None:
+        with self.assertRaisesRegex(ConfigurationError, "decision profile"):
+            LastLight(EXAMPLE_PACK, strategy="bm25", decision_profile="custom")
 
     def test_unknown_strategy_is_rejected_instead_of_falling_back(self) -> None:
         with self.assertRaisesRegex(ConfigurationError, "unsupported retrieval strategy"):

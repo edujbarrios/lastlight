@@ -7,7 +7,7 @@ from .interfaces import KnowledgeRepository, RetrievalStrategy
 from .language import resolve_retrieval_language
 from .safety import safe_answer_for_result
 from .triage import append_follow_up_questions
-from ..safety.decision import evaluate_answer_decision
+from ..safety.decision import AnswerDecision, evaluate_answer_decision
 
 
 class LastLightApp:
@@ -16,10 +16,12 @@ class LastLightApp:
         repository: KnowledgeRepository,
         retrieval: RetrievalStrategy,
         language: str | None = None,
+        decision_profile: str = "balanced",
     ) -> None:
         self.repository = repository
         self.retrieval = retrieval
         self.language = language.casefold() if language else None
+        self.decision_profile = decision_profile
 
     def search(self, text: str, top_k: int = 3) -> list[SearchResult]:
         documents = self.repository.list_documents()
@@ -36,9 +38,22 @@ class LastLightApp:
             ]
         return self.retrieval.search(SearchQuery(text=text, top_k=top_k), documents)
 
+    def decide(self, text: str, results: list[SearchResult]) -> AnswerDecision:
+        metadata = self.retrieval_metadata() or {}
+        selected = str(metadata.get("strategy") or (
+            "bm25" if type(self.retrieval).__name__ == "BM25RetrievalStrategy" else "lexical"
+        ))
+        return evaluate_answer_decision(
+            text, results, strategy=selected, profile=self.decision_profile,
+            corpus=self.repository.list_documents(),
+            verification_agreement=(metadata.get("verification_agreement")
+                                    if isinstance(metadata.get("verification_agreement"), bool)
+                                    else None),
+        )
+
     def answer(self, text: str, top_k: int = 3) -> str:
         results = self.search(text, top_k=top_k)
-        decision = evaluate_answer_decision(text, results)
+        decision = self.decide(text, results)
         return append_follow_up_questions(
             safe_answer_for_result(decision.result, confidence=decision.confidence),
             decision.result,

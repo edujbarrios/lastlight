@@ -102,6 +102,27 @@ class AdaptiveRetrievalTests(unittest.TestCase):
     def test_risk_terms_do_not_match_inside_unrelated_words(self) -> None:
         self.assertEqual(classify_query_risk("navigation near Las Vegas"), "normal")
 
+    def test_bm25_adaptive_verification_records_separate_backend(self) -> None:
+        strategy = AdaptiveRetrievalStrategy(
+            AdaptiveRetrievalConfig(mode="accuracy"), profile()
+        )
+        documents = [
+            KnowledgeDocument(
+                title="Cobalt valve", path="invented/cobalt.md",
+                body="Disconnect the cobalt valve before maintenance.",
+            ),
+            KnowledgeDocument(
+                title="Quartz cell", path="invented/quartz.md",
+                body="Store a quartz cell in dry conditions.",
+            ),
+        ]
+        results = strategy.search(SearchQuery("cobalt valve maintenance"), documents)
+        metadata = strategy.decision_metadata() or {}
+        self.assertEqual(results[0].document.path, "invented/cobalt.md")
+        self.assertEqual(metadata["strategy"], "bm25")
+        self.assertEqual(metadata["verification_backend"], "lexical")
+        self.assertIs(metadata["verification_agreement"], True)
+
     def test_decision_metadata_is_isolated_per_thread(self) -> None:
         strategy = AdaptiveRetrievalStrategy(
             AdaptiveRetrievalConfig(mode="accuracy"),

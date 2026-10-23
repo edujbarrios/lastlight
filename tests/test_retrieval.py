@@ -235,6 +235,16 @@ class RetrievalTests(unittest.TestCase):
         self.assertEqual(results[0].document, guide)
         self.assertIn("distress transmission", results[0].passage)
 
+    def test_passage_skips_heading_and_citation_only_windows(self) -> None:
+        body = (
+            "# Cobalt valve repair\n\n"
+            "Disconnect the cobalt valve before opening the sealed housing.\n\n"
+            'Source: "Cobalt valve repair". https://invented.example/cobalt-valve-repair'
+        )
+        passage = select_passage(body, "cobalt valve repair")
+        self.assertIn("Disconnect the cobalt valve", passage)
+        self.assertNotIn("https://", passage)
+
     def test_select_passage_prefers_best_sentence_window(self) -> None:
         body = (
             "General preparation matters. Keep supplies organized.\n\n"
