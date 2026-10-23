@@ -38,7 +38,8 @@ class ApplicationFactory:
                     mode=mode,
                     energy_budget_mwh=energy_budget_mwh,
                     memory_budget_mb=memory_budget_mb,
-                )
+                ),
+                section_config=sections,
             )
         else:
             retrieval = LexicalRetrievalStrategy(section_config=sections)
