@@ -333,21 +333,38 @@ def _passage_sufficiency(query: str, passage: str) -> tuple[bool, str]:
     p = normalize_text(passage)
     if not p.strip():
         return False, "empty_passage"
-    if _QUANTITY.search(q) and not (_QUANTITY_EVIDENCE.search(p) or _NUMBER.search(p)):
+    # Numbers, dates and prohibitions in unrelated footnotes are not evidence.
+    concepts = [term for term in _query_terms(q)
+                if term not in _GENERIC | _NEGATIONS | _CONSTRAINTS]
+    sentences = re.split(r"(?<=[.!?])\s+|\n+", p)
+    pertinent = [sentence for sentence in sentences
+                 if not concepts or any(
+                     _term_hit(term, set(tokenize(sentence, keep_stopwords=True)))
+                     for term in concepts
+                 )]
+    if _QUANTITY.search(q) and not any(
+        _QUANTITY_EVIDENCE.search(s) or _NUMBER.search(s) for s in pertinent
+    ):
         return False, "missing_quantity_evidence"
-    if _TIME.search(q) and not (_TIME_EVIDENCE.search(p) or _NUMBER.search(p)):
+    if _TIME.search(q) and not any(
+        _TIME_EVIDENCE.search(s) or _NUMBER.search(s) for s in pertinent
+    ):
         return False, "missing_temporal_evidence"
-    if _IDENTITY.search(q) and not (
-        _ROLE_EVIDENCE.search(p) or re.search(r"\b[A-Z][a-z]+\s+[A-Z][a-z]+\b", passage)
+    if _IDENTITY.search(q) and not any(
+        _ROLE_EVIDENCE.search(s) or re.search(r"\b[A-Z][a-z]+\s+[A-Z][a-z]+\b", passage)
+        for s in pertinent
     ):
         return False, "missing_identity_evidence"
-    if any(token in _NEGATIONS for token in tokenize(q, keep_stopwords=True)):
-        if not any(token in set(tokenize(p, keep_stopwords=True)) for token in _NEGATIVE_EVIDENCE):
+    if any(t in _NEGATIONS | {"without", "sin"} for t in tokenize(q, keep_stopwords=True)):
+        if not any(
+            set(tokenize(s, keep_stopwords=True)).intersection(_NEGATIVE_EVIDENCE)
+            for s in pertinent
+        ):
             return False, "missing_negative_evidence"
     if _LIST.search(q) and not (
-        len(re.findall(r"[,;]", p)) >= 2
+        len(re.findall(r"[,;]", " ".join(pertinent))) >= 2
         or len(re.findall(r"(?:^|\n)\s*[-*0-9]+[.) -]", passage)) >= 2
-        or len(re.split(r"\b(?:and|or|y)\b", p)) >= 3
+        or len(re.split(r"\b(?:and|or|y)\b", " ".join(pertinent))) >= 3
     ):
         return False, "incomplete_list_evidence"
     return True, "passage_supported"
