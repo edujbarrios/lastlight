@@ -247,7 +247,11 @@ class LastLight:
             accepted=decision.accepted,
             confidence=decision.confidence,
             passage=decision.result.passage if decision.result else None,
-            sources=tuple(self._source_result(result) for result in results),
+            sources=tuple(
+                self._source_result(result, calibrated_score=(
+                    decision.calibrated_score if index == 0 else None
+                )) for index, result in enumerate(results)
+            ),
             retrieval=metadata,
             refusal_reason=refusal_reason,
             decision=public_decision,
@@ -353,6 +357,8 @@ class LastLight:
             decision_profile=self.decision_profile,
             verification_backend=(str(raw["verification_backend"]) if raw.get("verification_backend") else None),
             verification_agreement=(raw.get("verification_agreement") if isinstance(raw.get("verification_agreement"), bool) else None),
+            verification_candidates=(int(raw["verification_candidates"])
+                                     if raw.get("verification_candidates") is not None else None),
         )
 
     @staticmethod
@@ -392,7 +398,9 @@ class LastLight:
         return None
 
     @staticmethod
-    def _source_result(result: SearchResult) -> SourceResult:
+    def _source_result(
+        result: SearchResult, calibrated_score: float | None = None
+    ) -> SourceResult:
         document = result.document
         public_document = SourceDocument(
             title=document.title,
@@ -414,4 +422,5 @@ class LastLight:
             matched_terms=result.matched_terms,
             section=result.section,
             backend_scores=result.backend_scores,
+            calibrated_score=calibrated_score,
         )
