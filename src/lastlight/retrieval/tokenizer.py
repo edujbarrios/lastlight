@@ -9,7 +9,7 @@ ENGLISH_STOPWORDS = {
     "a", "an", "and", "are", "as", "at", "be", "by", "can", "do", "for", "from",
     "how", "i", "if", "in", "is", "it", "of", "on", "or", "the", "this", "to",
     "what", "when", "with", "you", "your", "after", "could", "during", "later",
-    "may", "might", "need", "should", "use", "while", "would",
+    "may", "might", "need", "not", "should", "use", "while", "without", "would",
 }
 
 SPANISH_STOPWORDS = {
