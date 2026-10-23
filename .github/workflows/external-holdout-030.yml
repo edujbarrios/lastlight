@@ -1,0 +1,73 @@
+name: external-holdout-030
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/external-holdout-030.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  untouched-external-benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build candidate wheel
+        run: |
+          python -m pip install build twine
+          python -m build
+          python -m twine check dist/*
+          python -m venv /tmp/lastlight-installed
+          /tmp/lastlight-installed/bin/python -m pip install --no-deps dist/*.whl
+          /tmp/lastlight-installed/bin/python - <<'PY'
+          from lastlight import LastLight, CalibrationConfig, SectionConfig
+          assert LastLight and CalibrationConfig and SectionConfig
+          PY
+      - name: Check out untouched external evaluation
+        shell: bash
+        run: |
+          git clone --depth 1 https://github.com/edujbarrios/lastlight-bench.git /tmp/lastlight-bench
+          git -C /tmp/lastlight-bench rev-parse HEAD
+          /tmp/lastlight-installed/bin/python -m pip install --no-deps /tmp/lastlight-bench
+          /tmp/lastlight-installed/bin/python -m pip show lastlight lastlight-bench
+      - name: Execute external suite against installed candidate wheel
+        shell: bash
+        run: |
+          /tmp/lastlight-installed/bin/lastlight-bench-suite --output /tmp/holdout-result.json
+          # Do not print or inspect case-level labels: report aggregate metrics only.
+          /tmp/lastlight-installed/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("/tmp/holdout-result.json").read_text(encoding="utf-8"))
+          print("Top-level report format:", sorted(report))
+          def aggregates(node, trail=()):
+              if isinstance(node, dict):
+                  selected = {k: v for k, v in node.items()
+                              if k in {"top_1_accuracy", "mrr", "answer_precision",
+                                       "answerable_recall", "refusal_recall", "false_accept_rate",
+                                       "mean_ms", "p95_ms", "peak_mib"}
+                              and isinstance(v, (int, float))}
+                  if selected:
+                      print("AGGREGATE", "/".join(map(str, trail)), selected)
+                  for key, value in node.items():
+                      if key not in {"cases", "queries", "results", "per_case", "case_results", "rows"}:
+                          aggregates(value, trail + (key,))
+              elif isinstance(node, list):
+                  for index, value in enumerate(node):
+                      if isinstance(value, dict) and len(node) <= 12:
+                          aggregates(value, trail + (index,))
+          aggregates(report)
+          PY
+      - name: Store full report (not calibration input)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: untouched-holdout-030
+          path: /tmp/holdout-result.json
+          retention-days: 14
