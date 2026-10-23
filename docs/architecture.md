@@ -12,7 +12,7 @@ lastlight/
 ├── cli/           # argument parsing and command handlers
 ├── evaluation/    # deterministic regression evaluation
 ├── knowledge/     # repositories, Markdown/ZIP packs, validation, provenance, index
-├── retrieval/     # tokenization, chunking, ranking, lexical/BM25/adaptive search
+├── retrieval/     # tokenization, chunking, ranking, lexical/BM25/hybrid/adaptive search
 ├── safety/        # confidence-aware answers and deterministic follow-up checks
 └── shared/        # domain models, protocols, compatibility and path utilities
 ```
