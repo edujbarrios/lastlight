@@ -99,6 +99,44 @@ class CalibrationV3Tests(unittest.TestCase):
             outputs.append(int(decision.accepted))
         self.assertEqual(outputs, sorted(outputs, reverse=True))
 
+    def test_invalid_nonfinite_and_boolean_calibration_is_rejected(self):
+        for value in (float("nan"), float("inf"), -float("inf"), True):
+            with self.subTest(value=value):
+                with self.assertRaises(ValueError):
+                    StrategyCalibration(value, .30, .28, .45)
+                with self.assertRaises(ValueError):
+                    StrategyCalibration(.4, .30, .28, .45, ambiguity_ratio=value)
+                with self.assertRaises(ValueError):
+                    CalibrationConfig(weight_strength=value)
+                with self.assertRaises(ValueError):
+                    CalibrationConfig(conservative_delta=value)
+
+    def test_invalid_retrieval_scores_never_produce_acceptance(self):
+        for value in (float("nan"), float("inf"), -float("inf"), 0.0, -2.0):
+            with self.subTest(score=value):
+                candidate = SearchResult(DOCS[0], value, "HIGH",
+                    "Quartz batteries require 12 volts.",
+                    matched_terms=("quartz", "batteries", "volts"))
+                decision = evaluate_calibrated_decision(
+                    "How many volts for quartz batteries?", [candidate],
+                    strategy="bm25", corpus=DOCS,
+                )
+                self.assertFalse(decision.accepted)
+                self.assertEqual(decision.refusal_code, "INSUFFICIENT_EVIDENCE")
+
+    def test_public_single_source_still_checks_runner_up(self):
+        from pathlib import Path
+        pack = Path(__file__).resolve().parents[1] / "examplepack" / "lastlight-example-en.zip"
+        engine = LastLight(pack, strategy="bm25")
+        query = "How long will food stay cold during an outage?"
+        single = engine.query(query, top_k=1)
+        multiple = engine.query(query, top_k=3)
+        self.assertEqual(len(single.sources), 1)
+        self.assertEqual(single.accepted, multiple.accepted)
+        self.assertIsNotNone(single.decision.score_margin)
+        self.assertEqual(single.decision.score_margin, multiple.decision.score_margin)
+        self.assertGreaterEqual(single.retrieval.effective_top_k, 2)
+
     def test_incompatible_or_invalid_calibration_is_rejected(self):
         with self.assertRaises(ValueError):
             StrategyCalibration(-0.2, .3, .4, .5)
