@@ -1,9 +1,8 @@
 name: external-holdout-030
 
+# The external holdout is an opt-in release verification, never a per-commit
+# calibration loop. It is maintained separately from core CI.
 on:
-  pull_request:
-    paths:
-      - ".github/workflows/external-holdout-030.yml"
   workflow_dispatch:
 
 permissions:
