@@ -79,7 +79,10 @@ The original manual GitHub Release publishing flow remains supported.
 
 ## Publishing a release
 
-The production publisher is `.github/workflows/release.yml`. It runs only when a GitHub Release is published.
+The production publisher is `.github/workflows/release.yml`. It can run on a
+published GitHub Release, or on a guarded main-branch squash commit containing
+`[publish-pypi]` and changing a release-relevant path. The guarded workflow
+uploads first, then creates its version tag and GitHub Release.
 
 1. Merge the version-change PR to `main` and wait for `core` CI to pass.
 2. Create a GitHub Release from that exact `main` commit.
