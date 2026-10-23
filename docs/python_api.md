@@ -37,7 +37,7 @@ else:
 
 ## Confidence-aware decisions
 
-LastLight 0.2 separates retrieval confidence from the final answer decision. The final decision combines the winner's strategy-specific confidence with query-term coverage and the score margin to the runner-up from the same retrieval execution.
+LastLight separates **document relevance** (retrieval confidence/score), **passage sufficiency**, **answer confidence** and **accept/refuse**. The score is never interpreted as a probability. Decision thresholds differ for lexical and BM25 and never compare cross-backend scores. See [decision calibration](decision_calibration.md) for the synthetic calibration cases and threshold table.
 
 ```python
 result = engine.query("How can I make collected water safer to drink?")
@@ -51,7 +51,7 @@ if decision is not None:
     print(decision.score_margin)
 ```
 
-The decision layer is deterministic. It does not compare numeric lexical scores with BM25 scores across different searches. A clear high-confidence winner remains `HIGH`; a near-tie between strong candidates can be downgraded to `MEDIUM`; and a weakly covered `MEDIUM` result with a nearly tied alternative can be refused as `insufficient_confidence`.
+The decision layer is deterministic: a `HIGH` ranked document or a large winner margin **does not automatically authorize an answer**. Calibrated acceptance additionally requires original-term and IDF-weighted coverage, discriminative terms present in the passage, request-type evidence, and appropriate treatment of risk and ambiguous neighbours.
 
 `search()` remains the raw ranked-source boundary and continues to expose the retrieval strategy's own score and confidence for each source.
 
@@ -141,3 +141,14 @@ The CLI uses the same public `LastLight` facade as other consumers. `python src/
 ## Distribution
 
 This document covers local package installation only. Publishing releases to PyPI is a separate release concern and is intentionally handled independently from the runtime/library architecture.
+
+## Select a decision policy
+
+```python
+engine = LastLight("examplepack/lastlight-example-en.zip", strategy="bm25", decision_profile="conservative")
+result = engine.query("How long will food stay cold during a power outage?")
+print(result.retrieval.strategy, result.retrieval.decision_profile)
+print(result.decision.weighted_query_coverage, result.decision.evidence_sufficient)
+```
+
+The default is `balanced` for compatibility; `conservative` is an explicit stricter policy. In `adaptive` mode the retrieval backend remains resource-driven, while metadata records the selected backend and the independent decision profile. With BM25 as the selected backend, lexical is an optional verification signal, never a numerically mixed score. A negative answer is a refusal to assert a claim, not proof that it is false.
