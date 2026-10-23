@@ -90,9 +90,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--strategy",
-        choices=("lexical", "bm25", "adaptive"),
+        choices=("lexical", "bm25", "hybrid", "adaptive"),
         default="lexical",
         help="retrieval strategy to use",
+    )
+    parser.add_argument(
+        "--decision-profile",
+        choices=("balanced", "conservative"),
+        default="balanced",
+        help="evidence acceptance policy",
     )
     parser.add_argument(
         "--mode",
@@ -250,6 +256,8 @@ def main(argv: list[str] | None = None) -> int:
             energy_budget_mwh=args.energy_budget_mwh,
             memory_budget_mb=args.memory_budget_mb,
         )
+    if args.decision_profile != "balanced":
+        factory_kwargs["decision_profile"] = args.decision_profile
     app = ApplicationFactory.create(**factory_kwargs)
 
     if args.plan:
