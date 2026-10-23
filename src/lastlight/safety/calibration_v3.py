@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from collections import Counter
+import math
 import re
 from typing import Sequence
 
@@ -33,9 +34,9 @@ class StrategyCalibration:
             "min_passage_coverage", "min_decision_score",
         ):
             value = getattr(self, name)
-            if isinstance(value, bool) or not 0.0 <= value <= 1.0:
+            if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0.0 <= value <= 1.0:
                 raise ValueError(f"{name} must be within [0, 1]")
-        if self.ambiguity_ratio < 1.0:
+        if isinstance(self.ambiguity_ratio, bool) or not isinstance(self.ambiguity_ratio, (int, float)) or not math.isfinite(self.ambiguity_ratio) or self.ambiguity_ratio < 1.0:
             raise ValueError("ambiguity_ratio must be >= 1")
 
 
@@ -64,13 +65,13 @@ class CalibrationConfig:
     weight_agreement: float = .05
 
     def __post_init__(self) -> None:
-        if not 0 <= self.conservative_delta <= .5:
+        if isinstance(self.conservative_delta, bool) or not isinstance(self.conservative_delta, (int, float)) or not math.isfinite(self.conservative_delta) or not 0 <= self.conservative_delta <= .5:
             raise ValueError("conservative_delta must be within [0, 0.5]")
         weights = (
             self.weight_strength, self.weight_coverage, self.weight_passage,
             self.weight_title, self.weight_agreement
         )
-        if any(w < 0 or w > 1 for w in weights) or abs(sum(weights) - 1) > 1e-8:
+        if any(isinstance(w, bool) or not isinstance(w, (int, float)) or not math.isfinite(w) or w < 0 or w > 1 for w in weights) or abs(sum(weights) - 1) > 1e-8:
             raise ValueError("calibration signal weights must be nonnegative and sum to 1")
 
 
@@ -146,6 +147,14 @@ def evaluate_calibrated_decision(
                        explanation="No local source matched this query.")
     winner = results[0]
     passage = winner.passage
+    if not math.isfinite(winner.score) or winner.score <= 0 or winner.confidence not in {"HIGH", "MEDIUM"}:
+        return replace(
+            previous, strategy=strategy, accepted=False, result=None,
+            confidence=None, reason="invalid_or_low_retrieval_score",
+            refusal_reason="insufficient_confidence",
+            refusal_code="INSUFFICIENT_EVIDENCE",
+            explanation="The candidate has no finite, positive, sufficiently confident retrieval score.",
+        )
     gate = legacy._unsupported_intent(query_text)
     if gate == "requires_authorized_or_private_evidence" and re.search(
         r"\b(certify|certified|certification|certificar|certificado|"
