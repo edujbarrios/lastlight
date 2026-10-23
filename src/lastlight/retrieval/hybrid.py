@@ -4,12 +4,24 @@ from __future__ import annotations
 
 from contextvars import ContextVar
 from dataclasses import replace
+import re
 from typing import Iterable
 
 from ..domain import KnowledgeDocument, SearchQuery, SearchResult
 from ..interfaces import RetrievalStrategy
 from .strategies import BM25RetrievalStrategy, LexicalRetrievalStrategy
 from .sections import SectionConfig
+from .tokenizer import tokenize
+
+
+def _passage_support(result: SearchResult, query: str) -> int:
+    """Select the more answer-bearing passage from duplicate backend hits."""
+    terms = set(tokenize(query))
+    passage = set(tokenize(result.passage))
+    overlap = len(terms & passage)
+    if re.search(r"\b(how many|how much|how long|cuanto|cuantos)\b", query.casefold()):
+        overlap += 2 if re.search(r"\b\d+(?:[.,]\d+)?\b", result.passage) else 0
+    return overlap
 
 
 def reciprocal_rank_fusion(
@@ -17,6 +29,7 @@ def reciprocal_rank_fusion(
     *,
     rank_constant: int = 60,
     limit: int = 3,
+    query_text: str = "",
 ) -> list[SearchResult]:
     """Fuse ordered lists by source identity, not by incompatible raw scores.
 
@@ -27,7 +40,7 @@ def reciprocal_rank_fusion(
     if rank_constant < 1 or limit < 1:
         raise ValueError("rank_constant and limit must be positive")
     votes: dict[tuple[str, str, str], float] = {}
-    representative: dict[tuple[str, str, str], tuple[int, SearchResult]] = {}
+    representative: dict[tuple[str, str, str], tuple[int, int, SearchResult]] = {}
     components: dict[tuple[str, str, str], list[tuple[str, float]]] = {}
     for index, results in enumerate(rankings):
         name = ("lexical", "bm25")[index] if index < 2 else f"backend_{index}"
@@ -40,12 +53,13 @@ def reciprocal_rank_fusion(
             votes[key] = votes.get(key, 0.0) + 1.0 / (rank_constant + rank)
             components.setdefault(key, []).append((name, result.score))
             old = representative.get(key)
-            if old is None or rank < old[0]:
-                representative[key] = (rank, result)
+            support = _passage_support(result, query_text)
+            if old is None or (support, -rank) > (old[0], -old[1]):
+                representative[key] = (support, rank, result)
     ordered = sorted(votes, key=lambda key: (-votes[key], key))
     output: list[SearchResult] = []
     for key in ordered[:limit]:
-        original = representative[key][1]
+        original = representative[key][2]
         corroborated = len(components[key]) >= 2
         output.append(replace(
             original,
@@ -81,7 +95,8 @@ class HybridRetrievalStrategy(RetrievalStrategy):
         lexical = self.lexical.search(effective, documents)
         bm25 = self.bm25.search(effective, documents)
         results = reciprocal_rank_fusion(
-            [lexical, bm25], rank_constant=self.rank_constant, limit=max(query.top_k, 1)
+            [lexical, bm25], rank_constant=self.rank_constant,
+            limit=max(query.top_k, 1), query_text=query.text
         )
         self._last.set({
             "strategy": "hybrid", "mode": "fixed",
