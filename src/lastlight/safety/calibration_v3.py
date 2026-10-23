@@ -8,6 +8,7 @@ The legacy evaluator remains available for integrations that import it.
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+from collections import Counter
 from typing import Sequence
 
 from ..retrieval.tokenizer import tokenize
@@ -86,7 +87,7 @@ def _focus_terms(query: str) -> tuple[str, ...]:
 
 
 def _fraction(terms: Sequence[str], tokens: set[str], corpus: Sequence[KnowledgeDocument],
-              query: str, frequency: object | None = None) -> float:
+              query: str, frequency: Counter[str] | None = None) -> float:
     if not terms:
         return 0.0
     return legacy._weighted_coverage(tuple(terms), tokens,
