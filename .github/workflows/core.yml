@@ -95,7 +95,7 @@ jobs:
           lexical = LastLight(pack, strategy="lexical").query(food)
           assert lexical.accepted and lexical.sources[0].title == "Food safety during a power outage"
           bm25 = LastLight(pack, strategy="bm25").query(food)
-          assert bm25.accepted and bm25.sources[0].title == "Food safety during a power outage"
+          assert bm25.accepted and bm25.sources[0].title == "Food safety during a power outage", bm25.decision
           explanation = LastLight(pack, strategy="bm25").explain(food)
           assert explanation.decision.accepted and explanation.decision.score is not None
           refusal = LastLight(pack).query("How do I repair a diesel engine that will not start?")
