@@ -99,6 +99,13 @@ class CalibrationV3Tests(unittest.TestCase):
         self.assertEqual(len(fused), 2)
         self.assertTrue(all(len(r.backend_scores) == 2 for r in fused))
 
+    def test_hybrid_prefers_fact_bearing_duplicate_passage(self):
+        a = SearchResult(DOCS[0], 8, "HIGH", "Quartz batteries are protected.", ("quartz",))
+        b = SearchResult(DOCS[0], 5, "HIGH", "Quartz batteries must use 12 volts.", ("quartz",))
+        output = reciprocal_rank_fusion([[a], [b]], query_text="How many volts for quartz batteries?")
+        self.assertEqual(len(output), 1)
+        self.assertIn("12 volts", output[0].passage)
+
     def test_hybrid_search_reports_components(self):
         results = HybridRetrievalStrategy().search(
             SearchQuery("quartz batteries stored", top_k=2), DOCS
