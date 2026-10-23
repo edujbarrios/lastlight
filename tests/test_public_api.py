@@ -45,7 +45,7 @@ class PublicApiTests(unittest.TestCase):
         )
 
         self.assertIsInstance(result, QueryResult)
-        self.assertTrue(result.accepted)
+        self.assertTrue(result.accepted, result.decision)
         self.assertEqual(result.confidence, "HIGH")
         self.assertIn("rolling boil for 1 minute", result.passage or "")
         self.assertIsInstance(result.sources[0], SourceResult)
