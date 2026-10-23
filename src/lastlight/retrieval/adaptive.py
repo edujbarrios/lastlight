@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from contextvars import ContextVar
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from pathlib import Path
 
 from ..compat import is_low_resource_target
@@ -72,6 +72,8 @@ class RetrievalDecision:
     battery_percent: float | None
     energy_budget_mwh: float | None
     memory_budget_mb: int | None
+    verification_backend: str | None = None
+    verification_agreement: bool | None = None
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -103,7 +105,16 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
         self.last_decision = decision
         effective_query = SearchQuery(query.text, decision.effective_top_k)
         strategy = {"lexical": self.lexical, "bm25": self.bm25}[decision.strategy]
-        return strategy.search(effective_query, documents)
+        results = strategy.search(effective_query, documents)
+        # Verification never changes ranking or numerically mixes score scales.
+        # Avoid extra work in low-resource/lexical paths.
+        if decision.strategy == "bm25" and results:
+            secondary = self.lexical.search(SearchQuery(query.text, 1), documents)
+            agreement = bool(secondary) and secondary[0].document.path == results[0].document.path
+            self.last_decision = replace(
+                decision, verification_backend="lexical", verification_agreement=agreement
+            )
+        return results
 
     def plan(self, query: SearchQuery) -> RetrievalDecision:
         risk = classify_query_risk(query.text)
