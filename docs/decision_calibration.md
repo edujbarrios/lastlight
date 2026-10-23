@@ -41,7 +41,7 @@ within the same backend**, never combined across backends.
 | bm25 | balanced | .44 | .40 | .52 | .30 | 2 |
 | bm25 | conservative | .55 | .50 | .65 | .45 | 2 |
 
-High-risk queries add +.03 and critical ones +.05 to weighted and passage
+In the balanced profile, explicitly pertinent temporal or quantity evidence may contribute a small +.03 credit to the passage-coverage gate after the independent sufficiency check; this never relaxes the conservative profile or risk rules.\n\nHigh-risk queries add +.03 and critical ones +.05 to weighted and passage
 coverage requirements. A near tie (ratio under 1.12 for BM25) requires very
 strong coverage or is refused. A clear margin is *not* sufficient on its own.
 With BM25 + lexical verification disagreement, confidence is downgraded, or
