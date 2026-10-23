@@ -98,7 +98,7 @@ Example post-release verification:
 ```bash
 python -m venv /tmp/lastlight-pypi
 /tmp/lastlight-pypi/bin/python -m pip install --upgrade pip
-/tmp/lastlight-pypi/bin/python -m pip install lastlight==0.1.0
+/tmp/lastlight-pypi/bin/python -m pip install lastlight==0.3.1
 /tmp/lastlight-pypi/bin/lastlight --help
 ```
 

@@ -1,6 +1,7 @@
 # LastLight
 
-[![PyPI version](https://img.shields.io/pypi/v/lastlight.svg)](https://pypi.org/project/lastlight/)
+[![PyPI version](https://img.shields.io/pypi/v/lastlight?label=PyPI%20release)](https://pypi.org/project/lastlight/)
+[![Latest GitHub release](https://img.shields.io/github/v/release/edujbarrios/lastlight?label=GitHub%20release)](https://github.com/edujbarrios/lastlight/releases/latest)
 [![Python versions](https://img.shields.io/pypi/pyversions/lastlight.svg)](https://pypi.org/project/lastlight/)
 
 **A stdlib-only Python library for low-power, offline retrieval in disaster and infrastructure-failure scenarios.**
@@ -13,10 +14,11 @@ No cloud API. No embeddings. No vector database. No telemetry. No runtime depend
 
 ## Install
 
-LastLight is published on [PyPI](https://pypi.org/project/lastlight/):
+The current stable release is **0.3.1**, available on [PyPI](https://pypi.org/project/lastlight/0.3.1/).
+The PyPI and GitHub badges above resolve dynamically to the latest release.
 
 ```bash
-python -m pip install lastlight
+python -m pip install --upgrade lastlight==0.3.1
 ```
 
 Python 3.10+ is supported.
@@ -82,10 +84,14 @@ Confidence: HIGH
 Source paths are **pack-relative and stable**: the same document keeps the same logical path whether the pack is a directory, a ZIP file, or the ZIP is renamed. Pack identity metadata (`pack_name`, `pack_version`, `pack_source`, and `pack_path`) is preserved consistently whether one pack or several packs are mounted. Once the package and knowledge pack are local, querying does not require a network connection.
 
 
-## 0.3.0: hybrid retrieval and configurable evidence calibration
+## 0.3.x: hybrid retrieval and configurable evidence calibration
 
-These features are included in LastLight 0.3.0. Install the latest published
-package with `python -m pip install --upgrade lastlight`.
+The hybrid retrieval and calibrated decision features introduced in LastLight
+0.3.0 remain supported in 0.3.1. This maintenance release also adds read-only
+external benchmark-v4 readiness checks and controlled version-comparison tooling
+in the source repository. The separate corpus-v4 results have not yet been
+reproduced, so 0.3.1 makes no new retrieval-performance claims.
+See the [0.3.1 release notes](docs/releases/0.3.1.md).
 
 ```python
 from lastlight import LastLight, CalibrationConfig, StrategyCalibration, SectionConfig

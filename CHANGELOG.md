@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.1] — 2026-10-23
+
+- Added read-only corpus-v4 benchmark identity and integrity checks.
+- Added a controlled, independent-process 0.2.2 versus 0.3.0 comparison runner and a separate false-rejection audit utility for use when the actual v4 data becomes available.
+- Added deterministic regression tests for benchmark identity, changed labels, and malformed answerability fields.
+- Documented the reproducibility blocker and proposed 0.4.0 research/release gates.
+- Updated the README with the latest-release badges for PyPI and GitHub and explicit 0.3.1 installation instructions.
+- No changes to retrieval, calibration, public runtime APIs, or the external benchmark repository; no 0.4.0 performance improvements are claimed.
+
+
 ## [0.3.0] — 2026-10-23
 
 - Added separate publicly configurable lexical, BM25 and hybrid evidence calibrators.

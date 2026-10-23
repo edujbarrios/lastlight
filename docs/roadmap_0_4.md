@@ -1,7 +1,7 @@
 # LastLight 0.4.0 research and release plan
 
-**Status: baseline preflight, not a release.** LastLight 0.3.0 remains the
-published library version. This preparatory branch changes no retrieval,
+**Status: baseline preflight, not a release.** LastLight 0.3.1 is the
+published maintenance version; LastLight 0.4.0 remains unreleased. This preparatory branch changes no retrieval,
 calibration, packaging version, corpus, benchmark labels, or benchmark metrics.
 
 ## Corpus-v4 provenance blocker
