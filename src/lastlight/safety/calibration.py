@@ -149,6 +149,10 @@ def evaluate_answer_decision(
     margin = winner.score - second.score if winner and second else None
     ratio = _score_ratio(winner.score, second_score) if winner else None
     matched = tuple(sorted(set(winner.matched_terms))) if winner else ()
+    # Third-party retrieval adapters may omit matched_terms. Derive a
+    # conservative fallback from *passage* tokens, never title-only matches.
+    if winner and not matched:
+        matched = tuple(sorted(set(tokenize(winner.passage, keep_stopwords=True))))
     documents = tuple(corpus) if corpus is not None else tuple(result.document for result in results)
     frequency = _document_frequency(documents)
     n = len(documents)
@@ -261,8 +265,10 @@ def _query_terms(query_text: str) -> tuple[str, ...]:
 def _term_hit(term: str, matched: set[str]) -> bool:
     if term in matched:
         return True
-    # Ranking normalization may match a translated alias or simple plural.
-    alternatives = QUERY_ALIASES.get(term, ())
+    # Match both directions of the built-in bilingual aliases, without
+    # increasing the number of query concepts in the denominator.
+    alternatives = (*QUERY_ALIASES.get(term, ()),
+                    *(key for key, aliases in QUERY_ALIASES.items() if term in aliases))
     return any(alias in matched for alias in alternatives) or (
         (term.endswith("s") and term[:-1] in matched)
         or (term.endswith("es") and term[:-2] in matched)
@@ -294,11 +300,10 @@ def _term_weight(term: str, df: Counter[str], n: int, query: str) -> float:
     elif len(term) >= 8 and term not in _GENERIC:
         weight *= 1.25
     # Mid-sentence capitalized entities and acronyms, without external NER.
-    if re.search(r"(?<!\A)\b" + re.escape(term) + r"\b", query, re.IGNORECASE):
-        raw = re.findall(r"\b[A-Za-z][A-Za-z0-9]*\b", query)
-        if any(normalize_text(token) == term and (token.isupper() or token[0].isupper())
-               for token in raw[1:]):
-            weight *= 1.5
+    raw = re.findall(r"\b[A-Za-z][A-Za-z0-9]*\b", query)
+    if any(normalize_text(token) == term and (token.isupper() or token[0].isupper())
+           for token in raw[1:]):
+        weight *= 1.5
     return weight
 
 
@@ -323,7 +328,8 @@ def _discriminative_matches(
         _term_hit(t, found) and _term_hit(t, passage)
         for t in terms
         if t not in _GENERIC and (
-            n < 2 or df.get(t, 0) < n or t in _CONSTRAINTS or t in _NEGATIONS
+            n < 2 or df.get(t, 0) < n or len(t) >= 5
+            or t in _CONSTRAINTS or t in _NEGATIONS
         )
     )
 
@@ -355,12 +361,18 @@ def _passage_sufficiency(query: str, passage: str) -> tuple[bool, str]:
         for s in pertinent
     ):
         return False, "missing_identity_evidence"
-    if any(t in _NEGATIONS | {"without", "sin"} for t in tokenize(q, keep_stopwords=True)):
-        if not any(
-            set(tokenize(s, keep_stopwords=True)).intersection(_NEGATIVE_EVIDENCE)
-            for s in pertinent
-        ):
-            return False, "missing_negative_evidence"
+    # A negative *constraint* (forbidden/without/never) demands explicit
+    # negative evidence. "I have no bottled water" is situational context,
+    # not a request for a prohibition to be proved.
+    negative_intent = bool(re.search(
+        r"\b(without|never|must not|should not|cannot|is it forbidden|"
+        r"sin|nunca|no se debe|esta prohibido|prohibido|no puedo)\b", q
+    ))
+    if negative_intent and not any(
+        set(tokenize(s, keep_stopwords=True)).intersection(_NEGATIVE_EVIDENCE)
+        for s in pertinent
+    ):
+        return False, "missing_negative_evidence"
     if _LIST.search(q) and not (
         len(re.findall(r"[,;]", " ".join(pertinent))) >= 2
         or len(re.findall(r"(?:^|\n)\s*[-*0-9]+[.) -]", passage)) >= 2
