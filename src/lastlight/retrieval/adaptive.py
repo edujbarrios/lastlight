@@ -18,6 +18,8 @@ CRITICAL_RISK_TERMS = frozenset(
         "bleeding", "hemorrhage", "unconscious", "not breathing", "chest pain",
         "poison", "overdose", "seizure", "stroke", "hemorragia", "inconsciente",
         "no respira", "dolor pecho", "veneno", "sobredosis", "convulsion", "ictus",
+        "password", "contrasena", "secret", "private data", "datos privados",
+        "certify", "certificar", "prescribe", "prescribir", "dosage", "dosis",
     }
 )
 
@@ -26,6 +28,9 @@ HIGH_RISK_TERMS = frozenset(
         "water", "purify", "contaminated", "fire", "smoke", "gas", "generator",
         "hypothermia", "heatstroke", "agua", "purificar", "contaminada", "fuego",
         "humo", "gas", "generador", "hipotermia", "golpe calor",
+        "now", "today", "currently", "latest", "right now", "inventory",
+        "stock", "availability", "future", "ahora", "hoy", "actualmente",
+        "inventario", "disponibilidad", "manana",
     }
 )
 
