@@ -16,6 +16,21 @@ RETRIEVAL_UNIT_OVERLAP_CHARS = 250
 
 
 @dataclass(frozen=True)
+class SectionConfig:
+    """Bounded deterministic chunks; short documents retain one-unit scoring."""
+
+    min_chars: int = SECTION_AWARE_MIN_CHARS
+    max_chars: int = RETRIEVAL_UNIT_MAX_CHARS
+    overlap_chars: int = RETRIEVAL_UNIT_OVERLAP_CHARS
+
+    def __post_init__(self) -> None:
+        if self.min_chars < 1 or self.max_chars < 100:
+            raise ValueError("min_chars must be positive and max_chars >= 100")
+        if not 0 <= self.overlap_chars < self.max_chars:
+            raise ValueError("overlap_chars must be in [0, max_chars)")
+
+
+@dataclass(frozen=True)
 class MarkdownSection:
     """One structurally meaningful Markdown section."""
 
@@ -84,7 +99,9 @@ def markdown_sections(text: str) -> list[MarkdownSection]:
     return sections
 
 
-def retrieval_units(documents: list[KnowledgeDocument]) -> list[RetrievalUnit]:
+def retrieval_units(
+    documents: list[KnowledgeDocument], config: SectionConfig | None = None
+) -> list[RetrievalUnit]:
     """Create bounded scoring units for sufficiently large documents.
 
     Small documents keep the exact legacy scoring representation. Long documents
@@ -95,7 +112,9 @@ def retrieval_units(documents: list[KnowledgeDocument]) -> list[RetrievalUnit]:
 
     units: list[RetrievalUnit] = []
     for source_index, document in enumerate(documents):
-        units.extend(document_retrieval_units(document, source_index=source_index))
+        units.extend(document_retrieval_units(
+            document, source_index=source_index, config=config,
+        ))
     return units
 
 
@@ -103,8 +122,10 @@ def document_retrieval_units(
     document: KnowledgeDocument,
     *,
     source_index: int = 0,
+    config: SectionConfig | None = None,
 ) -> list[RetrievalUnit]:
-    if len(document.body) < SECTION_AWARE_MIN_CHARS:
+    config = config or SectionConfig()
+    if len(document.body) < config.min_chars:
         return [_legacy_unit(document, source_index)]
 
     sections = markdown_sections(document.body)
@@ -116,8 +137,8 @@ def document_retrieval_units(
         title = _section_ranking_title(document.title, section.heading_path)
         for chunk in overlapping_chunks(
             section.body,
-            max_chars=RETRIEVAL_UNIT_MAX_CHARS,
-            overlap_chars=RETRIEVAL_UNIT_OVERLAP_CHARS,
+            max_chars=config.max_chars,
+            overlap_chars=config.overlap_chars,
         ):
             units.append(
                 RetrievalUnit(
