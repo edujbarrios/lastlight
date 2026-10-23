@@ -24,6 +24,9 @@ class SectionConfig:
     overlap_chars: int = RETRIEVAL_UNIT_OVERLAP_CHARS
 
     def __post_init__(self) -> None:
+        if any(isinstance(v, bool) or not isinstance(v, int)
+               for v in (self.min_chars, self.max_chars, self.overlap_chars)):
+            raise ValueError("section bounds must be integers")
         if self.min_chars < 1 or self.max_chars < 100:
             raise ValueError("min_chars must be positive and max_chars >= 100")
         if not 0 <= self.overlap_chars < self.max_chars:
