@@ -41,7 +41,7 @@ python src/main.py --strategy adaptive --mode balanced "organize a field kit"
 
 ### Accuracy
 
-Normal and high-risk queries may use BM25 when resources are not constrained. Critical-risk queries stay on lexical retrieval because the current safety policy intentionally favors the more conservative refusal profile.
+Normal and high-risk queries may use BM25 when resources are not constrained. In accuracy mode, BM25 retrieves two additional internal candidates and lexical independently verifies up to three ranked candidates before the public list is capped to `top_k`. This spends more CPU/memory on verification, not on stricter acceptance thresholds. Critical-risk queries stay on lexical retrieval because the safety policy favors the cheaper safety-first path.
 
 ```bash
 python src/main.py --strategy adaptive --mode accuracy "radio communication plan"
@@ -100,3 +100,5 @@ The planner applies constraints in this order:
 This makes every strategy choice reproducible from the printed metadata.
 
 Optional accelerated retrieval backends are intentionally outside the core runtime and can evolve in a companion project such as `lastlight-native` without changing this policy contract.
+
+Hybrid is also available explicitly with `strategy='hybrid'` or `--strategy hybrid`, using deterministic RRF. Adaptive remains a resource-driven selector rather than automatically running full hybrid retrieval on constrained devices. `verification_candidates` in planner metadata records extra candidate work for the accuracy mode.
