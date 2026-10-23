@@ -86,7 +86,7 @@ to the development suite are not evidence of benchmark improvement.
 
 Passage selection excludes heading-only windows if substantive text exists; headings may aid ranking but never substitute for answer-bearing evidence. Original backend token coverage also guards against weak near ties even when passage vocabulary is richer than matched_terms.
 
-## Candidate 0.3.0: independent V3 calibration (unreleased)
+## 0.3.0: independent V3 calibration
 
 The 0.2.2 thresholds above remain the legacy `THRESHOLDS` contract for direct
 users of `lastlight.safety.decision.evaluate_answer_decision()`; applications
