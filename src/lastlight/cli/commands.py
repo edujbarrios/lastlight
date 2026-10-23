@@ -24,13 +24,13 @@ from .safety import (
 from .session import LastLightSession
 from ..safety.decision import evaluate_answer_decision
 from ..shared.domain import SearchResult
+from ..safety.safety import safe_answer_for_result
 
 
 def _calibrated_decision(app: LastLightApp, query: str, results: list[SearchResult]):
     # Preserve mocked CLI adapters while real callers use one decision policy.
     return (app.decide(query, results) if isinstance(app, LastLightApp)
             else evaluate_answer_decision(query, results))
-from ..safety.safety import safe_answer_for_result
 
 
 class InteractiveCommand:
