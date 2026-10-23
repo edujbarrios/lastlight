@@ -57,7 +57,7 @@ class LastLightApp:
         )
 
     def answer(self, text: str, top_k: int = 3) -> str:
-        results = self.search(text, top_k=top_k)
+        results = self.search(text, top_k=max(2, top_k))
         decision = self.decide(text, results)
         return append_follow_up_questions(
             safe_answer_for_result(decision.result, confidence=decision.confidence),
