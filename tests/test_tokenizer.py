@@ -19,6 +19,11 @@ class TokenizerTests(unittest.TestCase):
         self.assertIn("battery", tokens)
         self.assertIn("phone", tokens)
 
+    def test_aliases_reach_regular_plural_variants(self) -> None:
+        tokens = expand_query_tokens(tokenize("baterias"))
+        self.assertIn("bateria", tokens)
+        self.assertIn("battery", tokens)
+
     def test_expands_scenario_aliases(self) -> None:
         tokens = expand_query_tokens(tokenize("burned cut containers percent stove"))
         self.assertIn("burns", tokens)
