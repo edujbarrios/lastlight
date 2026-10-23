@@ -79,6 +79,7 @@ class RetrievalDecision:
     memory_budget_mb: int | None
     verification_backend: str | None = None
     verification_agreement: bool | None = None
+    verification_candidates: int = 1
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -108,16 +109,24 @@ class AdaptiveRetrievalStrategy(RetrievalStrategy):
     def search(self, query: SearchQuery, documents: list[KnowledgeDocument]) -> list[SearchResult]:
         decision = self.plan(query)
         self.last_decision = decision
-        effective_query = SearchQuery(query.text, decision.effective_top_k)
+        # Accuracy spends additional retrieval work on independent candidates
+        # while preserving the public top_k, resource budgets and primary backend.
+        depth = decision.effective_top_k + 2 if (
+            decision.strategy == "bm25" and self.config.mode == "accuracy"
+        ) else decision.effective_top_k
+        effective_query = SearchQuery(query.text, depth)
         strategy = {"lexical": self.lexical, "bm25": self.bm25}[decision.strategy]
-        results = strategy.search(effective_query, documents)
+        candidates = strategy.search(effective_query, documents)
+        results = candidates[:decision.effective_top_k]
         # Verification never changes ranking or numerically mixes score scales.
         # Avoid extra work in low-resource/lexical paths.
         if decision.strategy == "bm25" and results:
-            secondary = self.lexical.search(SearchQuery(query.text, 1), documents)
+            verify_k = 3 if self.config.mode == "accuracy" else 1
+            secondary = self.lexical.search(SearchQuery(query.text, verify_k), documents)
             agreement = bool(secondary) and secondary[0].document.path == results[0].document.path
             self.last_decision = replace(
-                decision, verification_backend="lexical", verification_agreement=agreement
+                decision, verification_backend="lexical", verification_agreement=agreement,
+                verification_candidates=verify_k,
             )
         return results
 
